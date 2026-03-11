@@ -1,0 +1,500 @@
+<!-- ============================================ -->
+<!-- Modal: Add Property -->
+<!-- ============================================ -->
+<div id="addPropertyModal" class="modal-overlay">
+    <div class="modal-container">
+        <div class="modal-header">
+            <div class="modal-header-title">
+                <div class="modal-header-title-icon">
+                    <i class="fa-solid fa-plus"></i>
+                </div>
+                <h3>Add New Property</h3>
+            </div>
+            <button class="modal-close-btn" onclick="closeAddPropertyModal()">
+                <i class="fa-solid fa-xmark"></i>
+            </button>
+        </div>
+        <form id="addPropertyForm" class="modal-body" onsubmit="event.preventDefault();">
+            <div class="modal-form-grid">
+                <!-- Row 1 -->
+                <div class="form-group">
+                    <label>Property Address <span class="required">*</span></label>
+                    <input type="text" class="form-control" placeholder="Enter Property Address" required>
+                </div>
+                <div class="form-group">
+                    <label>Property Type <span class="required">*</span></label>
+                    <select class="form-control" required>
+                        <option value="">Select Property Type</option>
+                        <option value="flat">Flat</option>
+                        <option value="house">House</option>
+                        <option value="apartment">Apartment</option>
+                        <option value="bungalow">Bungalow</option>
+                    </select>
+                </div>
+                <div class="form-group">
+                    <label>Property Status <span class="required">*</span></label>
+                    <select class="form-control" required>
+                        <option value="">Select Property Status</option>
+                        <option value="available">Available</option>
+                        <option value="occupied">Occupied</option>
+                        <option value="maintenance">Under Maintenance</option>
+                    </select>
+                </div>
+                <!-- Row 2 -->
+                <div class="form-group">
+                    <label>Rent Price <span class="required">*</span></label>
+                    <input type="number" class="form-control" placeholder="Enter Rent Amount" required>
+                </div>
+                <div class="form-group">
+                    <label>Landlord <span class="required">*</span></label>
+                    <select class="form-control" required>
+                        <option value="">Select Landlord</option>
+                        <option value="1">John Smith</option>
+                        <option value="2">Jane Doe</option>
+                    </select>
+                </div>
+                <div class="form-group">
+                    <label>Tenant</label>
+                    <input type="text" class="form-control" placeholder="Search for Tenant Name (Optional)">
+                </div>
+                <!-- Row 3 -->
+                <div class="form-group">
+                    <label>Gas Certificate Date <span class="required">*</span></label>
+                    <input type="date" class="form-control" required>
+                </div>
+                <div class="form-group">
+                    <label>EPC Due Date <span class="required">*</span></label>
+                    <input type="date" class="form-control" required>
+                </div>
+                <div class="form-group">
+                    <label>Electric Certificate Date <span class="required">*</span></label>
+                    <input type="date" class="form-control" required>
+                </div>
+            </div>
+        </form>
+        <div class="modal-footer">
+            <button type="button" class="modal-btn modal-btn-reset" onclick="resetAddPropertyForm()">
+                <i class="fa-solid fa-xmark"></i> Reset
+            </button>
+            <button type="button" class="modal-btn modal-btn-save" onclick="saveProperty()">
+                <i class="fa-solid fa-plus"></i> Add 
+            </button>
+        </div>
+    </div>
+</div>
+
+<!-- ============================================ -->
+<!-- Modal: Add Landlord -->
+<!-- ============================================ -->
+<div id="addLandlordModal" class="modal-overlay">
+    <div class="modal-container">
+        <div class="modal-header">
+            <div class="modal-header-title">
+                <div class="modal-header-title-icon">
+                    <i class="fa-solid fa-plus"></i>
+                </div>
+                <h3>Add New Landlord</h3>
+            </div>
+            <button class="modal-close-btn" onclick="closeAddLandlordModal()">
+                <i class="fa-solid fa-xmark"></i>
+            </button>
+        </div>
+        <form id="addLandlordForm" class="modal-body" onsubmit="event.preventDefault();">
+            <div class="modal-form-grid">
+                <div class="form-group">
+                    <label>Full Name <span class="required">*</span></label>
+                    <input type="text" class="form-control" placeholder="Enter Landlord's Full Name" required>
+                </div>
+                <div class="form-group">
+                    <label>Phone <span class="required">*</span></label>
+                    <input type="tel" class="form-control" placeholder="Enter Landlord's Phone Number" required>
+                </div>
+                <div class="form-group">
+                    <label>Email <span class="required">*</span></label>
+                    <input type="email" class="form-control" placeholder="Enter Landlord's Email" required>
+                </div>
+                <div class="form-group">
+                    <label>Address <span class="required">*</span></label>
+                    <input type="text" class="form-control" placeholder="Enter Landlord's Address" required>
+                </div>
+                <div class="form-group">
+                    <label>ID Type <span class="required">*</span></label>
+                    <select class="form-control" required>
+                        <option value="">Select Landlord's ID Type</option>
+                        <option value="passport">Passport</option>
+                        <option value="driving_license">Driving License</option>
+                        <option value="national_id">National ID</option>
+                    </select>
+                </div>
+                <div class="form-group">
+                    <label>ID Number <span class="required">*</span></label>
+                    <input type="text" class="form-control" placeholder="Enter Landlord's ID Number" required>
+                </div>
+                <div class="form-group">
+                    <label>ID Expiry Date <span class="required">*</span></label>
+                    <input type="date" class="form-control" required>
+                </div>
+                <div class="form-group">
+                    <label>Preferred Contact Method <span class="required">*</span></label>
+                    <select class="form-control" pl required>
+                        <option value="">Select Contact Method</option>
+                        <option value="phone">Phone</option>
+                        <option value="email">Email</option>
+                        <option value="whatsapp">WhatsApp</option>
+                    </select>
+                </div>
+                <div class="form-group">
+                    <label>Upload Files <span class="required">*</span></label>
+                    <input type="file" id="landlordFileInput" class="file-input" multiple accept=".pdf,.doc,.docx,.png,.jpg,.jpeg" onchange="handleFiles('landlord', this.files)">
+                    <div class="file-upload-group" onclick="document.getElementById('landlordFileInput').click()">
+                        <i class="fa-solid fa-cloud-arrow-up"></i>
+                        <p>Upload ID Document & other files</p>
+                    </div>
+                    <div id="landlordFileCount" class="file-count"></div>
+                    <div id="landlordFileList"></div>
+                </div>
+            </div>
+        </form>
+        <div class="modal-footer">
+            <button type="button" class="modal-btn modal-btn-reset" onclick="resetAddLandlordForm()">
+                <i class="fa-solid fa-xmark"></i> Reset
+            </button>
+            <button type="button" class="modal-btn modal-btn-save" onclick="saveLandlord()">
+                <i class="fa-solid fa-plus"></i> Add
+            </button>
+        </div>
+    </div>
+</div>
+
+<!-- ============================================ -->
+<!-- Modal: Add Tenant -->
+<!-- ============================================ -->
+<div id="addTenantModal" class="modal-overlay">
+    <div class="modal-container">
+        <div class="modal-header">
+            <div class="modal-header-title">
+                <div class="modal-header-title-icon">
+                    <i class="fa-solid fa-plus"></i>
+                </div>
+                <h3>Add New Tenant</h3>
+            </div>
+            <button class="modal-close-btn" onclick="closeAddTenantModal()">
+                <i class="fa-solid fa-xmark"></i>
+            </button>
+        </div>
+        <form id="addTenantForm" class="modal-body" onsubmit="event.preventDefault();">
+            <div class="modal-form-grid">
+                <div class="form-group">
+                    <label>Full Name <span class="required">*</span></label>
+                    <input type="text" class="form-control" placeholder="Enter Tenant's Full Name" required>
+                </div>
+                <div class="form-group">
+                    <label>Phone <span class="required">*</span></label>
+                    <input type="tel" class="form-control" placeholder="Enter Tenant's Phone Number" required>
+                </div>
+                <div class="form-group">
+                    <label>Email <span class="required">*</span></label>
+                    <input type="email" class="form-control" placeholder="Enter Tenant's Email" required>
+                </div>
+                <div class="form-group">
+                    <label>ID Number <span class="required">*</span></label>
+                    <input type="text" class="form-control" placeholder="Enter Tenant's ID Number" required>
+                </div>
+                <div class="form-group">
+                    <label>Address <span class="required">*</span></label>
+                    <input type="text" class="form-control" placeholder="Enter Tenant's Address" required>
+                </div>
+                <div class="form-group">
+                    <label>ID Type <span class="required">*</span></label>
+                    <select class="form-control" required>
+                        <option value="">Select Tenant's ID Type</option>
+                        <option value="passport">Passport</option>
+                        <option value="driving_license">Driving License</option>
+                        <option value="national_id">National ID</option>
+                    </select>
+                </div>
+                <div class="form-group">
+                    <label>ID Expiry Date <span class="required">*</span></label>
+                    <input type="date" class="form-control" required>
+                </div>
+                <div class="form-group">
+                    <label>Preferred Contact Method <span class="required">*</span></label>
+                    <select class="form-control" required>
+                        <option value="">Select Contact Method</option>
+                        <option value="phone">Phone</option>
+                        <option value="email">Email</option>
+                        <option value="whatsapp">WhatsApp</option>
+                    </select>
+                </div>
+                <div class="form-group">
+                    <label>Upload Files <span class="required">*</span></label>
+                    <input type="file" id="tenantFileInput" class="file-input" multiple accept=".pdf" onchange="handleFiles('tenant', this.files)">
+                    <div class="file-upload-group" onclick="document.getElementById('tenantFileInput').click()">
+                        <i class="fa-solid fa-cloud-arrow-up"></i>
+                        <p>Upload ID Document & other files</p>
+                    </div>
+                    <div id="tenantFileCount" class="file-count"></div>
+                    <div id="tenantFileList"></div>
+                </div>
+            </div>
+        </form>
+        <div class="modal-footer">
+            <button type="button" class="modal-btn modal-btn-reset" onclick="resetAddTenantForm()">
+                <i class="fa-solid fa-xmark"></i> Reset
+            </button>
+            <button type="button" class="modal-btn modal-btn-save" onclick="saveTenant()">
+                <i class="fa-solid fa-plus"></i> Add
+            </button>
+        </div>
+    </div>
+</div>
+
+<!-- ============================================ -->
+<!-- Modal: Book Viewing -->
+<!-- ============================================ -->
+<div id="bookViewingModal" class="modal-overlay">
+    <div class="modal-container">
+        <div class="modal-header">
+            <div class="modal-header-title">
+                <div class="modal-header-title-icon">
+                    <i class="fa-solid fa-plus"></i>
+                </div>
+                <h3>Book New Viewing</h3>
+            </div>
+            <button class="modal-close-btn" onclick="closeBookViewingModal()">
+                <i class="fa-solid fa-xmark"></i>
+            </button>
+        </div>
+        <form id="bookViewingForm" class="modal-body" onsubmit="event.preventDefault();">
+            <div class="modal-form-grid">
+                <div class="form-group">
+                    <label>Full Name <span class="required">*</span></label>
+                    <input type="text" class="form-control" placeholder="Enter Viewer Full Name" required>
+                </div>
+                <div class="form-group">
+                    <label>Phone <span class="required">*</span></label>
+                    <input type="tel" class="form-control" placeholder="Enter Viewer's Phone Number" required>
+                </div>
+                <div class="form-group">
+                    <label>Email <span class="required">*</span></label>
+                    <input type="email" class="form-control" placeholder="Enter Viewer's Email" required>
+                </div>
+                <div class="form-group">
+                    <label>Address <span class="required">*</span></label>
+                    <input type="text" class="form-control" placeholder="Enter Viewer Address" required>
+                </div>
+                <div class="form-group">
+                    <label>Preferred Contact Method <span class="required">*</span></label>
+                    <select class="form-control" required>
+                        <option value="">Select Contact Method</option>
+                        <option value="phone">Phone</option>
+                        <option value="email">Email</option>
+                        <option value="whatsapp">WhatsApp</option>
+                    </select>
+                </div>
+                <div class="form-group">
+                    <label>Property <span class="required">*</span></label>
+                    <select class="form-control" required>
+                        <option value="">Select Property</option>
+                        <option value="1">123 Main Street</option>
+                        <option value="2">456 Oak Avenue</option>
+                    </select>
+                </div>
+                <div class="form-group">
+                    <label>Viewing Date <span class="required">*</span></label>
+                    <input type="date" class="form-control" required>
+                </div>
+                <div class="form-group">
+                    <label>Viewing Time <span class="required">*</span></label>
+                    <input type="time" class="form-control" placeholder="Enter Viewing Time" required>
+                </div>
+                <div class="form-group">
+                    <label>Agent <span class="required">*</span></label>
+                    <select class="form-control" required>
+                        <option value="">Select Agent</option>
+                        <option value="1">Agent Smith</option>
+                        <option value="2">Agent Johnson</option>
+                    </select>
+                </div>
+            </div>
+        </form>
+        <div class="modal-footer">
+            <button type="button" class="modal-btn modal-btn-reset" onclick="resetBookViewingForm()">
+                <i class="fa-solid fa-xmark"></i> Reset
+            </button>
+            <button type="button" class="modal-btn modal-btn-save" onclick="saveViewing()">
+                <i class="fa-solid fa-plus"></i> Add
+            </button>
+        </div>
+    </div>
+</div>
+
+<!-- ============================================ -->
+<!-- Modal: Add Payment -->
+<!-- ============================================ -->
+<div id="addPaymentModal" class="modal-overlay">
+    <div class="modal-container">
+        <div class="modal-header">
+            <div class="modal-header-title">
+                <div class="modal-header-title-icon">
+                    <i class="fa-solid fa-plus"></i>
+                </div>
+                <h3>Add New Payment</h3>
+            </div>
+            <button class="modal-close-btn" onclick="closeAddPaymentModal()">
+                <i class="fa-solid fa-xmark"></i>
+            </button>
+        </div>
+        <form id="addPaymentForm" class="modal-body" onsubmit="event.preventDefault();">
+            <div class="modal-form-grid">
+                <div class="form-group">
+                    <label>Tenant <span class="required">*</span></label>
+                    <input type="text" class="form-control" placeholder="Search for Tenant's Name" required>
+                </div>
+                <div class="form-group">
+                    <label>Property <span class="required">*</span></label>
+                    <select class="form-control" required>
+                        <option value="">Select Property</option>
+                        <option value="1">123 Main Street</option>
+                        <option value="2">456 Oak Avenue</option>
+                    </select>
+                </div>
+                <div class="form-group">
+                    <label>Amount <span class="required">*</span></label>
+                    <input type="number" class="form-control" placeholder="Enter Rent Amount Received" required>
+                </div>
+                <div class="form-group">
+                    <label>Period Covered <span class="required">*</span></label>
+                    <input type="text" class="form-control" placeholder="Enter Period Covered: Mar - Apr 2025" required>
+                </div>
+                <div class="form-group">
+                    <label>Payment Method <span class="required">*</span></label>
+                    <select class="form-control" required>
+                        <option value="">Select Payment Method</option>
+                        <option value="bank_transfer">Bank Transfer</option>
+                        <option value="cash">Cash</option>
+                        <option value="card">Card Payment</option>
+                        <option value="cheque">Cheque</option>
+                    </select>
+                </div>
+                <div class="form-group">
+                    <label>Payment Date <span class="required">*</span></label>
+                    <input type="date" class="form-control" required>
+                </div>
+                <div class="form-group">
+                    <label>Payment Time <span class="required">*</span></label>
+                    <input type="time" class="form-control" placeholder="Enter Payment Time" required>
+                </div>
+                <div class="form-group">
+                    <label>Upload Files <span class="required">*</span></label>
+                    <input type="file" id="paymentFileInput" class="file-input" multiple accept=".pdf" onchange="handleFiles('payment', this.files)">
+                    <div class="file-upload-group" onclick="document.getElementById('paymentFileInput').click()">
+                        <i class="fa-solid fa-cloud-arrow-up"></i>
+                        <p>Upload Payment Proof & other files</p>
+                    </div>
+                    <div id="paymentFileCount" class="file-count"></div>
+                    <div id="paymentFileList"></div>
+                </div>
+            </div>
+        </form>
+        <div class="modal-footer">
+            <button type="button" class="modal-btn modal-btn-reset" onclick="resetAddPaymentForm()">
+                <i class="fa-solid fa-xmark"></i> Reset
+            </button>
+            <button type="button" class="modal-btn modal-btn-save" onclick="savePayment()">
+                <i class="fa-solid fa-plus"></i> Add
+            </button>
+        </div>
+    </div>
+</div>
+
+<!-- ============================================ -->
+<!-- Modal: Add Contract -->
+<!-- ============================================ -->
+<div id="addContractModal" class="modal-overlay">
+    <div class="modal-container">
+        <div class="modal-header">
+            <div class="modal-header-title">
+                <div class="modal-header-title-icon">
+                    <i class="fa-solid fa-plus"></i>
+                </div>
+                <h3>Add New Contract</h3>
+            </div>
+            <button class="modal-close-btn" onclick="closeAddContractModal()">
+                <i class="fa-solid fa-xmark"></i>
+            </button>
+        </div>
+        <form id="addContractForm" class="modal-body" onsubmit="event.preventDefault();">
+            <div class="modal-form-grid">
+                <div class="form-group">
+                    <label>Property Address <span class="required">*</span></label>
+                    <select class="form-control" required>
+                        <option value="">Select Property</option>
+                        <option value="1">123 Main Street</option>
+                        <option value="2">456 Oak Avenue</option>
+                    </select>
+                </div>
+                <div class="form-group">
+                    <label>Landlord <span class="required">*</span></label>
+                    <select class="form-control" required>
+                        <option value="">Select Landlord</option>
+                        <option value="1">John Smith</option>
+                        <option value="2">Jane Doe</option>
+                    </select>
+                </div>
+                <div class="form-group">
+                    <label>Tenant <span class="required">*</span></label>
+                    <select class="form-control" required>
+                        <option value="">Select Tenant</option>
+                        <option value="1">Mike Johnson</option>
+                        <option value="2">Sarah Williams</option>
+                    </select>
+                </div>
+                <div class="form-group">
+                    <label>Rent Price</label>
+                    <input type="text" class="form-control" placeholder="Rent Amount will be shown here" readonly>
+                </div>
+                <div class="form-group">
+                    <label>Payment Frequency <span class="required">*</span></label>
+                    <select class="form-control" required>
+                        <option value="">Select Payment Frequency</option>
+                        <option value="weekly">Weekly</option>
+                        <option value="monthly">Monthly</option>
+                        <option value="quarterly">Quarterly</option>
+                    </select>
+                </div>
+                <div class="form-group">
+                    <label>Payment Day <span class="required">*</span></label>
+                    <input type="number" class="form-control" placeholder="Enter Payment Day" required>
+                </div>
+                <div class="form-group">
+                    <label>Contract Start Date <span class="required">*</span></label>
+                    <input type="date" class="form-control" required>
+                </div>
+                <div class="form-group">
+                    <label>Contract End Date <span class="required">*</span></label>
+                    <input type="date" class="form-control" required>
+                </div>
+                <div class="form-group">
+                    <label>Upload Files <span class="required">*</span></label>
+                    <input type="file" id="contractFileInput" class="file-input" multiple accept=".pdf" onchange="handleFiles('contract', this.files)">
+                    <div class="file-upload-group" onclick="document.getElementById('contractFileInput').click()">
+                        <i class="fa-solid fa-cloud-arrow-up"></i>
+                        <p>Upload Contract & other files</p>
+                    </div>
+                    <div id="contractFileCount" class="file-count"></div>
+                    <div id="contractFileList"></div>
+                </div>
+            </div>
+        </form>
+        <div class="modal-footer">
+            <button type="button" class="modal-btn modal-btn-reset" onclick="resetAddContractForm()">
+                <i class="fa-solid fa-xmark"></i> Reset
+            </button>
+            <button type="button" class="modal-btn modal-btn-save" onclick="saveContract()">
+                <i class="fa-solid fa-plus"></i> Create
+            </button>
+        </div>
+    </div>
+</div>
+
