@@ -5,17 +5,19 @@ html, body {
     overflow-x: hidden;
 }
 
-body {
-    font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
-    background: #f7fafc;
-    color: #2d3748;
-    min-height: 100vh;
-}
-
 * {
+    box-sizing: border-box;
     margin: 0;
     padding: 0;
-    box-sizing: border-box;
+}
+
+body {
+    font-family: 'DM Sans', sans-serif;
+    background: #dce8f5;
+    height: 100vh;
+    display: flex;
+    align-items: center;
+    justify-content: center;
 }
 
 /* Navbar Container */
@@ -954,20 +956,68 @@ input.form-control[type="time"] {
 }
 
 /*Login Page*/
-.container {
-    flex: 1;
-    display: flex;
-    justify-content: center;
-    align-items: flex-start;
-    margin-top: 250px;
+.login-card {
+    background: white;
+    width: 400px;
+    padding: 45px;
+    border-radius: 25px;
+    box-shadow: 0 20px 40px rgba(0,0,0,0.1);
+    text-align: center;
 }
 
-.login-form{
-    background: rgba(255, 255, 255, 0.9);
-    padding: 40px;
+
+
+.logo-section i {
+    font-size: 40px;
+    color: #2d4a7a;
+    margin-bottom: 15px;
+}
+
+
+
+.login-card h2 {
+    font-size: 28px;
+    margin-bottom: 35px;
+}
+
+
+
+.input-group {
+    text-align: left;
+    margin-bottom: 20px;
+}
+
+.input-group label {
+    font-size: 14px;
+    font-weight: 600;
+}
+
+
+
+.input-group input {
+    width: 100%;
+    padding: 12px;
+    border: 1px solid #ccc;
     border-radius: 10px;
-    width: 360px;
-    
+    margin-top: 6px;
+}
+
+
+
+.login-btn {
+    width: 100%;
+    padding: 13px;
+    margin-top: 15px;
+    border: none;
+    background: #2d4a7a;
+    color: white;
+    font-weight: bold;
+    border-radius: 10px;
+    cursor: pointer;
+}
+
+.login-btn:hover {
+    background: #1e3560;
 }
 
 /* Responsive Modal */
