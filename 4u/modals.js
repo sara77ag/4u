@@ -146,16 +146,41 @@ function resetBookViewingForm() { resetForm('viewing'); }
 function resetAddPaymentForm() { resetForm('payment'); }
 function resetAddContractForm() { resetForm('contract'); }
 
-/*
-// Initialize - Close modal on outside click
-document.addEventListener('DOMContentLoaded', function() {
-    document.querySelectorAll('.modal-overlay').forEach(function(overlay) {
-        overlay.addEventListener('click', function(e) {
-            if (e.target === overlay) {
-                overlay.classList.remove('active');
-                document.body.style.overflow = 'auto';
+
+        let currentSort = {
+            column: null,
+            direction: 'asc'
+        };
+
+        // Toggle Filter Panel
+        function toggleFilter() {
+            const dropdowns = document.getElementById('filterDropdowns');
+            const btn = document.getElementById('filterToggle');
+            
+            if (dropdowns.style.display === 'none') {
+                dropdowns.style.display = 'flex';
+                btn.classList.add('active');
+            } else {
+                dropdowns.style.display = 'none';
+                btn.classList.remove('active');
             }
-        });
-    });
-});
-*/
+        }
+
+        
+        // Function to load modals from external file
+        function loadModals() {
+            const modalsContainer = document.getElementById('modals-container');
+            if (modalsContainer) {
+                // Create XMLHttpRequest to load the modals.html file
+                const xhr = new XMLHttpRequest();
+                xhr.open('GET', 'modals.html', true);
+                xhr.onreadystatechange = function() {
+                    if (xhr.readyState === 4 && xhr.status === 200) {
+                        modalsContainer.innerHTML = xhr.responseText;
+                        // Re-initialize modal close on outside click after loading
+                        initModalClose();
+                    }
+                };
+                xhr.send();
+            }
+        }
