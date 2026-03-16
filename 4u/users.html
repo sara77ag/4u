@@ -6,10 +6,11 @@
     <title>Users - iLet4You</title>
     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.1/css/all.min.css">
     <link rel="stylesheet" href="style.css">
+    <link rel="stylesheet" href="tables.css">
     <script src="navbar.js" defer></script>
     <script src="modals.js" defer></script>
 </head>
-<body onload="CallNavbar()">
+<body onload="CallNavbar(); loadModals();">
     <!-- Navbar Container -->
     <div id="navbar-container"></div>
 
@@ -18,16 +19,369 @@
         <!-- Page Title -->
         <h1 class="page-title">Users</h1>
 
-        <!-- Content Placeholder -->
-        <div class="content-card">
-            <div class="placeholder-content">
-                <i class="fa-solid fa-users"></i>
-                <h2>User Management</h2>
-                <p>Manage system users here. This page is under development.</p>
+        <div class="main-container">
+            <!-- Main Controls Row -->
+            <div class="controls-row">
+                <!-- Filter Toggle Button -->
+                <button class="btn-filter-toggle" id="filterToggle" onclick="toggleFilter()">
+                    <i class="fa-solid fa-filter"></i> Filter
+                </button>
+
+                <!-- Filter Dropdowns -->
+                <div class="filter-dropdowns" id="filterDropdowns" style="display: none;">
+                    <div class="filter-group">
+                        <label>Status</label>
+                        <select id="filterStatus" onchange="filterUsers()">
+                            <option value="">All Statuses</option>
+                            <option value="active">Active</option>
+                            <option value="inactive">Inactive</option>
+                        </select>
+                    </div>
+                    <div class="filter-group">
+                        <label>Role</label>
+                        <select id="filterRole" onchange="filterUsers()">
+                            <option value="">All Roles</option>
+                            <option value="admin">Admin</option>
+                            <option value="agent">Agent</option>
+                            <option value="viewer">Viewer</option>
+                        </select>
+                    </div>
+                    <div class="filter-group">
+                        <label>Sort By</label>
+                        <select id="sortBy" onchange="sortUsers()">
+                            <option value="name-asc">Name (A-Z)</option>
+                            <option value="name-desc">Name (Z-A)</option>
+                            <option value="role-asc">Role (A-Z)</option>
+                            <option value="role-desc">Role (Z-A)</option>
+                        </select>
+                    </div>
+                    <button class="filter-btn-reset" onclick="resetFilters()">
+                        <i class="fa-solid fa-rotate-left"></i>
+                    </button>
+                </div>
+
+                <!-- Spacer to push button to right -->
+                <div class="controls-spacer"></div>
+
+                <!-- Action Button -->
+                <button class="btn-add blue" onclick="openAddUserModal()">
+                    <i class="fa-solid fa-plus"></i> User
+                </button>
+            </div>
+
+            <!-- Cards Container -->
+            <div class="cards-container">
+                <div class="cards-grid" id="usersGrid">
+                    <!-- Sample User Card 1 -->
+                    <div class="card" data-name="smith" data-status="active" data-role="admin">
+                        <div class="card-header">
+                            <div class="card-name">John Smith <span class="card-status">(Active)</span></div>
+                        </div>
+                        <div class="card-body">
+                            <div class="card-detail">
+                                <i class="fa-solid fa-user"></i>
+                                <span>johnsmith</span>
+                            </div>
+                            <div class="card-detail">
+                                <i class="fa-solid fa-envelope"></i>
+                                <span>john.smith@email.com</span>
+                            </div>
+                            <div class="card-detail">
+                                <i class="fa-solid fa-phone"></i>
+                                <span>07700 901100</span>
+                            </div>
+                            <span class="blue-badge">Admin</span>
+                            <a class="reset-password-link" onclick="resetPassword(this)">Reset Password</a>
+                        </div>
+                        <div class="action-buttons">
+                            <button class="action-btn action-btn-view" title="View" onclick="viewUser(this)">
+                                <i class="fa-solid fa-eye"></i>
+                            </button>
+                            <button class="action-btn action-btn-edit" title="Edit" onclick="editUser(this)">
+                                <i class="fa-solid fa-pen"></i>
+                            </button>
+                            <button class="action-btn action-btn-delete" title="Delete" onclick="deleteUser(this)">
+                                <i class="fa-solid fa-trash"></i>
+                            </button>
+                        </div>
+                    </div>
+
+                    <!-- Sample User Card 2 -->
+                    <div class="card" data-name="doe" data-status="active" data-role="agent">
+                        <div class="card-header">
+                            <div class="card-name">Jane Doe <span class="card-status">(Active)</span></div>
+                        </div>
+                        <div class="card-body">
+                            <div class="card-detail">
+                                <i class="fa-solid fa-user"></i>
+                                <span>janedoe</span>
+                            </div>
+                            <div class="card-detail">
+                                <i class="fa-solid fa-envelope"></i>
+                                <span>jane.doe@email.com</span>
+                            </div>
+                            <div class="card-detail">
+                                <i class="fa-solid fa-phone"></i>
+                                <span>07700 901101</span>
+                            </div>
+                            <span class="blue-badge">Agent</span>
+                            <a class="reset-password-link" onclick="resetPassword(this)">Reset Password</a>
+                        </div>
+                        <div class="action-buttons">
+                            <button class="action-btn action-btn-view" title="View" onclick="viewUser(this)">
+                                <i class="fa-solid fa-eye"></i>
+                            </button>
+                            <button class="action-btn action-btn-edit" title="Edit" onclick="editUser(this)">
+                                <i class="fa-solid fa-pen"></i>
+                            </button>
+                            <button class="action-btn action-btn-delete" title="Delete" onclick="deleteUser(this)">
+                                <i class="fa-solid fa-trash"></i>
+                            </button>
+                        </div>
+                    </div>
+
+                    <!-- Sample User Card 3 -->
+                    <div class="card" data-name="wilson" data-status="inactive" data-role="viewer">
+                        <div class="card-header">
+                            <div class="card-name">Mike Wilson <span class="card-status">(Inactive)</span></div>
+                        </div>
+                        <div class="card-body">
+                            <div class="card-detail"> 
+                                <i class="fa-solid fa-user"></i>
+                                <span>mikewilson</span>
+                            </div>
+                            <div class="card-detail">
+                                <i class="fa-solid fa-envelope"></i>
+                                <span>mike.wilson@email.com</span>
+                            </div>
+                            <div class="card-detail">
+                                <i class="fa-solid fa-phone"></i>
+                                <span>07700 901102</span>
+                            </div>
+                            <span class="blue-badge">Viewer</span>
+                            <a class="reset-password-link" onclick="resetPassword(this)">Reset Password</a>
+                        </div>
+                        <div class="action-buttons">
+                            <button class="action-btn action-btn-view" title="View" onclick="viewUser(this)">
+                                <i class="fa-solid fa-eye"></i>
+                            </button>
+                            <button class="action-btn action-btn-edit" title="Edit" onclick="editUser(this)">
+                                <i class="fa-solid fa-pen"></i>
+                            </button>
+                            <button class="action-btn action-btn-delete" title="Delete" onclick="deleteUser(this)">
+                                <i class="fa-solid fa-trash"></i>
+                            </button>
+                        </div>
+                    </div>
+
+                    <!-- Sample User Card 4 -->
+                    <div class="card" data-name="taylor" data-status="active" data-role="admin">
+                        <div class="card-header">
+                            <div class="card-name">Lisa Taylor <span class="card-status">(Active)</span></div>
+                        </div>
+                        <div class="card-body">
+                            <div class="card-detail"> 
+                                <i class="fa-solid fa-user"></i>
+                                <span>lisataylor</span>
+                            </div>
+                            <div class="card-detail">
+                                <i class="fa-solid fa-envelope"></i>
+                                <span>lisa.taylor@email.com</span>
+                            </div>
+                            <div class="card-detail">
+                                <i class="fa-solid fa-phone"></i>
+                                <span>07700 901103</span>
+                            </div>
+                            <span class="blue-badge">Admin</span>
+                            <a class="reset-password-link" onclick="resetPassword(this)">Reset Password</a>
+                        </div>
+                        <div class="action-buttons">
+                            <button class="action-btn action-btn-view" title="View" onclick="viewUser(this)">
+                                <i class="fa-solid fa-eye"></i>
+                            </button>
+                            <button class="action-btn action-btn-edit" title="Edit" onclick="editUser(this)">
+                                <i class="fa-solid fa-pen"></i>
+                            </button>
+                            <button class="action-btn action-btn-delete" title="Delete" onclick="deleteUser(this)">
+                                <i class="fa-solid fa-trash"></i>
+                            </button>
+                        </div>
+                    </div>
+
+                    <!-- Sample User Card 5 -->
+                    <div class="card" data-name="brown" data-status="inactive" data-role="agent">
+                        <div class="card-header">
+                            <div class="card-name">David Brown <span class="card-status">(Inactive)</span></div>
+                        </div>
+                        <div class="card-body">
+                            <div class="card-detail"> 
+                                <i class="fa-solid fa-user"></i>
+                                <span>davidbrown</span>
+                            </div>
+                            <div class="card-detail">
+                                <i class="fa-solid fa-envelope"></i>
+                                <span>david.brown@email.com</span>
+                            </div>
+                            <div class="card-detail">
+                                <i class="fa-solid fa-phone"></i>
+                                <span>07700 901104</span>
+                            </div>
+                            <span class="blue-badge">Agent</span>
+                            <a class="reset-password-link" onclick="resetPassword(this)">Reset Password</a>
+                        </div>
+                        <div class="action-buttons">
+                            <button class="action-btn action-btn-view" title="View" onclick="viewUser(this)">
+                                <i class="fa-solid fa-eye"></i>
+                            </button>
+                            <button class="action-btn action-btn-edit" title="Edit" onclick="editUser(this)">
+                                <i class="fa-solid fa-pen"></i>
+                            </button>
+                            <button class="action-btn action-btn-delete" title="Delete" onclick="deleteUser(this)">
+                                <i class="fa-solid fa-trash"></i>
+                            </button>
+                        </div>
+                    </div>
+
+                    <!-- Sample User Card 6 -->
+                    <div class="card" data-name="davis" data-status="active" data-role="viewer">
+                        <div class="card-header">
+                            <div class="card-name">Emma Davis <span class="card-status">(Active)</span></div>
+                        </div>
+                        <div class="card-body">
+                            <div class="card-detail"> 
+                                <i class="fa-solid fa-user"></i>
+                                <span>emmadavis</span>
+                            </div>
+                            <div class="card-detail">
+                                <i class="fa-solid fa-envelope"></i>
+                                <span>emma.davis@email.com</span>
+                            </div>
+                            <div class="card-detail">
+                                <i class="fa-solid fa-phone"></i>
+                                <span>07700 901105</span>
+                            </div>
+                            <span class="blue-badge">Viewer</span>
+                            <a class="reset-password-link" onclick="resetPassword(this)">Reset Password</a>
+                        </div>
+                        <div class="action-buttons">
+                            <button class="action-btn action-btn-view" title="View" onclick="viewUser(this)">
+                                <i class="fa-solid fa-eye"></i>
+                            </button>
+                            <button class="action-btn action-btn-edit" title="Edit" onclick="editUser(this)">
+                                <i class="fa-solid fa-pen"></i>
+                            </button>
+                            <button class="action-btn action-btn-delete" title="Delete" onclick="deleteUser(this)">
+                                <i class="fa-solid fa-trash"></i>
+                            </button>
+                        </div>
+                    </div>
+                </div>
             </div>
         </div>
     </main>
 
+    <!-- Modals Container -->
+    <div id="modals-container"></div>
+
+    <script>
+        // Toggle Filter
+        function toggleFilter() {
+            const filterToggle = document.getElementById('filterToggle');
+            const filterDropdowns = document.getElementById('filterDropdowns');
+            filterDropdowns.style.display = filterDropdowns.style.display === 'none' ? 'flex' : 'none';
+            filterToggle.classList.toggle('active');
+        }
+
+        // Filter Users
+        function filterUsers() {
+            const statusFilter = document.getElementById('filterStatus').value;
+            const roleFilter = document.getElementById('filterRole').value;
+
+            const cards = document.querySelectorAll('.card');
+            cards.forEach(card => {
+                let show = true;
+
+                if (statusFilter && card.dataset.status !== statusFilter) {
+                    show = false;
+                }
+
+                if (roleFilter && card.dataset.role !== roleFilter) {
+                    show = false;
+                }
+
+                card.style.display = show ? '' : 'none';
+            });
+        }
+
+        // Sort Users
+        function sortUsers() {
+            const sortValue = document.getElementById('sortBy').value;
+            const [column, direction] = sortValue.split('-');
+            const cards = Array.from(document.querySelectorAll('.card'));
+
+            cards.sort((a, b) => {
+                let aVal, bVal;
+                if (column === 'name') {
+                    aVal = a.dataset.name.toLowerCase();
+                    bVal = b.dataset.name.toLowerCase();
+                } else {
+                    aVal = a.dataset.role.toLowerCase();
+                    bVal = b.dataset.role.toLowerCase();
+                }
+
+                if (aVal < bVal) return direction === 'asc' ? -1 : 1;
+                if (aVal > bVal) return direction === 'asc' ? 1 : -1;
+                return 0;
+            });
+
+            const grid = document.getElementById('usersGrid');
+            cards.forEach(card => grid.appendChild(card));
+        }
+
+        // Reset filters
+        function resetFilters() {
+            document.getElementById('filterStatus').value = '';
+            document.getElementById('filterRole').value = '';
+            document.getElementById('sortBy').value = 'name-asc';
+
+            const cards = document.querySelectorAll('.card');
+            cards.forEach(card => card.style.display = '');
+
+            sortUsers();
+        }
+
+        // Stub for Add User Modal
+        function openAddUserModal() {
+            alert('Open Add User Modal');
+        }
+
+        // User action functions
+        function viewUser(btn) {
+            const card = btn.closest('.card');
+            const name = card.querySelector('.card-name').textContent.trim();
+            alert('View User: ' + name);
+        }
+
+        function editUser(btn) {
+            const card = btn.closest('.card');
+            const name = card.querySelector('.card-name').textContent.trim();
+            alert('Edit User: ' + name);
+        }
+
+        function deleteUser(btn) {
+            const card = btn.closest('.card');
+            const name = card.querySelector('.card-name').textContent.trim();
+            if (confirm('Are you sure you want to delete user ' + name + '?')) {
+                card.remove();
+            }
+        }
+
+        function resetPassword(link) {
+            const card = link.closest('.card');
+            const name = card.querySelector('.card-name').textContent.trim();
+            alert('Reset password for: ' + name);
+        }
+    </script>
 </body>
 </html>
 

@@ -5,7 +5,8 @@ const modalConfig = {
     tenant: { form: 'addTenantForm', modal: 'addTenantModal', hasFiles: true, filesKey: 'tenantFiles' },
     viewing: { form: 'bookViewingForm', modal: 'bookViewingModal', hasFiles: false },
     payment: { form: 'addPaymentForm', modal: 'addPaymentModal', hasFiles: true, filesKey: 'paymentFiles' },
-    contract: { form: 'addContractForm', modal: 'addContractModal', hasFiles: true, filesKey: 'contractFiles' }
+    contract: { form: 'addContractForm', modal: 'addContractModal', hasFiles: true, filesKey: 'contractFiles' },
+    user: { form: 'addUserForm', modal: 'addUserModal', hasFiles: false }
 };
 
 // file storage object
@@ -121,6 +122,7 @@ function saveTenant() { saveForm('tenant', 'Tenant saved successfully!'); }
 function saveViewing() { saveForm('viewing', 'Viewing booked successfully!'); }
 function savePayment() { saveForm('payment', 'Payment saved successfully!'); }
 function saveContract() { saveForm('contract', 'Contract created successfully!'); }
+function saveUser() { saveForm('user', 'User added successfully!'); }
 
 // open functions
 function openAddPropertyModal() { openModal('property'); }
@@ -129,6 +131,7 @@ function openAddTenantModal() { openModal('tenant'); }
 function openBookViewingModal() { openModal('viewing'); }
 function openAddPaymentModal() { openModal('payment'); }
 function openAddContractModal() { openModal('contract'); }
+function openAddUserModal() { openModal('user'); }
 
 // close functions
 function closeAddPropertyModal() { closeModal('property'); }
@@ -137,6 +140,7 @@ function closeAddTenantModal() { closeModal('tenant'); }
 function closeBookViewingModal() { closeModal('viewing'); }
 function closeAddPaymentModal() { closeModal('payment'); }
 function closeAddContractModal() { closeModal('contract'); }
+function closeAddUserModal() { closeModal('user'); }
 
 // reset functions
 function resetAddPropertyForm() { resetForm('property'); }
@@ -145,17 +149,44 @@ function resetAddTenantForm() { resetForm('tenant'); }
 function resetBookViewingForm() { resetForm('viewing'); }
 function resetAddPaymentForm() { resetForm('payment'); }
 function resetAddContractForm() { resetForm('contract'); }
+function resetAddUserForm() { resetForm('user'); }
 
-/*
-// Initialize - Close modal on outside click
-document.addEventListener('DOMContentLoaded', function() {
-    document.querySelectorAll('.modal-overlay').forEach(function(overlay) {
-        overlay.addEventListener('click', function(e) {
-            if (e.target === overlay) {
-                overlay.classList.remove('active');
-                document.body.style.overflow = 'auto';
+
+
+        let currentSort = {
+            column: null,
+            direction: 'asc'
+        };
+
+        // Toggle Filter Panel
+        function toggleFilter() {
+            const dropdowns = document.getElementById('filterDropdowns');
+            const btn = document.getElementById('filterToggle');
+            
+            if (dropdowns.style.display === 'none') {
+                dropdowns.style.display = 'flex';
+                btn.classList.add('active');
+            } else {
+                dropdowns.style.display = 'none';
+                btn.classList.remove('active');
             }
-        });
-    });
-});
-*/
+        }
+
+        
+        // Function to load modals from external file
+        function loadModals() {
+            const modalsContainer = document.getElementById('modals-container');
+            if (modalsContainer) {
+                // Create XMLHttpRequest to load the modals.html file
+                const xhr = new XMLHttpRequest();
+                xhr.open('GET', 'modals.html', true);
+                xhr.onreadystatechange = function() {
+                    if (xhr.readyState === 4 && xhr.status === 200) {
+                        modalsContainer.innerHTML = xhr.responseText;
+                        // Re-initialize modal close on outside click after loading
+                        initModalClose();
+                    }
+                };
+                xhr.send();
+            }
+        }

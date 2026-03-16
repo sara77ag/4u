@@ -1,13 +1,22 @@
-
-html, body {
-    overflow-x: hidden;
-}
-
 body {
     font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
     background: #f7fafc;
     color: #2d3748;
     min-height: 100vh;
+}
+
+body.login-page {
+    font-family: 'DM Sans', sans-serif;
+    background: #dce8f5;
+    height: 100vh;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+}
+
+/* Hide scrollbar */
+::-webkit-scrollbar {
+    display: none;
 }
 
 * {
@@ -934,21 +943,86 @@ input.form-control[type="time"] {
 }
 
 .modal-btn-reset {
-    background: #a0aec0;
+    background: #718096;
     color: #ffffff;
 }
 
 .modal-btn-reset:hover {
-    background: #2d3748;
+    background: #4a5568;
 }
 
 .modal-btn-save {
-    background: #38a169;
+    background: #266c49;
     color: #ffffff;
 }
 
 .modal-btn-save:hover {
-    background: #2f855a;
+    background: #1e5439;
+}
+
+/*Login Page*/
+.login-card {
+    background: white;
+    width: 400px;
+    padding: 45px;
+    border-radius: 25px;
+    box-shadow: 0 20px 40px rgba(0,0,0,0.1);
+    text-align: center;
+}
+
+
+
+.logo-section i {
+    font-size: 40px;
+    color: #2d4a7a;
+    margin-bottom: 15px;
+}
+
+
+
+.login-card h2 {
+    font-size: 28px;
+    margin-bottom: 35px;
+}
+
+
+
+.input-group {
+    text-align: left;
+    margin-bottom: 20px;
+}
+
+.input-group label {
+    font-size: 14px;
+    font-weight: 600;
+}
+
+
+
+.input-group input {
+    width: 100%;
+    padding: 12px;
+    border: 1px solid #ccc;
+    border-radius: 10px;
+    margin-top: 6px;
+}
+
+
+
+.login-btn {
+    width: 100%;
+    padding: 13px;
+    margin-top: 15px;
+    border: none;
+    background: #2d4a7a;
+    color: white;
+    font-weight: bold;
+    border-radius: 10px;
+    cursor: pointer;
+}
+
+.login-btn:hover {
+    background: #1e3560;
 }
 
 /* Responsive Modal */
