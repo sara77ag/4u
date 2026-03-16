@@ -6,10 +6,11 @@
     <title>Landlords - iLet4You</title>
     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.1/css/all.min.css">
     <link rel="stylesheet" href="style.css">
+    <link rel="stylesheet" href="tables.css">
     <script src="navbar.js" defer></script>
     <script src="modals.js" defer></script>
 </head>
-<body onload="CallNavbar()">
+<body onload="CallNavbar(); loadModals();">
     <!-- Navbar Container -->
     <div id="navbar-container"></div>
 
@@ -18,16 +19,356 @@
         <!-- Page Title -->
         <h1 class="page-title">Landlords</h1>
 
-        <!-- Content Placeholder -->
-        <div class="content-card">
-            <div class="placeholder-content">
-                <i class="fa-solid fa-user-tie"></i>
-                <h2>Landlords Management</h2>
-                <p>Manage your landlords here. This page is under development.</p>
+        <div class="main-container">
+            <!-- Main Controls Row -->
+            <div class="controls-row">
+                <!-- Filter Toggle Button -->
+                <button class="btn-filter-toggle" id="filterToggle" onclick="toggleFilter()">
+                    <i class="fa-solid fa-filter"></i> Filter
+                </button>
+
+                <!-- Filter Dropdowns -->
+                <div class="filter-dropdowns" id="filterDropdowns" style="display: none;">
+                    <div class="filter-group">
+                        <label>Status</label>
+                        <select id="filterStatus" onchange="filterLandlords()">
+                            <option value="">All Statuses</option>
+                            <option value="active">Active</option>
+                            <option value="inactive">Inactive</option>
+                        </select>
+                    </div>
+                    <div class="filter-group">
+                        <label>Properties</label>
+                        <select id="filterProperties" onchange="filterLandlords()">
+                            <option value="">All Counts</option>
+                            <option value="0">0 Properties</option>
+                            <option value="1-5">1-5 Properties</option>
+                            <option value="6+">6+ Properties</option>
+                        </select>
+                    </div>
+                    <div class="filter-group">
+                        <label>Sort By</label>
+                        <select id="sortBy" onchange="sortLandlords()">
+                            <option value="name-asc">Name (A-Z)</option>
+                            <option value="name-desc">Name (Z-A)</option>
+                            <option value="properties-asc">Properties (Low-High)</option>
+                            <option value="properties-desc">Properties (High-Low)</option>
+                        </select>
+                    </div>
+                    <button class="filter-btn-reset" onclick="resetFilters()">
+                        <i class="fa-solid fa-rotate-left"></i>
+                    </button>
+                </div>
+
+                <!-- Spacer to push button to right -->
+                <div class="controls-spacer"></div>
+
+                <!-- Action Button -->
+                <button class="btn-add blue" onclick="openAddLandlordModal()">
+                    <i class="fa-solid fa-plus"></i> Landlord
+                </button>
+            </div>
+
+            <!-- Cards Container -->
+            <div class="cards-container">
+                <div class="cards-grid" id="landlordsGrid">
+                    <!-- Sample Landlord Card 1 -->
+                    <div class="card" data-name="smith" data-status="active" data-properties="4">
+                        <div class="card-header">
+                            <div class="card-name">John Smith <span class="card-status">(Active)</span></div>
+                        </div>
+                        <div class="card-body">
+                            <div class="card-detail">
+                                <i class="fa-solid fa-phone"></i>
+                                <span>07700 901100</span>
+                            </div>
+                            <div class="card-detail">
+                                <i class="fa-solid fa-envelope"></i>
+                                <span>john.smith@email.com</span>
+                            </div>
+                            <div class="card-detail">
+                                <i class="fa-solid fa-map-marker-alt"></i>
+                                <span>123 High St, London, SW1 1AA</span>
+                            </div>
+                            <div class="blue-badge">4 Properties</div>
+                        </div>
+                        <div class="action-buttons">
+                            <button class="action-btn action-btn-view" title="View" onclick="viewLandlord(this)">
+                                <i class="fa-solid fa-eye"></i>
+                            </button>
+                            <button class="action-btn action-btn-edit" title="Edit" onclick="editLandlord(this)">
+                                <i class="fa-solid fa-pen"></i>
+                            </button>
+                            <button class="action-btn action-btn-delete" title="Delete" onclick="deleteLandlord(this)">
+                                <i class="fa-solid fa-trash"></i>
+                            </button>
+                        </div>
+                    </div>
+
+                    <!-- Sample Landlord Card 2 -->
+                    <div class="card" data-name="doe" data-status="active" data-properties="2">
+                        <div class="card-header">
+                            <div class="card-name">Jane Doe <span class="card-status">(Active)</span></div>
+                        </div>
+                        <div class="card-body">
+                            <div class="card-detail">
+                                <i class="fa-solid fa-phone"></i>
+                                <span>07700 901101</span>
+                            </div>
+                            <div class="card-detail">
+                                <i class="fa-solid fa-envelope"></i>
+                                <span>jane.doe@email.com</span>
+                            </div>
+                            <div class="card-detail">
+                                <i class="fa-solid fa-map-marker-alt"></i>
+                                <span>456 Oxford Rd, Manchester, M1 5EE</span>
+                            </div>
+                            <div class="blue-badge">2 Properties</div>
+                        </div>
+                        <div class="action-buttons">
+                            <button class="action-btn action-btn-view" title="View" onclick="viewLandlord(this)">
+                                <i class="fa-solid fa-eye"></i>
+                            </button>
+                            <button class="action-btn action-btn-edit" title="Edit" onclick="editLandlord(this)">
+                                <i class="fa-solid fa-pen"></i>
+                            </button>
+                            <button class="action-btn action-btn-delete" title="Delete" onclick="deleteLandlord(this)">
+                                <i class="fa-solid fa-trash"></i>
+                            </button>
+                        </div>
+                    </div>
+
+                    <!-- Sample Landlord Card 3 -->
+                    <div class="card" data-name="wilson" data-status="inactive" data-properties="7">
+                        <div class="card-header">
+                            <div class="card-name">Mike Wilson <span class="card-status">(Inactive)</span></div>
+                        </div>
+                        <div class="card-body">
+                            <div class="card-detail">
+                                <i class="fa-solid fa-phone"></i>
+                                <span>07700 901102</span>
+                            </div>
+                            <div class="card-detail">
+                                <i class="fa-solid fa-envelope"></i>
+                                <span>mike.wilson@email.com</span>
+                            </div>
+                            <div class="card-detail">
+                                <i class="fa-solid fa-map-marker-alt"></i>
+                                <span>789 New St, Birmingham, B2 4QA</span>
+                            </div>
+                            <div class="blue-badge">7 Properties</div>
+                        </div>
+                        <div class="action-buttons">
+                            <button class="action-btn action-btn-view" title="View" onclick="viewLandlord(this)">
+                                <i class="fa-solid fa-eye"></i>
+                            </button>
+                            <button class="action-btn action-btn-edit" title="Edit" onclick="editLandlord(this)">
+                                <i class="fa-solid fa-pen"></i>
+                            </button>
+                            <button class="action-btn action-btn-delete" title="Delete" onclick="deleteLandlord(this)">
+                                <i class="fa-solid fa-trash"></i>
+                            </button>
+                        </div>
+                    </div>
+
+                    <!-- Sample Landlord Card 4 -->
+                    <div class="card" data-name="taylor" data-status="active" data-properties="1">
+                        <div class="card-header">
+                            <div class="card-name">Lisa Taylor <span class="card-status">(Active)</span></div>
+                        </div>
+                        <div class="card-body">
+                            <div class="card-detail">
+                                <i class="fa-solid fa-phone"></i>
+                                <span>07700 901103</span>
+                            </div>
+                            <div class="card-detail">
+                                <i class="fa-solid fa-envelope"></i>
+                                <span>lisa.taylor@email.com</span>
+                            </div>
+                            <div class="card-detail">
+                                <i class="fa-solid fa-map-marker-alt"></i>
+                                <span>321 Liverpool Rd, Liverpool, L3 8EA</span>
+                            </div>
+                            <div class="blue-badge">1 Property</div>
+                        </div>
+                        <div class="action-buttons">
+                            <button class="action-btn action-btn-view" title="View" onclick="viewLandlord(this)">
+                                <i class="fa-solid fa-eye"></i>
+                            </button>
+                            <button class="action-btn action-btn-edit" title="Edit" onclick="editLandlord(this)">
+                                <i class="fa-solid fa-pen"></i>
+                            </button>
+                            <button class="action-btn action-btn-delete" title="Delete" onclick="deleteLandlord(this)">
+                                <i class="fa-solid fa-trash"></i>
+                            </button>
+                        </div>
+                    </div>
+
+                    <!-- Sample Landlord Card 5 -->
+                    <div class="card" data-name="brown" data-status="inactive" data-properties="0">
+                        <div class="card-header">
+                            <div class="card-name">David Brown <span class="card-status">(Inactive)</span></div>
+                        </div>
+                        <div class="card-body">
+                            <div class="card-detail">
+                                <i class="fa-solid fa-phone"></i>
+                                <span>07700 901104</span>
+                            </div>
+                            <div class="card-detail">
+                                <i class="fa-solid fa-envelope"></i>
+                                <span>david.brown@email.com</span>
+                            </div>
+                            <div class="card-detail">
+                                <i class="fa-solid fa-map-marker-alt"></i>
+                                <span>654 Park St, Bristol, BS2 8PE</span>
+                            </div>
+                            <div class="blue-badge">0 Properties</div>
+                        </div>
+                        <div class="action-buttons">
+                            <button class="action-btn action-btn-view" title="View" onclick="viewLandlord(this)">
+                                <i class="fa-solid fa-eye"></i>
+                            </button>
+                            <button class="action-btn action-btn-edit" title="Edit" onclick="editLandlord(this)">
+                                <i class="fa-solid fa-pen"></i>
+                            </button>
+                            <button class="action-btn action-btn-delete" title="Delete" onclick="deleteLandlord(this)">
+                                <i class="fa-solid fa-trash"></i>
+                            </button>
+                        </div>
+                    </div>
+
+                    <!-- Sample Landlord Card 6 -->
+                    <div class="card" data-name="davis" data-status="active" data-properties="12">
+                        <div class="card-header">
+                            <div class="card-name">Emma Davis <span class="card-status">(Active)</span></div>
+                        </div>
+                        <div class="card-body">
+                            <div class="card-detail">
+                                <i class="fa-solid fa-phone"></i>
+                                <span>07700 901105</span>
+                            </div>
+                            <div class="card-detail">
+                                <i class="fa-solid fa-envelope"></i>
+                                <span>emma.davis@email.com</span>
+                            </div>
+                            <div class="card-detail">
+                                <i class="fa-solid fa-map-marker-alt"></i>
+                                <span>987 York Way, Leeds, LS2 7EH</span>
+                            </div>
+                            <div class="blue-badge">12 Properties</div>
+                        </div>
+                        <div class="action-buttons">
+                            <button class="action-btn action-btn-view" title="View" onclick="viewLandlord(this)">
+                                <i class="fa-solid fa-eye"></i>
+                            </button>
+                            <button class="action-btn action-btn-edit" title="Edit" onclick="editLandlord(this)">
+                                <i class="fa-solid fa-pen"></i>
+                            </button>
+                            <button class="action-btn action-btn-delete" title="Delete" onclick="deleteLandlord(this)">
+                                <i class="fa-solid fa-trash"></i>
+                            </button>
+                        </div>
+                    </div>
+                </div>
             </div>
         </div>
     </main>
 
+    <!-- Modals Container -->
+    <div id="modals-container"></div>
+
+    <script>
+        // Toggle Filter
+        function toggleFilter() {
+            const filterToggle = document.getElementById('filterToggle');
+            const filterDropdowns = document.getElementById('filterDropdowns');
+            filterDropdowns.style.display = filterDropdowns.style.display === 'none' ? 'flex' : 'none';
+            filterToggle.classList.toggle('active');
+        }
+
+        // Filter Landlords
+        function filterLandlords() {
+            const statusFilter = document.getElementById('filterStatus').value;
+            const propsFilter = document.getElementById('filterProperties').value;
+
+            const cards = document.querySelectorAll('.card');
+            cards.forEach(card => {
+                let show = true;
+
+                // Status filter
+                if (statusFilter && card.dataset.status !== statusFilter) {
+                    show = false;
+                }
+
+                // Properties filter
+                if (propsFilter) {
+                    const numProps = parseInt(card.dataset.properties);
+                    if (propsFilter === '0' && numProps !== 0) show = false;
+                    if (propsFilter === '1-5' && (numProps < 1 || numProps > 5)) show = false;
+                    if (propsFilter === '6+' && numProps < 6) show = false;
+                }
+
+                card.style.display = show ? '' : 'none';
+            });
+        }
+
+        // Sort Landlords
+        function sortLandlords() {
+            const sortValue = document.getElementById('sortBy').value;
+            const [column, direction] = sortValue.split('-');
+            const cards = Array.from(document.querySelectorAll('.card'));
+
+            cards.sort((a, b) => {
+                let aVal, bVal;
+                if (column === 'name') {
+                    aVal = a.dataset.name.toLowerCase();
+                    bVal = b.dataset.name.toLowerCase();
+                } else {
+                    aVal = parseInt(a.dataset.properties);
+                    bVal = parseInt(b.dataset.properties);
+                }
+
+                if (aVal < bVal) return direction === 'asc' ? -1 : 1;
+                if (aVal > bVal) return direction === 'asc' ? 1 : -1;
+                return 0;
+            });
+
+            const grid = document.getElementById('landlordsGrid');
+            cards.forEach(card => grid.appendChild(card));
+        }
+
+        // Reset filters
+        function resetFilters() {
+            document.getElementById('filterStatus').value = '';
+            document.getElementById('filterProperties').value = '';
+            document.getElementById('sortBy').value = 'name-asc';
+
+            const cards = document.querySelectorAll('.card');
+            cards.forEach(card => card.style.display = '');
+
+            currentSort = { column: null, direction: 'asc' };
+        }
+
+        // action button functions
+        function viewLandlord(btn) {
+            const card = btn.closest('.card');
+            const name = card.querySelector('.card-name').textContent.trim();
+            alert('View Landlord: ' + name);
+        }
+
+        function editLandlord(btn) {
+            const card = btn.closest('.card');
+            const name = card.querySelector('.card-name').textContent.trim();
+            alert('Edit Landlord: ' + name);
+        }
+
+        function deleteLandlord(btn) {
+            const card = btn.closest('.card');
+            const name = card.querySelector('.card-name').textContent.trim();
+            if (confirm('Are you sure you want to delete landlord ' + name + '?')) {
+                card.remove();
+            }
+        }
+    </script>
 </body>
 </html>
-

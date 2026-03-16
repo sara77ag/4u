@@ -44,9 +44,9 @@ if ($_SERVER["REQUEST_METHOD"] == "POST") {
     <script src="navbar.js" defer></script>
     <script src="modals.js" defer></script>
 </head>
-<body>
-    <body class="login-page"><div class="login-container">
-        <div class="login-card">
+<body class="login-page">
+        <div class="login-container">
+                <div class="login-card">
             <div class="logo-section">
                 <i class="fa-solid fa-house"></i>
             </div>

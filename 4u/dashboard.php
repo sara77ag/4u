@@ -128,7 +128,7 @@ $deadlines = $pdo->query("SELECT COUNT(*) FROM tenants WHERE contract_end BETWEE
                             <i class="fa-brands fa-whatsapp"></i>
                         </div>
                         <h4 class="quick-card-title">Open WhatsApp</h4>
-                        <p class="quick-card-desc">Send a quick message</p>
+                        <p class="quick-card-desc">Send a quick message via WhatsApp</p>
                     </div>
                     <div class="quick-card">
                         <div class="quick-card-icon">

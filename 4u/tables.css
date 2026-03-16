@@ -85,7 +85,7 @@
         }
 
         .filter-dropdowns .filter-btn-reset {
-            background: #a0aec0;
+            background: #718096;
             color: #ffffff;
             border: none;
             height: 40px;
@@ -103,7 +103,7 @@
         }
 
         .filter-dropdowns .filter-btn-reset:hover {
-            background: #2d3748;
+            background: #4a5568;
         }
 
         /* Spacer to push action buttons to right */
@@ -231,16 +231,6 @@
             vertical-align: middle;
         }
 
-        /* Column specific widths */
-        .col-address { width: 18%; }
-        .col-type { width: 8%; }
-        .col-landlord { width: 13%; }
-        .col-price { width: 9%; }
-        .col-tenant { width: 13%; }
-        .col-status { width: 11%; }
-        .col-contract { width: 14%; }
-        .col-action { width: 14%; text-align: center; }
-        
         .td-address {
             font-weight: 500;
             color: #1a365d;
@@ -324,17 +314,17 @@
 
         .status-active {
             background: #bee3f8;
-            color: #2b6cb0; /* Blue */
+            color: #2b6cb0;
         }
 
         .status-former {
             background: #edf2f7;
-            color: #718096; /* Gray */
+            color: #718096;
         }
 
         .status-new {
             background: #fed7aa;
-            color: #c05621; /* Orange */
+            color: #c05621; 
         }
 
         .contract-info {
@@ -418,5 +408,132 @@
             
             .action-buttons {
                 flex-wrap: wrap;
+            }
+        }
+
+        /* ============================================
+            Cards styles
+           ============================================ */
+        .cards-container {
+            overflow: hidden;
+            padding: 0px;
+        }
+
+        .cards-grid {
+            display: grid;
+            grid-template-columns: repeat(4, 1fr);
+            gap: 25px;
+        }
+
+        .card {
+            background: #ffffff;
+            border-radius: 12px;
+            box-shadow: 0 2px 4px rgba(0, 0, 0, 0.05);
+            padding: 20px;
+            transition: all 0.2s ease;
+            border: 1px solid #f7fafc;
+            height: 100%;
+            display: flex;
+            flex-direction: column;
+        }
+
+        .card:hover {
+            box-shadow: 0 8px 15px rgba(0, 0, 0, 0.1);
+            transform: translateY(-2px);
+            border-color: #e2e8f0;
+        }
+
+        .card-header {
+            margin-bottom: 15px;
+            border-bottom: 1px solid #f7fafc;
+            padding-bottom: 12px;
+        }
+
+        .card-name {
+            font-size: 16px;
+            font-weight: 600;
+            color: #1a365d;
+            margin-bottom: 2px;
+        }
+
+        .card-status {
+            font-size: 12px;
+            color: #718096;
+            font-style: italic;
+        }
+
+        .card-body {
+            flex: 1;
+            margin-bottom: auto;
+        }
+
+        .card-detail {
+            display: flex;
+            align-items: center;
+            gap: 8px;
+            font-size: 13px;
+            color: #4a5568;
+            margin-bottom: 8px;
+        }
+
+        .card-detail i {
+            color: #a0aec0;
+            width: 16px;
+            font-size: 12px;
+        }
+
+        .blue-badge {
+            background: #bee3f8;
+            color: #2b6cb0;
+            padding: 4px 10px;
+            border-radius: 12px;
+            font-size: 12px;
+            font-weight: 500;
+            margin-bottom: 15px;
+            display: inline-block;
+        }
+
+        /* Reuse action-buttons */
+        .card .action-buttons {
+            margin-top: auto;
+            padding-top: 15px;
+            border-top: 1px solid #f7fafc;
+        }
+        
+        .reset-password-link {
+            color: #3182ce;
+            font-size: 13px;
+            text-decoration: underline;
+            cursor: pointer;
+            display: block;
+            text-align: center;
+            margin-bottom: 10px;
+            transition: color 0.2s ease;
+        }
+
+        .reset-password-link:hover {
+            color: #2c5282;
+        }
+
+        /* Responsive Grid */
+        @media (max-width: 1200px) {
+            .card-grid {
+                grid-template-columns: repeat(3, 1fr);
+            }
+        }
+
+        @media (max-width: 992px) {
+            .card-grid {
+                grid-template-columns: repeat(2, 1fr);
+            }
+        }
+
+        @media (max-width: 768px) {
+            .cards-container {
+                padding: 15px;
+            }
+            .card-grid {
+                grid-template-columns: 1fr;
+                gap: 15px;
             }
         }
