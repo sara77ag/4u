@@ -12,6 +12,13 @@ html, body {
 }
 
 body {
+    font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+    background: #f7fafc;
+    color: #2d3748;
+    min-height: 100vh;
+}
+
+body.login-page {
     font-family: 'DM Sans', sans-serif;
     background: #dce8f5;
     height: 100vh;
