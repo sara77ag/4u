@@ -6,10 +6,23 @@
     <title>Viewing - iLet4You</title>
     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.1/css/all.min.css">
     <link rel="stylesheet" href="style.css">
+    <link rel="stylesheet" href="tables.css">
     <script src="navbar.js" defer></script>
     <script src="modals.js" defer></script>
+    <style>
+        /* Column specific widths */
+        .col-name { width: 16%; }
+        .col-number { width: 12%; }
+        .col-email { width: 22%; }
+        .col-property { width: 20%; }
+        .col-datetime { width: 10%; }
+        .col-agent { width: 15%; }
+        .col-status {width: 5%}
+        .col-action { width: 10%; text-align: center; }
+    </style>
 </head>
-<body onload="CallNavbar()">
+<body onload="CallNavbar(); loadModals();">
+
     <!-- Navbar Container -->
     <div id="navbar-container"></div>
 
@@ -18,15 +31,418 @@
         <!-- Page Title -->
         <h1 class="page-title">Viewing</h1>
 
-        <!-- Content Placeholder -->
-        <div class="content-card">
-            <div class="placeholder-content">
-                <i class="fa-solid fa-street-view"></i>
-                <h2>Property Viewings</h2>
-                <p>Manage property viewings here. This page is under development.</p>
+        <div class="main-container">
+            <!--Main Controls Row-->
+            <div class="controls-row">
+                <!--Filter Toggle Button-->
+                <button class="btn-filter-toggle" id="filterToggle" onclick="toggleFilter()">
+                    <i class="fa-solid fa-filter"></i> Filter
+                </button>
+
+                <!--Filter Dropdowns-->
+                <div class="filter-dropdowns" id="filterDropdowns" style="display: none;">
+                    <div class="filter-group">
+                        <label> Status</label>
+                        <select id="filterStatus" onchange="filterViewings()">
+                            <option value="">All Statuses</option>
+                            <option value="Scheduled">Scheduled</option>
+                            <option value="NoShow">No Show</option>
+                            <option value="Cancelled">Cancelled</option>
+                            <option value="Completed">Completed</option>
+                        </select>
+                    </div>
+                    <div class="filter-group">
+                        <label>Date/Time</label>
+                        <input type="datetime-local" id="filterDateTime" onchange="filterViewings()">
+                    </div>
+                    <div class="filter-group">
+                        <label>Agent</label>
+                        <input type="text" id="filterAgent" onchange="filterViewings()">
+                    </div>
+                    <button class="filter-btn-reset" onclick="resetFilters()">
+                        <i class="fa-solid fa-rotate-left"></i>
+                    </button>
+                </div>
+
+                <!-- Spacer to push button to right -->
+                <div class="controls-spacer"></div>
+
+                <!-- Action Button -->
+                <button class="btn-add blue" onclick="openAddViewingModal()">
+                    <i class="fa-solid fa-plus"></i> Tenant
+                </button>
             </div>
-        </div>
+
+            <!--Table Container-->
+            <div class="table-container">
+                <div class="table-wrapper">
+                    <table id="viewingsTable">
+                        <thead>
+                            <tr>
+                                <th class="sortable col-name" onclick="sortTable('name', this)">
+                                    Name <i class="fa-solid fa-sort sort-icon"></i>
+                                </th>
+                                <th class="sortable col-number" onclick="sortTable('number', this)">
+                                    Phone Number <i class="fa-solid fa-sort sort-icon"></i>
+                                </th>
+                                <th class="sortable col-email" onclick="sortTable('email', this)">
+                                    Email <i class="fa-solid fa-sort sort-icon"></i>
+                                </th>
+                                <th class="sortable col-property" onclick="sortTable('property', this)">
+                                    Property <i class="fa-solid fa-sort sort-icon"></i>
+                                </th>
+                                <th class="sortable col-datetime" onclick="sortTable('datetime', this)">
+                                    Date/Time <i class="fa-solid fa-sort sort-icon"></i>
+                                </th>
+                                <th class="sortable col-agent" onclick="sortTable('agent', this)">
+                                    Agent <i class="fa-solid fa-sort sort-icon"></i>
+                                </th>
+                                <th class="sortable col-status" onclick="sortTable('status', this)">
+                                    Status <i class="fa-solid fa-sort sort-icon"></i>
+                                </th>
+                                <th class="col-action">Action</th>
+                            </tr>
+                        </thead>
+                        <tbody id="tableBody">
+
+                            <tr data-name="Mason" data-number="07700 901128" data-email="mason" data-property="sheffield" data-datetime="05/03/2026 12:30" data-agent="Gregory" data-status="Completed">
+                                <td class="viewer-name">Jenny Mason</td>
+                                <td>07700 901128</td>
+                                <td class="viewer-email">Jennymason@gmail.com</td>
+                                <td class="viewing-property"> 14 Carlisle Street, Sheffield, S3 4TY</td>
+                                <td class="viewing-datetime">05/03/2026 12:30</td>
+                                <td class="agent"> Tina Gregory</td>
+                                <td>
+                                    <span class="status-badge status-completed">
+                                        <i class="fa-solid fa-circle-check"></i>
+                                        Completed
+                                    </span>
+                                </td>
+                                <td>
+                                    <div class="action-buttons">
+                                        <button class="action-btn action-btn-view" title="View" onclick="viewViewing(this)">
+                                            <i class="fa-solid fa-eye"></i>
+                                        </button>
+                                        <button class="action-btn action-btn-edit" title="Edit" onclick="editViewing(this)">
+                                            <i class="fa-solid fa-pen"> </i>
+                                        </button>
+                                        <button class="action-btn action-btn-delete" title="Delete" onclick="deleteViewing(this)">
+                                            <i class="fa-solid fa-trash"></i>
+                                        </button>
+                                    </div>
+                                </td>
+                            </tr>
+
+                            <tr data-name="Doe" data-number="07700 901129" data-email="doe" data-property="london" data-datetime="13/03/2026 13:45" data-agent="Haven" data-status="Cancelled">
+                                <td class="viewer-name">John Doe</td>
+                                <td>07700 901129</td>
+                                <td class="viewer-email">Djohn@gmail.com</td>
+                                <td class="viewing-property"> 107 Regal Street, London L12 6YU</td>
+                                <td class="viewing-datetime">13/03/2026 13:45</td>
+                                <td class="agent"> Agnes Haven</td>
+                                <td>
+                                    <span class="status-badge status-cancelled">
+                                        <i class="fa-solid fa-circle-xmark"></i>
+                                        Cancelled
+                                    </span>
+                                </td>
+                                <td>
+                                    <div class="action-buttons">
+                                        <button class="action-btn action-btn-view" title="View" onclick="viewViewing(this)">
+                                            <i class="fa-solid fa-eye"></i>
+                                        </button>
+                                        <button class="action-btn action-btn-edit" title="Edit" onclick="editViewing(this)">
+                                            <i class="fa-solid fa-pen"> </i>
+                                        </button>
+                                        <button class="action-btn action-btn-delete" title="Delete" onclick="deleteViewing(this)">
+                                            <i class="fa-solid fa-trash"></i>
+                                        </button>
+                                    </div>
+                                </td>
+                            </tr>
+
+                            <tr data-name="Keel" data-number="07700 901130" data-email="keel" data-property="lancaster" data-datetime="14/03/2026 15:15" data-agent="Haven" data-status="NoShow">
+                                <td class="viewer-name">Jacy Keel</td>
+                                <td>07700 901130</td>
+                                <td class="viewer-email">Jacy.Keel@gmail.com</td>
+                                <td class="viewing-property"> 17 Loud Avenue, Lancaster L1 6OP</td>
+                                <td class="viewing-datetime">14/03/2026 15:15</td>
+                                <td class="agent"> Agnes Haven</td>
+                                <td>
+                                    <span class="status-badge status-noshow">
+                                        <i class="fa-solid fa-triangle-exclamation"></i>
+                                        No Show
+                                    </span>
+                                </td>
+                                <td>
+                                    <div class="action-buttons">
+                                        <button class="action-btn action-btn-view" title="View" onclick="viewViewing(this)">
+                                            <i class="fa-solid fa-eye"></i>
+                                        </button>
+                                        <button class="action-btn action-btn-edit" title="Edit" onclick="editViewing(this)">
+                                            <i class="fa-solid fa-pen"> </i>
+                                        </button>
+                                        <button class="action-btn action-btn-delete" title="Delete" onclick="deleteViewing(this)">
+                                            <i class="fa-solid fa-trash"></i>
+                                        </button>
+                                    </div>
+                                </td>
+                            </tr>
+
+                            <tr data-name="Tucker" data-number="07700 901131" data-email="tucker" data-property="sheffield" data-datetime="19/04/2026 10:50" data-agent="santiago" data-status="Scheduled">
+                                <td class="viewer-name">Sam Tucker</td>
+                                <td>07700 901131</td>
+                                <td class="viewer-email">TuckerSthetrucker@gmail.com</td>
+                                <td class="viewing-property"> 85 Broad Street, Sheffield, S4 5TL</td>
+                                <td class="viewing-datetime">19/04/2026 10:50</td>
+                                <td class="agent"> Carmen Santiago</td>
+                                <td>
+                                    <span class="status-badge status-scheduled">
+                                        <i class="fa-solid fa-calendar"></i>
+                                        Scheduled
+                                    </span>
+                                </td>
+                                <td>
+                                    <div class="action-buttons">
+                                        <button class="action-btn action-btn-view" title="View" onclick="viewViewing(this)">
+                                            <i class="fa-solid fa-eye"></i>
+                                        </button>
+                                        <button class="action-btn action-btn-edit" title="Edit" onclick="editViewing(this)">
+                                            <i class="fa-solid fa-pen"> </i>
+                                        </button>
+                                        <button class="action-btn action-btn-delete" title="Delete" onclick="deleteViewing(this)">
+                                            <i class="fa-solid fa-trash"></i>
+                                        </button>
+                                    </div>
+                                </td>
+                            </tr>
+                        </tbody>
+                    </table>
+                </div>
+            </div>
+        </div> 
     </main>
+
+        <!--Modals Container-->
+        <div id="modals-container"></div>
+
+        <script>
+            // Sort Table
+            function sortTable(column, headerElement) {
+                const tbody = document.getElementById('tableBody');
+                const rows = Array.from(tbody.querySelectorAll('tr'));
+
+                // Toggle sort direction
+                if (currentSort.column === column) {
+                    currentSort.direction = currentSort.direction === 'asc' ? 'desc' : 'asc';
+                } else {
+                    currentSort.column = column;
+                    currentSort.direction = 'asc';
+                }
+
+                document.querySelectorAll('table th').forEach(th => {
+                    th.classList.remove('sorted');
+                    const icon = th.querySelector('.sort-icon');
+                    if (icon) {
+                        icon.classList.remove('asc', 'desc');
+                    }
+                });
+                
+                headerElement.classList.add('sorted');
+                const icon = headerElement.querySelector('.sort-icon');
+                if (icon) {
+                    icon.classList.add(currentSort.direction);
+                }
+
+                //Sort rows
+                rows.sort((a,b) => {
+                    let aVal, bVal;
+
+                    switch(column) {
+                        case 'name':
+                            aVal = a.querySelector('.viewer-name').textContent.toLowerCase();
+                            bVal = b.querySelector('.viewer-name').textContent.toLowerCase();
+                            break;
+                        case 'number':
+                            aVal = a.cells[1].textContent.toLowerCase();
+                            bVal = b.cells[1].textContent.toLowerCase();
+                            break;
+                        case 'email':
+                            aVal = a.querySelector('.viewer-email').textContent.toLowerCase();
+                            bVal = b.querySelector('.viewer-email').textContent.toLowerCase();
+                            break;
+                        case 'property':
+                            aVal = a.querySelector('.viewing-property').textContent.toLowerCase();
+                            bVal = b.querySelector('.viewing-property').textContent.toLowerCase();
+                            break;
+                        case 'datetime':
+                            aVal = a.querySelector('.viewing-datetime').textContent.toLowerCase();
+                            bVal = b.querySelector('.viewing-datetime').textContent.toLowerCase();
+                            break;
+                        case 'agent':
+                            aVal = a.querySelector('.agent').textContent.toLowerCase();
+                            bVal = b.querySelector('.agent').textContent.toLowerCase();
+                            break;
+                        case 'status':
+                            aVal = a.querySelector('.status-badge').textContent.toLowerCase();
+                            bVal = b.querySelector('.status-badge').textContent.toLowerCase();
+                            break; 
+                        default:
+                            return 0;
+                    }
+
+                    if (aVal < bVal) return currentSort.direction === 'asc' ? -1 : 1;
+                    if (aVal > bVal) return currentSort.direction === 'asc' ? 1 : -1;
+                    return 0;
+                });
+
+                rows.forEach(row => tbody.appendChild(row));
+
+                //Update statuses after sorting
+                updateAllStatuses();
+            }
+
+            //Filter Viewings
+            function filterViewings() {
+                const statusFilter = document.getElementById('filterStatus').value;
+                const datetimeFilter = document.getElementById('filterDateTime').value;
+                const agentFilter = document.getElementById('filterAgent').value;
+
+                const rows = document.querySelectorAll('#tableBody tr');
+
+                rows.forEach(row => {
+                    let show = true;
+
+                    //Status filter
+                    if (statusFilter) {
+                        const statusCell = row.querySelector('.status-badge');
+                        if (statusCell && statusCell.textContent.toLowerCase().includes(statusFilter.toLowerCase()) === false) {
+                            show = false;
+                        }
+                    }
+
+                    //Viewing date filters
+                    // Viewing date filter
+                    if (datetimeFilter) {
+
+                        const datetimeCell = row.querySelector('.viewing-datetime');
+
+                        if (datetimeCell) {
+
+                            const text = datetimeCell.textContent.trim();
+
+                            const [datePart, timePart] = text.split(' ');
+                            const [day, month, year] = datePart.split('/');
+                            const [hour, minute] = timePart.split(':');
+
+                            const viewingDate = new Date(year, month - 1, day, hour, minute);
+                            const filterDate = new Date(datetimeFilter);
+
+                            if (viewingDate < filterDate) {
+                                show = false;
+                            }
+                        }
+                    }
+
+                    if (agentFilter) {
+                        const agentCell = row.querySelector('.agent');
+
+                        if (agentCell && agentCell.textContent.toLowerCase().includes(agentFilter.toLowerCase()) === false) {
+                            show = false;
+                        }
+                    }
+
+                    row.style.display = show ? '' : 'none';
+                });
+            }
+
+            //Reset filters
+            function resetFilters() {
+                document.getElementById('filterStatus').value = '';
+                document.getElementById('filterDateTime').value = '';
+                document.getElementById('filterAgent').value = '';
+
+                const rows = document.querySelectorAll('#tableBody tr');
+                rows.forEach(row => row.style.display = '');
+
+                document.querySelectorAll('table th').forEach(th => {
+                    th.classList.remove('sorted');
+                    const icon = th.querySelector('.sort-icon');
+                    if (icon) {
+                        icon.classList.remove('asc', 'desc');
+                    }
+                });
+                currentSort = { column: null, direction: 'asc' };
+            }
+
+            //Update all viewing dynamically based on viewing dates
+            function updateAllStatuses() {
+                const rows = document.querySelectorAll('#tableBody tr');
+                const today = new Date();
+
+                rows.forEach(row => {
+                    const statusCell = row.querySelector('.status-badge');
+                    const datetimeCell = row.querySelector('.viewing-datetime');
+                    const agentCell = row.querySelector('.agent');
+                   if (!datetimeCell || !statusCell || !agentCell) return; 
+
+                   const datetimeText = datetimeCell.textContent.trim();
+                   const parseDateTime = (dateStr) => {
+                        if (!dateStr) return null;
+
+                        const [datePart, timePart] = dateStr.trim().split(' ');
+                        const [day, month, year] = datePart.split('/').map(Number);
+                        const [hour, minute] = timePart.split(':').map(Number);
+
+                        return new Date(year, month - 1, day, hour, minute);
+                    };
+                    const viewingDate = parseDateTime(datetimeText);
+
+                    //let status, statusKey, icon;
+                    //if (viewingDate > today) {
+                    //    status = 'Scheduled';
+                    //    statusKey = 'scheduled';
+                    //    icon = 'fa-calendar';
+                    //} else {
+                    //    status = 'Completed';
+                    //    statusKey = 'completed';
+                    //    icon = 'fa-circle-check';
+                    //}
+
+                    statusCell.innerHTML = `<i class="fa-solid ${icon}"></i> ${status}`;
+                    statusCell.className = `status-badge status-${statusKey}`;
+                    row.dataset.status = statusKey;
+                    
+                });
+            }
+
+            //Viewing action functions
+            function viewViewing(btn) {
+                const row = btn.closest('tr');
+                const name = row.querySelector('.viewer-name').textContent;
+                alert('View Viewer: ' + name);
+            }
+
+            function editViewing(btn) {
+                const row = btn.closest('tr');
+                const name = row.querySelector('.viewer-name').textContent;
+                alert('Edit Viewer: ' + name);
+            }
+
+            function deleteViewing(btn) {
+                const row = btn.closest('tr');
+                const name = row.querySelector('.viewer-name').textContent;
+                if (confirm('Are you sure you want to delete viewer ' + name + '?')) {
+                    row.remove();
+                }
+            }
+
+            // Initialize statuses on Load
+            window.addEventListener('load', () =>{
+                updateAllStatuses();
+            });
+
+        </script>
 
 </body>
 </html>
