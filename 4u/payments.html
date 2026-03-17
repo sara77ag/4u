@@ -372,7 +372,6 @@
 
                 if (!nextDueCell || !statusCell) return;
 
-                // If already paid, keep it paid
                 if (row.dataset.status === "paid") {
                     statusCell.innerHTML = `<i class="fa-solid fa-circle-check"></i> Paid`;
                     statusCell.className = "status-badge status-paid";

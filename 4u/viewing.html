@@ -398,16 +398,16 @@
                     };
                     const viewingDate = parseDateTime(datetimeText);
 
-                    let status, statusKey, icon;
-                    if (viewingDate > today) {
-                        status = 'Scheduled';
-                        statusKey = 'scheduled';
-                        icon = 'fa-calendar';
-                    } else {
-                        status = 'Completed';
-                        statusKey = 'completed';
-                        icon = 'fa-circle-check';
-                    }
+                    //let status, statusKey, icon;
+                    //if (viewingDate > today) {
+                    //    status = 'Scheduled';
+                    //    statusKey = 'scheduled';
+                    //    icon = 'fa-calendar';
+                    //} else {
+                    //    status = 'Completed';
+                    //    statusKey = 'completed';
+                    //    icon = 'fa-circle-check';
+                    //}
 
                     statusCell.innerHTML = `<i class="fa-solid ${icon}"></i> ${status}`;
                     statusCell.className = `status-badge status-${statusKey}`;
