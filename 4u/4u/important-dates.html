@@ -1,0 +1,203 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Important Dates - iLet4You</title>
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.1/css/all.min.css">
+    <link rel="stylesheet" href="style.css">
+    <link rel="stylesheet" href="tables.css">
+    <script src="navbar.js" defer></script>
+    <script src="modals.js" defer></script>
+    <style>
+        /* Column specific widths */
+        .col-property { width: 22%; }
+        .col-gas { width: 11%; }
+        .col-electric { width: 12%; }
+        .col-epc { width: 11%; }
+        .col-idlandlord { width: 12%; }
+        .col-idtenant { width: 11%; }
+        .col-contract {width: 11%}
+        .col-action { width: 10%; text-align: center; }
+    </style>
+</head>
+<body onload="CallNavbar(); loadModals();">
+
+    <!-- Navbar Container -->
+    <div id="navbar-container"></div>
+
+    <!-- Main Content -->
+    <main class="main-content">
+        <!-- Page Title -->
+        <h1 class="page-title">Important Dates</h1>
+
+        <div class="main-container">
+            <!-- Main Contols Row -->
+            <div class="controls-row">
+                <!-- Filter Toggle Button -->
+                <button class="btn-filter-toggle" id="filterToggle" onclick="toggleFilter()">
+                    <i class="fa-solid fa-filter"></i> Filter
+                </button>
+
+                <!-- Filter Dropdowns -->
+                <div class="filter-dropdowns" id="filterDropdowns" style="display: none;">
+                    <div class="filter-group">
+                        <label>Property</label>
+                        <input type="text" id="filterProperty" onchange="filterImportantDates()">
+                        </input>
+                    </div>
+                    <button class="filter-btn-reset" onclick="resetFilters()">
+                        <i class="fa-solid fa-rotate-left"></i>
+                    </button>
+                </div>
+
+                <!-- Spacer to push button to right -->
+                <div class="controls-spacer"></div>
+
+                <!-- Action Button -->
+                <button class="btn-add blue" onclick="openAddImportantDatesModal()">
+                    <i class="fa-solid fa-plus"></i> Important Dates
+                </button>
+            </div>
+
+            <!-- Table Container -->
+            <div class="table-container">
+                <div class="table-wrapper">
+                    <table id="tenantsTable">
+                        <thead>
+                            <tr>
+                                <th class="sortable col-property" onclick="sortTable('property', this)">
+                                    Property <i class="fa-solid fa-sort sort-icon"></i>
+                                </th>
+                                <th class="sortable col-gas" onclick="sortTable('gas', this)">
+                                    Gas <i class="fa-solid fa-sort sort-icon"></i>
+                                </th>
+                                <th class="sortable col-electric" onclick="sortTable('electric', this)">
+                                    Electric <i class="fa-solid fa-sort sort-icon"></i>
+                                </th>
+                                <th class="sortable col-epc" onclick="sortTable('epc', this)">
+                                    EPC <i class="fa-solid fa-sort sort-icon"></i>
+                                </th>
+                                <th class="sortable col-idlandlord" onclick="sortTable('idlandlord', this)">
+                                    Landlord Id <br>Verification <i class="fa-solid fa-sort sort-icon"></i>
+                                </th>
+                                <th class="sortable col-idtenant" onclick="sortTable('idtenanat', this)">
+                                    Tenant Id <br>verification <i class="fa-solid fa-sort sort-icon"></i>
+                                </th>
+                                <th class="sortable col-contract" onclick="sortTable('contract', this)">
+                                    Contract <i class="fa-solid fa-sort sort-icon"></i>
+                                </th>
+                                <th class="col-action">Action</th>
+                            </tr>
+                        </thead>
+                        <tbody id="tableBody">
+
+                            <tr data-property="newcastle" data-gas="15/04/2026" data-electric="18/06/2027" data-epc="03/04/2028" data-idlandlord="12/12/2027" data-idtenanat="30/04/2026" data-contract="16/06/2026">
+                                <td class="property-name">84 third street, Newcastle, N15 6HT</td>
+                                <td class="gas-date">15/04/2026</td>
+                                <td class="electric-date">18/06/2027</td>
+                                <td class="epc-date">03/04/2028</td>
+                                <td class="landlord-id-ver">12/12/2027</td>
+                                <td class="tenant-id-ver">30/04/2026</td>
+                                <td class="contract-enddate">16/06/2026</td>
+                                <td>
+                                    <div class="action-buttons">
+                                        <button class="action-btn action-btn-view" title="View" onclick="viewImportantDate(this)">
+                                            <i class="fa-solid fa-eye"></i>
+                                        </button>
+                                        <button class="action-btn action-btn-edit" title="Edit" onclick="editImportantDate(this)">
+                                            <i class="fa-solid fa-pen"></i>
+                                        </button>
+                                        <button class="action-btn action-btn-delete" title="Delete" onclick="deleteImportantDate(this)">
+                                            <i class="fa-solid fa-trash"></i>
+                                        </button>
+                                    </div>
+                                </td>
+                            </tr>
+                            <tr data-property="london" data-gas="19/08/2027" data-electric="18/10/2029" data-epc="03/04/2026" data-idlandlord="12/03/2027" data-idtenanat="30/09/2030" data-contract="24/07/2026">
+                                <td class="property-name">132 Highland Road, London, L92 8YU</td>
+                                <td class="gas-date">19/08/2027</td>
+                                <td class="electric-date">18/10/2029</td>
+                                <td class="epc-date">03/04/2026</td>
+                                <td class="landlord-id-ver">12/03/2027</td>
+                                <td class="tenant-id-ver">30/09/2030</td>
+                                <td class="contract-enddate">24/07/2026</td>
+                                <td>
+                                    <div class="action-buttons">
+                                        <button class="action-btn action-btn-view" title="View" onclick="viewImportantDate(this)">
+                                            <i class="fa-solid fa-eye"></i>
+                                        </button>
+                                        <button class="action-btn action-btn-edit" title="Edit" onclick="editImportantDate(this)">
+                                            <i class="fa-solid fa-pen"></i>
+                                        </button>
+                                        <button class="action-btn action-btn-delete" title="Delete" onclick="deleteImportantDate(this)">
+                                            <i class="fa-solid fa-trash"></i>
+                                        </button>
+                                    </div>
+                                </td>
+                            </tr>
+                            <tr data-property="london" data-gas="15/04/2026" data-electric="18/06/2027" data-epc="03/04/2028" data-idlandlord="12/12/2027" data-idtenanat="30/04/2026" data-contract="16/06/2026">
+                                <td class="property-name">1 Bedford, Bird Lane, London, L2 3RT</td>
+                                <td class="gas-date">15/04/2026</td>
+                                <td class="electric-date">18/06/2027</td>
+                                <td class="epc-date">03/04/2028</td>
+                                <td class="landlord-id-ver">12/12/2027</td>
+                                <td class="tenant-id-ver">30/04/2026</td>
+                                <td class="contract-enddate">16/06/2026</td>
+                                <td>
+                                    <div class="action-buttons">
+                                        <button class="action-btn action-btn-view" title="View" onclick="viewImportantDate(this)">
+                                            <i class="fa-solid fa-eye"></i>
+                                        </button>
+                                        <button class="action-btn action-btn-edit" title="Edit" onclick="editImportantDate(this)">
+                                            <i class="fa-solid fa-pen"></i>
+                                        </button>
+                                        <button class="action-btn action-btn-delete" title="Delete" onclick="deleteImportantDate(this)">
+                                            <i class="fa-solid fa-trash"></i>
+                                        </button>
+                                    </div>
+                                </td>
+                            </tr>
+                            <tr data-property="liverpool" data-gas="15/04/2026" data-electric="18/06/2027" data-epc="03/04/2028" data-idlandlord="12/12/2027" data-idtenanat="30/04/2026" data-contract="16/06/2026">
+                                <td class="property-name">132 Yenta Street, Liverpool, L13 4RE</td>
+                                <td class="gas-date">15/04/2026</td>
+                                <td class="electric-date">18/06/2027</td>
+                                <td class="epc-date">03/04/2028</td>
+                                <td class="landlord-id-ver">12/12/2027</td>
+                                <td class="tenant-id-ver">30/04/2026</td>
+                                <td class="contract-enddate">16/06/2026</td>
+                                <td>
+                                    <div class="action-buttons">
+                                        <button class="action-btn action-btn-view" title="View" onclick="viewImportantDate(this)">
+                                            <i class="fa-solid fa-eye"></i>
+                                        </button>
+                                        <button class="action-btn action-btn-edit" title="Edit" onclick="editImportantDate(this)">
+                                            <i class="fa-solid fa-pen"></i>
+                                        </button>
+                                        <button class="action-btn action-btn-delete" title="Delete" onclick="deleteImportantDate(this)">
+                                            <i class="fa-solid fa-trash"></i>
+                                        </button>
+                                    </div>
+                                </td>
+                            </tr>
+                        </tbody>
+                    </table>
+                </div>
+            </div>
+        </div>
+    </main>
+
+        <!--Modals Conatainer-->
+        <div id="modals-container"></div>
+
+        <script>
+            //Sort Table
+            function sortTable(column,headerElement) {
+                const tbody = document.getElementById('tableBody');
+                const rows = Array.from(tbody.querySelectorAll)
+            }
+        </script>
+
+</body>
+</html>
+
