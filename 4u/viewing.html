@@ -69,7 +69,7 @@
 
                 <!-- Action Button -->
                 <button class="btn-add blue" onclick="openAddViewingModal()">
-                    <i class="fa-solid fa-plus"></i> Tenant
+                    <i class="fa-solid fa-plus"></i> Viewings
                 </button>
             </div>
 
@@ -344,6 +344,7 @@
                         }
                     }
 
+                    //Agent Filter
                     if (agentFilter) {
                         const agentCell = row.querySelector('.agent');
 
@@ -397,17 +398,6 @@
                         return new Date(year, month - 1, day, hour, minute);
                     };
                     const viewingDate = parseDateTime(datetimeText);
-
-                    //let status, statusKey, icon;
-                    //if (viewingDate > today) {
-                    //    status = 'Scheduled';
-                    //    statusKey = 'scheduled';
-                    //    icon = 'fa-calendar';
-                    //} else {
-                    //    status = 'Completed';
-                    //    statusKey = 'completed';
-                    //    icon = 'fa-circle-check';
-                    //}
 
                     statusCell.innerHTML = `<i class="fa-solid ${icon}"></i> ${status}`;
                     statusCell.className = `status-badge status-${statusKey}`;
