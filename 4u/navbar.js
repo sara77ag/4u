@@ -11,7 +11,7 @@ function CallNavbar() {
             
             menuItems.forEach(item => {
                 const href = item.getAttribute('href');
-                if (href === currentPage || (currentPage === '' && href === 'dashboard.html')) {
+                if (href === currentPage || (currentPage === '' && href === 'dashboard.php')) {
                     item.parentElement.classList.add('active');
                 } else {
                     item.parentElement.classList.remove('active');
