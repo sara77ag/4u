@@ -41,8 +41,8 @@ if ($_SERVER["REQUEST_METHOD"] == "POST") {
     <title>Login - iLet4You</title>
     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.1/css/all.min.css">
     <link rel="stylesheet" href="style.css">
-    <script src="navbar.js" defer></script>
-    <script src="modals.js" defer></script>
+    <script src="navbar.js" ></script>
+    <script src="modals.js" ></script>
 </head>
 <body class="login-page">
         <div class="login-container">
