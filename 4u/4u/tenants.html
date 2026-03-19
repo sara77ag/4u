@@ -1,0 +1,451 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Tenants - iLet4You</title>
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.1/css/all.min.css">
+    <link rel="stylesheet" href="style.css">
+    <link rel="stylesheet" href="tables.css">
+    <script src="navbar.js" defer></script>
+    <script src="modals.js" defer></script>
+    <style>
+        /* Column specific widths */
+        .col-name { width: 16%; }
+        .col-number { width: 12%; }
+        .col-email { width: 22%; }
+        .col-address { width: 20%; }
+        .col-status { width: 10%; }
+        .col-contract { width: 15%; }
+        .col-action { width: 10%; text-align: center; }
+    </style>
+</head>
+<body onload="CallNavbar(); loadModals();">
+ 
+    <!-- Navbar Container -->
+    <div id="navbar-container"></div>
+
+    <!-- Main Content -->
+    <main class="main-content">
+        <!-- Page Title -->
+        <h1 class="page-title">Tenants</h1>
+
+        <div class="main-container">
+            <!-- Main Controls Row -->
+            <div class="controls-row">
+                <!-- Filter Toggle Button -->
+                <button class="btn-filter-toggle" id="filterToggle" onclick="toggleFilter()">
+                    <i class="fa-solid fa-filter"></i> Filter
+                </button>
+
+                <!-- Filter Dropdowns -->
+                <div class="filter-dropdowns" id="filterDropdowns" style="display: none;">
+                    <div class="filter-group">
+                        <label>Status</label>
+                        <select id="filterStatus" onchange="filterTenants()">
+                            <option value="">All Statuses</option>
+                            <option value="active">Active</option>
+                            <option value="former">Former</option>
+                            <option value="new">New</option>
+                        </select>
+                    </div>
+                    <div class="filter-group">
+                        <label>Start</label>
+                        <input type="date" id="filterStart" onchange="filterTenants()">
+                    </div>
+                    <div class="filter-group">
+                        <label>End</label>
+                        <input type="date" id="filterEnd" onchange="filterTenants()">
+                    </div>
+                    <button class="filter-btn-reset" onclick="resetFilters()">
+                        <i class="fa-solid fa-rotate-left"></i> 
+                    </button>
+                </div>
+
+                <!-- Spacer to push button to right -->
+                <div class="controls-spacer"></div>
+
+                <!-- Action Button -->
+                <button class="btn-add blue" onclick="openAddTenantModal()">
+                    <i class="fa-solid fa-plus"></i> Tenant
+                </button>
+            </div>
+
+            <!-- Table Container -->
+            <div class="table-container">
+                <div class="table-wrapper">
+                    <table id="tenantsTable">
+                        <thead>
+                            <tr>
+                                <th class="sortable col-name" onclick="sortTable('name', this)">
+                                    Name <i class="fa-solid fa-sort sort-icon"></i>
+                                </th>
+                                <th class="sortable col-number" onclick="sortTable('number', this)">
+                                    Number <i class="fa-solid fa-sort sort-icon"></i>
+                                </th>
+                                <th class="sortable col-email" onclick="sortTable('email', this)">
+                                    Email <i class="fa-solid fa-sort sort-icon"></i>
+                                </th>
+                                <th class="sortable col-address" onclick="sortTable('address', this)">
+                                    Address <i class="fa-solid fa-sort sort-icon"></i>
+                                </th>
+                                <th class="sortable col-status" onclick="sortTable('status', this)">
+                                    Status <i class="fa-solid fa-sort sort-icon"></i>
+                                </th>
+                                <th class="sortable col-contract" onclick="sortTable('contract', this)">
+                                    Contract <i class="fa-solid fa-sort sort-icon"></i>
+                                </th>
+                                <th class="col-action">Action</th>
+                            </tr>
+                        </thead>
+                        <tbody id="tableBody">
+
+                            <tr data-name="johnson" data-number="07700901123" data-email="johnson" data-address="london" data-status="active" data-contract="2025-01">
+                                <td class="tenant-name">Sarah Johnson</td>
+                                <td>07700 901123</td>
+                                <td class="td-email">sarah.johnson@email.com</td>
+                                <td class="tenant-address">123 High St, London, SW1 1AA</td>
+                                <td>
+                                    <span class="status-badge status-active">
+                                        <i class="fa-solid fa-circle-check"></i> Active
+                                    </span>
+                                </td>
+                                <td class="contract-info">01/01/2025 to 01/01/2026</td>
+                                <td>
+                                    <div class="action-buttons">
+                                        <button class="action-btn action-btn-view" title="View" onclick="viewTenant(this)">
+                                            <i class="fa-solid fa-eye"></i>
+                                        </button>
+                                        <button class="action-btn action-btn-edit" title="Edit" onclick="editTenant(this)">
+                                            <i class="fa-solid fa-pen"></i>
+                                        </button>
+                                        <button class="action-btn action-btn-delete" title="Delete" onclick="deleteTenant(this)">
+                                            <i class="fa-solid fa-trash"></i>
+                                        </button>
+                                    </div>
+                                </td>
+                            </tr>
+
+                            <tr data-name="williams" data-number="07700901124" data-email="williams" data-address="manchester" data-status="long-term" data-contract="2024-12">
+                                <td class="tenant-name">Mike Williams</td>
+                                <td>07700 901124</td>
+                                <td class="td-email">mike.williams@email.com</td>
+                                <td class="tenant-address">456 Oxford Rd, Manchester, M1 5EE</td>
+                                <td>
+                                    <span class="status-badge status-long-term">
+                                        <i class="fa-solid fa-clock"></i> Long-term
+                                    </span>
+                                </td>
+                                <td class="contract-info">01/12/2024 to 01/12/2027</td>
+                                <td>
+                                    <div class="action-buttons">
+                                        <button class="action-btn action-btn-view" title="View" onclick="viewTenant(this)">
+                                            <i class="fa-solid fa-eye"></i>
+                                        </button>
+                                        <button class="action-btn action-btn-edit" title="Edit" onclick="editTenant(this)">
+                                            <i class="fa-solid fa-pen"></i>
+                                        </button>
+                                        <button class="action-btn action-btn-delete" title="Delete" onclick="deleteTenant(this)">
+                                            <i class="fa-solid fa-trash"></i>
+                                        </button>
+                                    </div>
+                                </td>
+                            </tr>
+
+                            <tr data-name="davis" data-number="07700901125" data-email="davis" data-address="birmingham" data-status="notice" data-contract="2025-02">
+                                <td class="tenant-name">Emma Davis</td>
+                                <td>07700 901125</td>
+                                <td class="td-email">emma.davis@email.com</td>
+                                <td class="tenant-address">789 New St, Birmingham, B2 4QA</td>
+                                <td>
+                                    <span class="status-badge status-notice">
+                                        <i class="fa-solid fa-exclamation-triangle"></i> Notice
+                                    </span>
+                                </td>
+                                <td class="contract-info">01/02/2025 to 31/08/2025</td>
+                                <td>
+                                    <div class="action-buttons">
+                                        <button class="action-btn action-btn-view" title="View" onclick="viewTenant(this)">
+                                            <i class="fa-solid fa-eye"></i>
+                                        </button>
+                                        <button class="action-btn action-btn-edit" title="Edit" onclick="editTenant(this)">
+                                            <i class="fa-solid fa-pen"></i>
+                                        </button>
+                                        <button class="action-btn action-btn-delete" title="Delete" onclick="deleteTenant(this)">
+                                            <i class="fa-solid fa-trash"></i>
+                                        </button>
+                                    </div>
+                                </td>
+                            </tr>
+
+                            <tr data-name="brown" data-number="07700901126" data-email="brown" data-address="liverpool" data-status="vacant" data-contract="">
+                                <td class="tenant-name">David Brown</td>
+                                <td>07700 901126</td>
+                                <td class="td-email">david.brown@email.com</td>
+                                <td class="tenant-address">321 Liverpool Rd, Liverpool, L3 8EA</td>
+                                <td>
+                                    <span class="status-badge status-vacant">
+                                        <i class="fa-solid fa-house"></i> Vacant
+                                    </span>
+                                </td>
+                                <td class="contract-info">-</td>
+                                <td>
+                                    <div class="action-buttons">
+                                        <button class="action-btn action-btn-view" title="View" onclick="viewTenant(this)">
+                                            <i class="fa-solid fa-eye"></i>
+                                        </button>
+                                        <button class="action-btn action-btn-edit" title="Edit" onclick="editTenant(this)">
+                                            <i class="fa-solid fa-pen"></i>
+                                        </button>
+                                        <button class="action-btn action-btn-delete" title="Delete" onclick="deleteTenant(this)">
+                                            <i class="fa-solid fa-trash"></i>
+                                        </button>
+                                    </div>
+                                </td>
+                            </tr>
+
+                            <tr data-name="taylor" data-number="07700901127" data-email="taylor" data-address="bristol" data-status="active" data-contract="2025-04">
+                                <td class="tenant-name">Lisa Taylor</td>
+                                <td>07700 901127</td>
+                                <td class="td-email">lisa.taylor@email.com</td>
+                                <td class="tenant-address">654 Park St, Bristol, BS2 8PE</td>
+                                <td>
+                                    <span class="status-badge status-active">
+                                        <i class="fa-solid fa-circle-check"></i> Active
+                                    </span>
+                                </td>
+                                <td class="contract-info">01/04/2025 to 01/04/2026</td>
+                                <td>
+                                    <div class="action-buttons">
+                                        <button class="action-btn action-btn-view" title="View" onclick="viewTenant(this)">
+                                            <i class="fa-solid fa-eye"></i>
+                                        </button>
+                                        <button class="action-btn action-btn-edit" title="Edit" onclick="editTenant(this)">
+                                            <i class="fa-solid fa-pen"></i>
+                                        </button>
+                                        <button class="action-btn action-btn-delete" title="Delete" onclick="deleteTenant(this)">
+                                            <i class="fa-solid fa-trash"></i>
+                                        </button>
+                                    </div>
+                                </td>
+                            </tr>
+                        </tbody>
+                    </table>
+                </div>
+            </div>
+        </div>
+    </main>
+
+        <!-- Modals Container -->
+    <div id="modals-container"></div>
+
+    <script>
+        // Sort Table
+        function sortTable(column, headerElement) {
+            const tbody = document.getElementById('tableBody');
+            const rows = Array.from(tbody.querySelectorAll('tr'));
+            
+            // Toggle sort direction
+            if (currentSort.column === column) {
+                currentSort.direction = currentSort.direction === 'asc' ? 'desc' : 'asc';
+            } else {
+                currentSort.column = column;
+                currentSort.direction = 'asc';
+            }
+            
+            // Update header styles
+            document.querySelectorAll('table th').forEach(th => {
+                th.classList.remove('sorted');
+                const icon = th.querySelector('.sort-icon');
+                if (icon) {
+                    icon.classList.remove('asc', 'desc');
+                }
+            });
+            
+            headerElement.classList.add('sorted');
+            const icon = headerElement.querySelector('.sort-icon');
+            if (icon) {
+                icon.classList.add(currentSort.direction);
+            }
+            
+            // Sort rows
+            rows.sort((a, b) => {
+                let aVal, bVal;
+                
+                switch(column) {
+                    case 'name':
+                        aVal = a.querySelector('.tenant-name').textContent.toLowerCase();
+                        bVal = b.querySelector('.tenant-name').textContent.toLowerCase();
+                        break;
+                    case 'number':
+                        aVal = a.cells[1].textContent.toLowerCase();
+                        bVal = b.cells[1].textContent.toLowerCase();
+                        break;
+                    case 'email':
+                        aVal = a.querySelector('.td-email').textContent.toLowerCase();
+                        bVal = b.querySelector('.td-email').textContent.toLowerCase();
+                        break;
+                    case 'address':
+                        aVal = a.querySelector('.tenant-address').textContent.toLowerCase();
+                        bVal = b.querySelector('.tenant-address').textContent.toLowerCase();
+                        break;
+                    case 'status':
+                        aVal = a.querySelector('.status-badge').textContent.toLowerCase();
+                        bVal = b.querySelector('.status-badge').textContent.toLowerCase();
+                        break;
+                    case 'contract':
+                        aVal = a.querySelector('.contract-info').textContent.toLowerCase();
+                        bVal = b.querySelector('.contract-info').textContent.toLowerCase();
+                        break;
+                    default:
+                        return 0;
+                }
+                
+                if (aVal < bVal) return currentSort.direction === 'asc' ? -1 : 1;
+                if (aVal > bVal) return currentSort.direction === 'asc' ? 1 : -1;
+                return 0;
+            });
+            
+            rows.forEach(row => tbody.appendChild(row));
+            
+            // Update statuses after sorting
+            updateAllStatuses();
+        }
+
+        // Filter Tenants
+        function filterTenants() {
+            const statusFilter = document.getElementById('filterStatus').value;
+            const startFilter = document.getElementById('filterStart').value;
+            const endFilter = document.getElementById('filterEnd').value;
+            
+            const rows = document.querySelectorAll('#tableBody tr');
+            
+            rows.forEach(row => {
+                let show = true;
+                
+                // Status filter
+                if (statusFilter) {
+                    const statusCell = row.querySelector('.status-badge');
+                    if (statusCell && statusCell.textContent.toLowerCase().includes(statusFilter.toLowerCase()) === false) {
+                        show = false;
+                    }
+                }
+                
+                // Contract date filters
+                if (startFilter || endFilter) {
+                    const contractCell = row.querySelector('.contract-info');
+                    if (contractCell && contractCell.textContent !== '-') {
+                        const [startDate, endDate] = contractCell.textContent.split(' to ');
+                        if (startFilter && new Date(startDate) < new Date(startFilter)) {
+                            show = false;
+                        }
+                        if (endFilter && new Date(endDate) > new Date(endFilter)) {
+                            show = false;
+                        }
+                    }
+                }
+                
+                row.style.display = show ? '' : 'none';
+            });
+        }
+
+        // Reset filters
+        function resetFilters() {
+            document.getElementById('filterStatus').value = '';
+            document.getElementById('filterStart').value = '';
+            document.getElementById('filterEnd').value = '';
+            
+            const rows = document.querySelectorAll('#tableBody tr');
+            rows.forEach(row => row.style.display = '');
+            
+            document.querySelectorAll('table th').forEach(th => {
+                th.classList.remove('sorted');
+                const icon = th.querySelector('.sort-icon');
+                if (icon) {
+                    icon.classList.remove('asc', 'desc');
+                }
+            });
+            currentSort = { column: null, direction: 'asc' };
+        }
+
+        // Update all tenant statuses dynamically based on contract dates
+        function updateAllStatuses() {
+            const rows = document.querySelectorAll('#tableBody tr');
+            const today = new Date();
+
+            rows.forEach(row => {
+                const contractCell = row.querySelector('.contract-info');
+                const statusCell = row.querySelector('.status-badge');
+                if (!contractCell || !statusCell) return;
+
+                const contractText = contractCell.textContent.trim();
+                if (contractText === '-' || contractText === '') {
+                    // No contract -> New
+                    statusCell.innerHTML = '<i class="fa-solid fa-play-circle"></i> New';
+                    statusCell.className = 'status-badge status-new';
+                    row.dataset.status = 'new';
+                    return;
+                }
+
+                const [startStr, endStr] = contractText.split(' to ');
+                if (!startStr || !endStr) return;
+
+                // Parse MM/DD/YYYY -> Date (assume current year if needed, but samples have full year)
+                const parseDate = (dateStr) => {
+                    const [month, day, year] = dateStr.split('/').map(Number);
+                    return new Date(year, month - 1, day); // JS months 0-indexed
+                };
+
+                const startDate = parseDate(startStr.trim());
+                const endDate = parseDate(endStr.trim());
+
+                let status, statusKey, icon;
+                if (today >= startDate && today <= endDate) {
+                    status = 'Active';
+                    statusKey = 'active';
+                    icon = 'fa-circle-check';
+                } else if (today > endDate) {
+                    status = 'Former';
+                    statusKey = 'former';
+                    icon = 'fa-clock';
+                } else {
+                    status = 'new';
+                    statusKey = 'new';
+                    icon = 'fa-play-circle';
+                }
+
+                statusCell.innerHTML = `<i class="fa-solid ${icon}"></i> ${status}`;
+                statusCell.className = `status-badge status-${statusKey}`;
+                row.dataset.status = statusKey;
+            });
+        }
+
+        // Tenant action functions
+        function viewTenant(btn) {
+            const row = btn.closest('tr');
+            const name = row.querySelector('.tenant-name').textContent;
+            alert('View Tenant: ' + name);
+        }
+
+        function editTenant(btn) {
+            const row = btn.closest('tr');
+            const name = row.querySelector('.tenant-name').textContent;
+            alert('Edit Tenant: ' + name);
+        }
+
+        function deleteTenant(btn) {
+            const row = btn.closest('tr');
+            const name = row.querySelector('.tenant-name').textContent;
+            if (confirm('Are you sure you want to delete tenant ' + name + '?')) {
+                row.remove();
+            }
+        }
+
+        // Initialize statuses on load
+        window.addEventListener('load', () => {
+            updateAllStatuses();
+        });
+    </script>
+</body>
+</html>
+
