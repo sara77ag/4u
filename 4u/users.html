@@ -7,8 +7,8 @@
     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.1/css/all.min.css">
     <link rel="stylesheet" href="style.css">
     <link rel="stylesheet" href="tables.css">
-    <script src="navbar.js" defer></script>
-    <script src="modals.js" defer></script>
+    <script src="navbar.js" ></script>
+    <script src="modals.js" ></script>
 </head>
 <body onload="CallNavbar(); loadModals();">
     <!-- Navbar Container -->
@@ -348,11 +348,6 @@
             cards.forEach(card => card.style.display = '');
 
             sortUsers();
-        }
-
-        // Stub for Add User Modal
-        function openAddUserModal() {
-            alert('Open Add User Modal');
         }
 
         // User action functions

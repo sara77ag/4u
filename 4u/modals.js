@@ -183,8 +183,7 @@ function resetAddUserForm() { resetForm('user'); }
                 xhr.onreadystatechange = function() {
                     if (xhr.readyState === 4 && xhr.status === 200) {
                         modalsContainer.innerHTML = xhr.responseText;
-                        // Re-initialize modal close on outside click after loading
-                        initModalClose();
+
                     }
                 };
                 xhr.send();
