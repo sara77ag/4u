@@ -26,8 +26,8 @@ $deadlines = $pdo->query("SELECT COUNT(*) FROM tenants WHERE contract_end BETWEE
     <title>Dashboard - iLet4You</title>
     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.1/css/all.min.css">
     <link rel="stylesheet" href="style.css">
-    <script src="navbar.js" defer></script>
-    <script src="modals.js" defer></script>
+    <script src="navbar.js" ></script>
+    <script src="modals.js" ></script>
 
 </head>
 <body onload="CallNavbar(); loadModals();">
@@ -227,35 +227,7 @@ $deadlines = $pdo->query("SELECT COUNT(*) FROM tenants WHERE contract_end BETWEE
             }
         });
 
-        // Function to load modals from external file
-        function loadModals() {
-            const modalsContainer = document.getElementById('modals-container');
-            if (modalsContainer) {
-                // Create XMLHttpRequest to load the modals.html file
-                const xhr = new XMLHttpRequest();
-                xhr.open('GET', 'modals.html', true);
-                xhr.onreadystatechange = function() {
-                    if (xhr.readyState === 4 && xhr.status === 200) {
-                        modalsContainer.innerHTML = xhr.responseText;
-                        // Re-initialize modal close on outside click after loading
-                        initModalClose();
-                    }
-                };
-                xhr.send();
-            }
-        }
 
-        // Initialize modal close on outside click
-        function initModalClose() {
-            document.querySelectorAll('.modal-overlay').forEach(function(overlay) {
-                overlay.addEventListener('click', function(e) {
-                    if (e.target === overlay) {
-                        overlay.classList.remove('active');
-                        document.body.style.overflow = 'auto';
-                    }
-                });
-            });
-        }
     </script>
 </body>
 </html>

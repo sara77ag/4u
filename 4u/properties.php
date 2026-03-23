@@ -44,8 +44,8 @@ $properties = $stmt->fetchAll(PDO::FETCH_ASSOC);
     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.1/css/all.min.css">
     <link rel="stylesheet" href="style.css">
     <link rel="stylesheet" href="tables.css">
-    <script src="navbar.js" defer></script>
-    <script src="modals.js" defer></script>
+    <script src="navbar.js" ></script>
+    <script src="modals.js" ></script>
     <style>
         .col-address { width: 18%; }
         .col-type { width: 8%; }
@@ -205,7 +205,6 @@ $properties = $stmt->fetchAll(PDO::FETCH_ASSOC);
     <div id="modals-container"></div>
 
     <script>
-        let currentSort = { column: null, direction: 'asc' };
 
         function toggleFilter() {
             const dropdown = document.getElementById('filterDropdowns');
@@ -327,6 +326,14 @@ $properties = $stmt->fetchAll(PDO::FETCH_ASSOC);
             const row = btn.closest('tr');
             const address = row.querySelector('.td-address').textContent;
             alert('Edit Property: ' + address);
+        }
+
+        function deleteProperty(btn) {
+            const row = btn.closest('tr');
+            const id = row.querySelector('.property-id').textContent;
+            if (confirm('Are you sure you want to delete property ' + id + '?')) {
+                row.remove();
+            }
         }
     </script>
 </body>

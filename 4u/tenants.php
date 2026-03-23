@@ -15,8 +15,8 @@ try {
     die('DB connection failed: ' . $e->getMessage());
 }
 
+// Handle archive request
 if ($_SERVER['REQUEST_METHOD'] === 'POST' && isset($_POST['archive_id'])) {
-
     $stmt = $pdo->prepare("UPDATE tenants SET archived = 1, date_archived = date('now') WHERE tenant_id = ?");
     $stmt->execute([$_POST['archive_id']]);
     header("Location: tenants.php");
