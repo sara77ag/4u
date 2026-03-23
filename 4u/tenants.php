@@ -1,4 +1,11 @@
 <?php
+session_start();
+
+if(!isset($_SESSION['user_id'])) {
+    header("Location: index.php");
+    exit();
+}
+
 $dbPath = __DIR__ . '/database.db';
 
 try {
@@ -16,24 +23,14 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST' && isset($_POST['archive_id'])) {
     exit();
 }
 
-// Fetch all tenants with property info
-$stmt = $pdo->query("
-    SELECT 
-        t.tenant_id,
-        t.name,
-        t.phone,
-        t.email,
-        t.contract_start,
-        t.contract_end,
-        p.property_address
-    FROM tenants t
-    LEFT JOIN properties p ON t.property_id = p.property_id
-    WHERE t.archived = 0
-    ORDER BY t.name
-");
+$query  = "SELECT t.*, p.property_address
+        FROM tenants t
+        LEFT JOIN properties p on t.property_id = p.property_id
+        WHERE t.archived = 0";
 
-$tenants = $stmt->fetchAll(PDO::FETCH_ASSOC);
+$tenants = $pdo -> query($query)->fetchAll(PDO::FETCH_ASSOC);
 ?>
+
 <!DOCTYPE html>
 <html lang="en">
 <head>
@@ -43,9 +40,10 @@ $tenants = $stmt->fetchAll(PDO::FETCH_ASSOC);
     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.1/css/all.min.css">
     <link rel="stylesheet" href="style.css">
     <link rel="stylesheet" href="tables.css">
-    <script src="navbar.js"></script>
-    <script src="modals.js"></script>
+    <script src="navbar.js" ></script>
+    <script src="modals.js" ></script>
     <style>
+        /* Column specific widths */
         .col-name { width: 16%; }
         .col-number { width: 12%; }
         .col-email { width: 22%; }
@@ -57,17 +55,23 @@ $tenants = $stmt->fetchAll(PDO::FETCH_ASSOC);
 </head>
 <body onload="CallNavbar(); loadModals();">
  
+    <!-- Navbar Container -->
     <div id="navbar-container"></div>
 
+    <!-- Main Content -->
     <main class="main-content">
+        <!-- Page Title -->
         <h1 class="page-title">Tenants</h1>
 
         <div class="main-container">
+            <!-- Main Controls Row -->
             <div class="controls-row">
+                <!-- Filter Toggle Button -->
                 <button class="btn-filter-toggle" id="filterToggle" onclick="toggleFilter()">
                     <i class="fa-solid fa-filter"></i> Filter
                 </button>
 
+                <!-- Filter Dropdowns -->
                 <div class="filter-dropdowns" id="filterDropdowns" style="display: none;">
                     <div class="filter-group">
                         <label>Status</label>
@@ -91,77 +95,59 @@ $tenants = $stmt->fetchAll(PDO::FETCH_ASSOC);
                     </button>
                 </div>
 
+                <!-- Spacer to push button to right -->
                 <div class="controls-spacer"></div>
 
+                <!-- Action Button -->
                 <button class="btn-add blue" onclick="openAddTenantModal()">
                     <i class="fa-solid fa-plus"></i> Tenant
                 </button>
             </div>
 
+            <!-- Table Container -->
             <div class="table-container">
                 <div class="table-wrapper">
                     <table id="tenantsTable">
                         <thead>
                             <tr>
-                                <th class="sortable col-name" onclick="sortTable('name', this)">
-                                    Name <i class="fa-solid fa-sort sort-icon"></i>
-                                </th>
-                                <th class="sortable col-number" onclick="sortTable('number', this)">
-                                    Number <i class="fa-solid fa-sort sort-icon"></i>
-                                </th>
-                                <th class="sortable col-email" onclick="sortTable('email', this)">
-                                    Email <i class="fa-solid fa-sort sort-icon"></i>
-                                </th>
-                                <th class="sortable col-address" onclick="sortTable('address', this)">
-                                    Address <i class="fa-solid fa-sort sort-icon"></i>
-                                </th>
-                                <th class="sortable col-status" onclick="sortTable('status', this)">
-                                    Status <i class="fa-solid fa-sort sort-icon"></i>
-                                </th>
-                                <th class="sortable col-contract" onclick="sortTable('contract', this)">
-                                    Contract <i class="fa-solid fa-sort sort-icon"></i>
-                                </th>
+                                <th class="sortable col-name" onclick="sortTable('name', this)">Name <i class="fa-solid fa-sort"></i></th>
+                                <th class="sortable col-number" onclick="sortTable('number', this)">Number <i class="fa-solid fa-sort"></i></th>
+                                <th class="sortable col-email" onclick="sortTable('email', this)">Email <i class="fa-solid fa-sort"></i></th>
+                                <th class="sortable col-address" onclick="sortTable('address', this)">Address <i class="fa-solid fa-sort"></i></th>
+                                <th class="sortable col-status" onclick="sortTable('status', this)">Status <i class="fa-solid fa-sort"></i></th>
+                                <th class="sortable col-contract" onclick="sortTable('contract', this)">Contract <i class="fa-solid fa-sort"></i></th>
                                 <th class="col-action">Action</th>
                             </tr>
                         </thead>
                         <tbody id="tableBody">
-<?php foreach ($tenants as $t): 
-    $contract = $t['contract_start'] ? $t['contract_start'] . ' to ' . $t['contract_end'] : '-';
-?>
-    <tr data-name="<?= strtolower($t['name']) ?>" 
-        data-number="<?= htmlspecialchars($t['phone']) ?>" 
-        data-email="<?= strtolower($t['email']) ?>" 
-        data-address="<?= htmlspecialchars($t['property_address'] ?? '') ?>" 
-        data-contract="<?= htmlspecialchars($t['contract_start'] ?? '') ?>">
-        <td class="tenant-name"><?= htmlspecialchars($t['name']) ?></td>
-        <td><?= htmlspecialchars($t['phone']) ?></td>
-        <td class="td-email"><?= htmlspecialchars($t['email']) ?></td>
-        <td class="tenant-address"><?= htmlspecialchars($t['property_address'] ?? 'No property assigned') ?></td>
-        <td>
-            <span class="status-badge status-active">
-                <i class="fa-solid fa-circle-check"></i> Active
-            </span>
-        </td>
-        <td class="contract-info"><?= htmlspecialchars($contract) ?></td>
-        <td>
-            <div class="action-buttons">
-                <button class="action-btn action-btn-view" title="View" onclick="viewTenant(this)">
-                    <i class="fa-solid fa-eye"></i>
-                </button>
-                <button class="action-btn action-btn-edit" title="Edit" onclick="editTenant(this)">
-                    <i class="fa-solid fa-pen"></i>
-                </button>
-                <form method="POST" style="display:inline;">
-                    <input type="hidden" name="archive_id" value="<?= $t['tenant_id'] ?>">
-                    <button type="submit" class="action-btn action-btn-delete" title="Archive"
-                        onclick="return confirm('Archive this tenant?\n<?= htmlspecialchars($t['name']) ?>')">
-                        <i class="fa-solid fa-trash"></i>
-                    </button>
-                </form>
-            </div>
-        </td>
-    </tr>
-<?php endforeach; ?>
+                            <?php foreach ($tenants as $t): ?>
+                            <tr data-name="<?= strtolower($t['name']) ?>" 
+                                data-status="" 
+                                data-contract="<?= $t['contract_start'] ?>">
+                                <td class="tenant-name"><?= htmlspecialchars($t['name']) ?></td>
+                                <td><?= htmlspecialchars($t['phone']) ?></td>
+                                <td class="td-email"><?= htmlspecialchars($t['email']) ?></td>
+                                <td class="tenant-address"><?= htmlspecialchars($t['property_address'] ?? 'Unassigned') ?></td>
+                                <td><span class="status-badge"></span></td>
+                                <td class="contract-info">
+                                    <?= date('m/d/Y', strtotime($t['contract_start'])) ?> to <?= date('m/d/Y', strtotime($t['contract_end'])) ?>
+                                </td>
+                                <td>
+                                    <div class="action-buttons">
+                                        <button class="action-btn action-btn-view" onclick="viewTenant(this)"><i class="fa-solid fa-eye"></i></button>
+                                        
+                                        <?php if ($_SESSION['role'] !== 'read_only'): ?>
+                                            <button class="action-btn action-btn-edit" onclick="editTenant(this)"><i class="fa-solid fa-pen"></i></button>
+                                            
+                                            <form method="POST" style="display:inline;" onsubmit="return confirm('Archive <?= htmlspecialchars($t['name']) ?>?')">
+                                                <input type="hidden" name="archive_id" value="<?= $t['tenant_id'] ?>">
+                                                <button type="submit" class="action-btn action-btn-delete"><i class="fa-solid fa-trash"></i></button>
+                                            </form>
+                                        <?php endif; ?>
+                                    </div>
+                                </td>
+                            </tr>
+                            <?php endforeach; ?>
                         </tbody>
                     </table>
                 </div>
@@ -169,17 +155,20 @@ $tenants = $stmt->fetchAll(PDO::FETCH_ASSOC);
         </div>
     </main>
 
+        <!-- Modals Container -->
     <div id="modals-container"></div>
 
     <script>
-        let currentSort = {
-            column: null,
-            direction: 'asc'
-        };
 
+        function toggleFilter() {
+            const dropdown = document.getElementById('filterDropdowns');
+            dropdown.style.display = dropdown.style.display === 'none' ? 'flex' : 'none';
+        }
+        
         function sortTable(column, headerElement) {
             const tbody = document.getElementById('tableBody');
             const rows = Array.from(tbody.querySelectorAll('tr'));
+            
             
             if (currentSort.column === column) {
                 currentSort.direction = currentSort.direction === 'asc' ? 'desc' : 'asc';
@@ -188,16 +177,22 @@ $tenants = $stmt->fetchAll(PDO::FETCH_ASSOC);
                 currentSort.direction = 'asc';
             }
             
+            
             document.querySelectorAll('table th').forEach(th => {
                 th.classList.remove('sorted');
                 const icon = th.querySelector('.sort-icon');
-                if (icon) icon.classList.remove('asc', 'desc');
+                if (icon) {
+                    icon.classList.remove('asc', 'desc');
+                }
             });
             
             headerElement.classList.add('sorted');
             const icon = headerElement.querySelector('.sort-icon');
-            if (icon) icon.classList.add(currentSort.direction);
+            if (icon) {
+                icon.classList.add(currentSort.direction);
+            }
             
+            // Sort rows
             rows.sort((a, b) => {
                 let aVal, bVal;
                 
@@ -236,9 +231,12 @@ $tenants = $stmt->fetchAll(PDO::FETCH_ASSOC);
             });
             
             rows.forEach(row => tbody.appendChild(row));
+            
+            // Update statuses after sorting
             updateAllStatuses();
         }
 
+        // Filter Tenants
         function filterTenants() {
             const statusFilter = document.getElementById('filterStatus').value;
             const startFilter = document.getElementById('filterStart').value;
@@ -249,19 +247,25 @@ $tenants = $stmt->fetchAll(PDO::FETCH_ASSOC);
             rows.forEach(row => {
                 let show = true;
                 
+                // Status filter
                 if (statusFilter) {
                     const statusCell = row.querySelector('.status-badge');
-                    if (statusCell && !statusCell.textContent.toLowerCase().includes(statusFilter.toLowerCase())) {
+                    if (statusCell && statusCell.textContent.toLowerCase().includes(statusFilter.toLowerCase()) === false) {
                         show = false;
                     }
                 }
                 
+                // Contract date filters
                 if (startFilter || endFilter) {
                     const contractCell = row.querySelector('.contract-info');
                     if (contractCell && contractCell.textContent !== '-') {
                         const [startDate, endDate] = contractCell.textContent.split(' to ');
-                        if (startFilter && new Date(startDate) < new Date(startFilter)) show = false;
-                        if (endFilter && new Date(endDate) > new Date(endFilter)) show = false;
+                        if (startFilter && new Date(startDate) < new Date(startFilter)) {
+                            show = false;
+                        }
+                        if (endFilter && new Date(endDate) > new Date(endFilter)) {
+                            show = false;
+                        }
                     }
                 }
                 
@@ -269,20 +273,26 @@ $tenants = $stmt->fetchAll(PDO::FETCH_ASSOC);
             });
         }
 
+        // Reset filters
         function resetFilters() {
             document.getElementById('filterStatus').value = '';
             document.getElementById('filterStart').value = '';
             document.getElementById('filterEnd').value = '';
             
-            document.querySelectorAll('#tableBody tr').forEach(row => row.style.display = '');
+            const rows = document.querySelectorAll('#tableBody tr');
+            rows.forEach(row => row.style.display = '');
+            
             document.querySelectorAll('table th').forEach(th => {
                 th.classList.remove('sorted');
                 const icon = th.querySelector('.sort-icon');
-                if (icon) icon.classList.remove('asc', 'desc');
+                if (icon) {
+                    icon.classList.remove('asc', 'desc');
+                }
             });
             currentSort = { column: null, direction: 'asc' };
         }
 
+        // Update all tenant statuses dynamically based on contract dates
         function updateAllStatuses() {
             const rows = document.querySelectorAll('#tableBody tr');
             const today = new Date();
@@ -293,17 +303,25 @@ $tenants = $stmt->fetchAll(PDO::FETCH_ASSOC);
                 if (!contractCell || !statusCell) return;
 
                 const contractText = contractCell.textContent.trim();
-                if (contractText === '-') {
+                if (contractText === '-' || contractText === '') {
+                    // No contract -> New
                     statusCell.innerHTML = '<i class="fa-solid fa-play-circle"></i> New';
                     statusCell.className = 'status-badge status-new';
+                    row.dataset.status = 'new';
                     return;
                 }
 
                 const [startStr, endStr] = contractText.split(' to ');
                 if (!startStr || !endStr) return;
 
-                const startDate = new Date(startStr.trim());
-                const endDate = new Date(endStr.trim());
+                // Parse MM/DD/YYYY -> Date (assume current year if needed, but samples have full year)
+                const parseDate = (dateStr) => {
+                    const [month, day, year] = dateStr.split('/').map(Number);
+                    return new Date(year, month - 1, day); // JS months 0-indexed
+                };
+
+                const startDate = parseDate(startStr.trim());
+                const endDate = parseDate(endStr.trim());
 
                 let status, statusKey, icon;
                 if (today >= startDate && today <= endDate) {
@@ -315,16 +333,18 @@ $tenants = $stmt->fetchAll(PDO::FETCH_ASSOC);
                     statusKey = 'former';
                     icon = 'fa-clock';
                 } else {
-                    status = 'New';
+                    status = 'new';
                     statusKey = 'new';
                     icon = 'fa-play-circle';
                 }
 
                 statusCell.innerHTML = `<i class="fa-solid ${icon}"></i> ${status}`;
                 statusCell.className = `status-badge status-${statusKey}`;
+                row.dataset.status = statusKey;
             });
         }
 
+        // Tenant action functions
         function viewTenant(btn) {
             const row = btn.closest('tr');
             const name = row.querySelector('.tenant-name').textContent;
@@ -337,9 +357,19 @@ $tenants = $stmt->fetchAll(PDO::FETCH_ASSOC);
             alert('Edit Tenant: ' + name);
         }
 
+        function deleteTenant(btn) {
+            const row = btn.closest('tr');
+            const name = row.querySelector('.tenant-name').textContent;
+            if (confirm('Are you sure you want to delete tenant ' + name + '?')) {
+                row.remove();
+            }
+        }
+
+        // Initialise statuses on load
         window.addEventListener('load', () => {
             updateAllStatuses();
         });
     </script>
 </body>
 </html>
+
