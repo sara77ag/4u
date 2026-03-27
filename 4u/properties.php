@@ -46,6 +46,7 @@ $properties = $stmt->fetchAll(PDO::FETCH_ASSOC);
     <link rel="stylesheet" href="tables.css">
     <script src="navbar.js" ></script>
     <script src="modals.js" ></script>
+    <script src="actionbtn.js"></script>
     <style>
         .col-address { width: 18%; }
         .col-type { width: 8%; }
@@ -178,7 +179,7 @@ $properties = $stmt->fetchAll(PDO::FETCH_ASSOC);
         <td class="contract-info"><?= htmlspecialchars($contract) ?></td>
         <td>
             <div class="action-buttons">
-                <button class="action-btn action-btn-view" title="View" onclick="viewProperty(this)">
+                <button class="action-btn action-btn-view" title="View" onclick="actionbtn.viewProperty(this)">
                     <i class="fa-solid fa-eye"></i>
                 </button>
                 <button class="action-btn action-btn-edit" title="Edit" onclick="editProperty(this)">
