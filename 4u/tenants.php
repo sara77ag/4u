@@ -1,3 +1,36 @@
+<?php
+session_start();
+
+if(!isset($_SESSION['user_id'])) {
+    header("Location: index.php");
+    exit();
+}
+
+$dbPath = __DIR__ . '/database.db';
+
+try {
+    $pdo = new PDO('sqlite:' . $dbPath);
+    $pdo->setAttribute(PDO::ATTR_ERRMODE, PDO::ERRMODE_EXCEPTION);
+} catch (PDOException $e) {
+    die('DB connection failed: ' . $e->getMessage());
+}
+
+// Handle archive request
+if ($_SERVER['REQUEST_METHOD'] === 'POST' && isset($_POST['archive_id'])) {
+    $stmt = $pdo->prepare("UPDATE tenants SET archived = 1, date_archived = date('now') WHERE tenant_id = ?");
+    $stmt->execute([$_POST['archive_id']]);
+    header("Location: tenants.php");
+    exit();
+}
+
+$query  = "SELECT t.*, p.property_address
+        FROM tenants t
+        LEFT JOIN properties p on t.property_id = p.property_id
+        WHERE t.archived = 0";
+
+$tenants = $pdo -> query($query)->fetchAll(PDO::FETCH_ASSOC);
+?>
+
 <!DOCTYPE html>
 <html lang="en">
 <head>
@@ -77,158 +110,44 @@
                     <table id="tenantsTable">
                         <thead>
                             <tr>
-                                <th class="sortable col-name" onclick="sortTable('name', this)">
-                                    Name <i class="fa-solid fa-sort sort-icon"></i>
-                                </th>
-                                <th class="sortable col-number" onclick="sortTable('number', this)">
-                                    Number <i class="fa-solid fa-sort sort-icon"></i>
-                                </th>
-                                <th class="sortable col-email" onclick="sortTable('email', this)">
-                                    Email <i class="fa-solid fa-sort sort-icon"></i>
-                                </th>
-                                <th class="sortable col-address" onclick="sortTable('address', this)">
-                                    Address <i class="fa-solid fa-sort sort-icon"></i>
-                                </th>
-                                <th class="sortable col-status" onclick="sortTable('status', this)">
-                                    Status <i class="fa-solid fa-sort sort-icon"></i>
-                                </th>
-                                <th class="sortable col-contract" onclick="sortTable('contract', this)">
-                                    Contract <i class="fa-solid fa-sort sort-icon"></i>
-                                </th>
+                                <th class="sortable col-name" onclick="sortTable('name', this)">Name <i class="fa-solid fa-sort"></i></th>
+                                <th class="sortable col-number" onclick="sortTable('number', this)">Number <i class="fa-solid fa-sort"></i></th>
+                                <th class="sortable col-email" onclick="sortTable('email', this)">Email <i class="fa-solid fa-sort"></i></th>
+                                <th class="sortable col-address" onclick="sortTable('address', this)">Address <i class="fa-solid fa-sort"></i></th>
+                                <th class="sortable col-status" onclick="sortTable('status', this)">Status <i class="fa-solid fa-sort"></i></th>
+                                <th class="sortable col-contract" onclick="sortTable('contract', this)">Contract <i class="fa-solid fa-sort"></i></th>
                                 <th class="col-action">Action</th>
                             </tr>
                         </thead>
                         <tbody id="tableBody">
-
-                            <tr data-name="johnson" data-number="07700901123" data-email="johnson" data-address="london" data-status="active" data-contract="2025-01">
-                                <td class="tenant-name">Sarah Johnson</td>
-                                <td>07700 901123</td>
-                                <td class="td-email">sarah.johnson@email.com</td>
-                                <td class="tenant-address">123 High St, London, SW1 1AA</td>
-                                <td>
-                                    <span class="status-badge status-active">
-                                        <i class="fa-solid fa-circle-check"></i> Active
-                                    </span>
+                            <?php foreach ($tenants as $t): ?>
+                            <tr data-name="<?= strtolower($t['name']) ?>" 
+                                data-status="" 
+                                data-contract="<?= $t['contract_start'] ?>">
+                                <td class="tenant-name"><?= htmlspecialchars($t['name']) ?></td>
+                                <td><?= htmlspecialchars($t['phone']) ?></td>
+                                <td class="td-email"><?= htmlspecialchars($t['email']) ?></td>
+                                <td class="tenant-address"><?= htmlspecialchars($t['property_address'] ?? 'Unassigned') ?></td>
+                                <td><span class="status-badge"></span></td>
+                                <td class="contract-info">
+                                    <?= date('m/d/Y', strtotime($t['contract_start'])) ?> to <?= date('m/d/Y', strtotime($t['contract_end'])) ?>
                                 </td>
-                                <td class="contract-info">01/01/2025 to 01/01/2026</td>
                                 <td>
                                     <div class="action-buttons">
-                                        <button class="action-btn action-btn-view" title="View" onclick="viewTenant(this)">
-                                            <i class="fa-solid fa-eye"></i>
-                                        </button>
-                                        <button class="action-btn action-btn-edit" title="Edit" onclick="editTenant(this)">
-                                            <i class="fa-solid fa-pen"></i>
-                                        </button>
-                                        <button class="action-btn action-btn-delete" title="Delete" onclick="deleteTenant(this)">
-                                            <i class="fa-solid fa-trash"></i>
-                                        </button>
+                                        <button class="action-btn action-btn-view" onclick="viewTenant(this)"><i class="fa-solid fa-eye"></i></button>
+                                        
+                                        <?php if ($_SESSION['role'] !== 'read_only'): ?>
+                                            <button class="action-btn action-btn-edit" onclick="editTenant(this)"><i class="fa-solid fa-pen"></i></button>
+                                            
+                                            <form method="POST" style="display:inline;" onsubmit="return confirm('Archive <?= htmlspecialchars($t['name']) ?>?')">
+                                                <input type="hidden" name="archive_id" value="<?= $t['tenant_id'] ?>">
+                                                <button type="submit" class="action-btn action-btn-delete"><i class="fa-solid fa-trash"></i></button>
+                                            </form>
+                                        <?php endif; ?>
                                     </div>
                                 </td>
                             </tr>
-
-                            <tr data-name="williams" data-number="07700901124" data-email="williams" data-address="manchester" data-status="long-term" data-contract="2024-12">
-                                <td class="tenant-name">Mike Williams</td>
-                                <td>07700 901124</td>
-                                <td class="td-email">mike.williams@email.com</td>
-                                <td class="tenant-address">456 Oxford Rd, Manchester, M1 5EE</td>
-                                <td>
-                                    <span class="status-badge status-long-term">
-                                        <i class="fa-solid fa-clock"></i> Long-term
-                                    </span>
-                                </td>
-                                <td class="contract-info">01/12/2024 to 01/12/2027</td>
-                                <td>
-                                    <div class="action-buttons">
-                                        <button class="action-btn action-btn-view" title="View" onclick="viewTenant(this)">
-                                            <i class="fa-solid fa-eye"></i>
-                                        </button>
-                                        <button class="action-btn action-btn-edit" title="Edit" onclick="editTenant(this)">
-                                            <i class="fa-solid fa-pen"></i>
-                                        </button>
-                                        <button class="action-btn action-btn-delete" title="Delete" onclick="deleteTenant(this)">
-                                            <i class="fa-solid fa-trash"></i>
-                                        </button>
-                                    </div>
-                                </td>
-                            </tr>
-
-                            <tr data-name="davis" data-number="07700901125" data-email="davis" data-address="birmingham" data-status="notice" data-contract="2025-02">
-                                <td class="tenant-name">Emma Davis</td>
-                                <td>07700 901125</td>
-                                <td class="td-email">emma.davis@email.com</td>
-                                <td class="tenant-address">789 New St, Birmingham, B2 4QA</td>
-                                <td>
-                                    <span class="status-badge status-notice">
-                                        <i class="fa-solid fa-exclamation-triangle"></i> Notice
-                                    </span>
-                                </td>
-                                <td class="contract-info">01/02/2025 to 31/08/2025</td>
-                                <td>
-                                    <div class="action-buttons">
-                                        <button class="action-btn action-btn-view" title="View" onclick="viewTenant(this)">
-                                            <i class="fa-solid fa-eye"></i>
-                                        </button>
-                                        <button class="action-btn action-btn-edit" title="Edit" onclick="editTenant(this)">
-                                            <i class="fa-solid fa-pen"></i>
-                                        </button>
-                                        <button class="action-btn action-btn-delete" title="Delete" onclick="deleteTenant(this)">
-                                            <i class="fa-solid fa-trash"></i>
-                                        </button>
-                                    </div>
-                                </td>
-                            </tr>
-
-                            <tr data-name="brown" data-number="07700901126" data-email="brown" data-address="liverpool" data-status="vacant" data-contract="">
-                                <td class="tenant-name">David Brown</td>
-                                <td>07700 901126</td>
-                                <td class="td-email">david.brown@email.com</td>
-                                <td class="tenant-address">321 Liverpool Rd, Liverpool, L3 8EA</td>
-                                <td>
-                                    <span class="status-badge status-vacant">
-                                        <i class="fa-solid fa-house"></i> Vacant
-                                    </span>
-                                </td>
-                                <td class="contract-info">-</td>
-                                <td>
-                                    <div class="action-buttons">
-                                        <button class="action-btn action-btn-view" title="View" onclick="viewTenant(this)">
-                                            <i class="fa-solid fa-eye"></i>
-                                        </button>
-                                        <button class="action-btn action-btn-edit" title="Edit" onclick="editTenant(this)">
-                                            <i class="fa-solid fa-pen"></i>
-                                        </button>
-                                        <button class="action-btn action-btn-delete" title="Delete" onclick="deleteTenant(this)">
-                                            <i class="fa-solid fa-trash"></i>
-                                        </button>
-                                    </div>
-                                </td>
-                            </tr>
-
-                            <tr data-name="taylor" data-number="07700901127" data-email="taylor" data-address="bristol" data-status="active" data-contract="2025-04">
-                                <td class="tenant-name">Lisa Taylor</td>
-                                <td>07700 901127</td>
-                                <td class="td-email">lisa.taylor@email.com</td>
-                                <td class="tenant-address">654 Park St, Bristol, BS2 8PE</td>
-                                <td>
-                                    <span class="status-badge status-active">
-                                        <i class="fa-solid fa-circle-check"></i> Active
-                                    </span>
-                                </td>
-                                <td class="contract-info">01/04/2025 to 01/04/2026</td>
-                                <td>
-                                    <div class="action-buttons">
-                                        <button class="action-btn action-btn-view" title="View" onclick="viewTenant(this)">
-                                            <i class="fa-solid fa-eye"></i>
-                                        </button>
-                                        <button class="action-btn action-btn-edit" title="Edit" onclick="editTenant(this)">
-                                            <i class="fa-solid fa-pen"></i>
-                                        </button>
-                                        <button class="action-btn action-btn-delete" title="Delete" onclick="deleteTenant(this)">
-                                            <i class="fa-solid fa-trash"></i>
-                                        </button>
-                                    </div>
-                                </td>
-                            </tr>
+                            <?php endforeach; ?>
                         </tbody>
                     </table>
                 </div>
@@ -240,12 +159,17 @@
     <div id="modals-container"></div>
 
     <script>
-        // Sort Table
+
+        function toggleFilter() {
+            const dropdown = document.getElementById('filterDropdowns');
+            dropdown.style.display = dropdown.style.display === 'none' ? 'flex' : 'none';
+        }
+        
         function sortTable(column, headerElement) {
             const tbody = document.getElementById('tableBody');
             const rows = Array.from(tbody.querySelectorAll('tr'));
             
-            // Toggle sort direction
+            
             if (currentSort.column === column) {
                 currentSort.direction = currentSort.direction === 'asc' ? 'desc' : 'asc';
             } else {
@@ -253,7 +177,7 @@
                 currentSort.direction = 'asc';
             }
             
-            // Update header styles
+            
             document.querySelectorAll('table th').forEach(th => {
                 th.classList.remove('sorted');
                 const icon = th.querySelector('.sort-icon');
@@ -441,7 +365,7 @@
             }
         }
 
-        // Initialize statuses on load
+        // Initialise statuses on load
         window.addEventListener('load', () => {
             updateAllStatuses();
         });
