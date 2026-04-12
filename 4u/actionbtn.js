@@ -43,7 +43,6 @@ window.actionbtn = {
             bathrooms: row.dataset.bathrooms,
             epc: row.dataset.epc,
             pets: row.dataset.pets === "1" ? "Yes" : "No",
-            balcony: row.dataset.balcony === "1" ? "Yes" : "No",
             garden: row.dataset.garden === "1" ? "Yes" : "No",
             council: row.dataset.council,
             gasDate: row.dataset.gas,
@@ -118,23 +117,96 @@ window.actionbtn = {
 
         document.getElementById('propertyTitle').textContent = data.address;
         document.getElementById('p-property-landlord').textContent = data.landlord;
+
         const statusEl = document.getElementById('p-property-status');
         statusEl.textContent = data.status.charAt(0).toUpperCase() + data.status.slice(1);
         statusEl.className = `status-badge status-${data.status}`;
+
         document.getElementById('p-property-type').textContent = data.type;
         document.getElementById('p-property-tenant').textContent = data.tenant;
+        document.getElementById('p-property-rooms').textContent = data.rooms || 'N/A';
+        document.getElementById('p-property-bathrooms').textContent = data.bathrooms || 'N/A';
+        document.getElementById('p-property-epc').textContent = data.epc || 'N/A';
+        document.getElementById('p-property-pets').textContent = data.pets === "Yes" || data.pets === "1" ? "Yes" : "No";
+        document.getElementById('p-property-garden').textContent = data.garden === "Yes" || data.garden === "1" ? "Yes" : "No";
+        document.getElementById('p-property-council').textContent = data.council || 'N/A';
+
+        document.getElementById('p-contract-landlord').textContent = data.landlord;
+        document.getElementById('p-contract-tenant').textContent = data.tenant;
         document.getElementById('p-contract-rent').textContent = `£${parseInt(data.rent || 0).toLocaleString()}`;
         document.getElementById('p-contract-frequency').textContent = data.frequency || 'N/A';
         document.getElementById('p-contract-start').textContent = data.startDate || 'N/A';
         document.getElementById('p-contract-end').textContent = data.endDate || 'N/A';
-        document.getElementById('p-property-rooms').textContent = data.rooms || 'N/A';
-        document.getElementById('p-property-bathrooms').textContent = data.bathrooms || 'N/A';
-        document.getElementById('p-property-epc').textContent = data.epc || 'N/A';
-        document.getElementById('p-property-pets').textContent = data.pets || 'N/A';
-        document.getElementById('p-property-balcony').textContent = data.balcony || 'N/A';
-        document.getElementById('p-property-garden').textContent = data.garden || 'N/A';
-        document.getElementById('p-property-council').textContent = data.council || 'N/A';
-    },
+
+        document.getElementById('p-date-landlord-id').textContent = data.landlordIdExpiry || 'N/A';
+        document.getElementById('p-date-tenant-id').textContent = data.tenantIdExpiry || 'N/A';
+        document.getElementById('p-date-contract-end').textContent = data.endDate || 'N/A';
+        document.getElementById('p-date-gas').textContent = data.gasDate || 'N/A';
+        document.getElementById('p-date-electric').textContent = data.electricDate || 'N/A';
+        document.getElementById('p-date-epc').textContent = data.epcDate || 'N/A';
+
+    
+        // ======================
+        // FETCH NOTES
+        // ======================
+        fetch(`notes.php?property_id=${data.id}`)
+            .then(res => res.json())
+            .then(notes => {
+                const notesList = document.getElementById('p-notesList');
+                notesList.innerHTML = '';
+
+                notes.forEach(n => {
+                    notesList.insertAdjacentHTML('afterbegin', `
+                        <div class="note-item">
+                            <div class="note-text">${n.note_text}</div>
+                            <div class="note-timestamp">
+                                <i class="fa-solid fa-clock"></i>
+                                ${n.created_at} - ${n.created_by ?? 'Unknown'}
+                            </div>
+                        </div>
+                    `);
+                });
+            });
+
+    // ==========================
+    // Fetch Files 
+    // ==========================
+    fetch(`get_files.php?property_id=${data.id}`)
+        .then(res => res.json())
+        .then(files => {
+            const filesList = document.querySelector('#p-tab-files .files-list');
+            filesList.innerHTML = '';
+            files.forEach(f => {
+                filesList.insertAdjacentHTML('beforeend', `
+                    <div class="file-item">
+                        <i class="fa-solid fa-file-pdf file-icon"></i>
+                        <span class="file-name">${f.file_name}</span>
+                        <button class="file-open-btn" onclick="window.open('${f.file_path}', '_blank')">Open</button>
+                    </div>
+                `);
+            });
+        });
+
+    // ==========================
+    // Calculate Payment Due Date
+    // ==========================
+    if (data.startDate && data.frequency) {
+        const start = new Date(data.startDate);
+        const freq = data.frequency.toLowerCase();
+        const today = new Date();
+        let due = new Date(start);
+
+        while (due < today) {
+            if (freq === 'monthly') due.setMonth(due.getMonth() + 1);
+            else if (freq === 'weekly') due.setDate(due.getDate() + 7);
+            else if (freq === 'biweekly') due.setDate(due.getDate() + 14);
+            else if (freq === 'quarterly') due.setMonth(due.getMonth() + 3);
+        }
+        document.getElementById('p-contract-duedate').textContent = due.toISOString().split('T')[0];
+    } else {
+        document.getElementById('p-contract-duedate').textContent = 'N/A';
+    }
+},
 
     // ======================
     // Populate Landlord Data
@@ -171,32 +243,39 @@ window.actionbtn = {
         if (event) event.target.classList.add('active');
     },
 
+
     // ======================
-    // Add Note
+    // ADD NOTE
     // ======================
     addNote() {
         if (!this.modal) return;
 
-        const isProperty = this.modal.id === 'viewPropertyModal';
-        const textarea = document.getElementById(isProperty ? 'p-noteTextarea' : 'l-noteTextarea');
-        const notesList = document.getElementById(isProperty ? 'p-notesList' : 'l-note-notesList');
+        const textarea = document.getElementById('p-noteTextarea');
         const text = textarea.value.trim();
         if (!text) return;
 
-        const timestamp = new Date().toLocaleString();
-        const username = 'Current User'; // Replace dynamically if needed
+        fetch('notes.php', {
+            method: 'POST',
+            headers: { 'Content-Type': 'application/x-www-form-urlencoded' },
+            body: `property_id=${this.currentProperty.id}&note_text=${encodeURIComponent(text)}`
+        })
+        .then(res => res.json())
+        .then(data => {
 
-        const noteHtml = `
-            <div class="note-item">
-                <div class="note-text">${this.escapeHtml(text)}</div>
-                <div class="note-timestamp">
-                    <i class="fa-solid fa-clock"></i>
-                    ${timestamp} - ${username}
+            const notesList = document.getElementById('p-notesList');
+
+            notesList.insertAdjacentHTML('afterbegin', `
+                <div class="note-item">
+                    <div class="note-text">${this.escapeHtml(text)}</div>
+                    <div class="note-timestamp">
+                        <i class="fa-solid fa-clock"></i>
+                        ${data.created_at} - ${data.created_by ?? 'Unknown'}
+                    </div>
                 </div>
-            </div>
-        `;
-        notesList.insertAdjacentHTML('afterbegin', noteHtml);
-        textarea.value = '';
+            `);
+
+            textarea.value = '';
+        });
     }
 };
 
@@ -212,7 +291,7 @@ document.addEventListener('click', function(e) {
 });
 
 // ======================
-// File open placeholder
+// File open 
 // ======================
 function openFile(fileType) {
     alert(`Opening ${fileType.toUpperCase()} file... (Implement PDF viewer)`);
