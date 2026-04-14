@@ -72,7 +72,7 @@ window.actionbtn = {
             name: container.querySelector('.card-name')?.textContent.trim() || container.dataset.name || 'N/A',
             phone: container.dataset.phone || 'N/A',
             email: container.dataset.email || 'N/A',
-            idtype: row.dataset.idtype || 'N/A',
+            idtype: container.dataset.idtype || 'N/A',
             idnumber: container.dataset.idnumber || 'N/A',
             idexpiry: container.dataset.idexpiry || 'N/A',
             address: container.dataset.address || 'N/A',
