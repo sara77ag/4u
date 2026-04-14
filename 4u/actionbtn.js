@@ -24,6 +24,16 @@ window.actionbtn = {
     },
 
     // ======================
+    // View Tenant
+    // ======================
+    viewTenant(btn) {
+        this.currentTenant = this.getTenantData(btn);
+        this.openTenantModal();
+        this.populateTenantData();
+        this.switchTab('tenant');
+    },
+
+    // ======================
     // Get Property Data
     // ======================
     getPropertyData(btn) {
@@ -32,24 +42,24 @@ window.actionbtn = {
             id: row.dataset.propertyId || row.dataset.id,
             address: row.querySelector('.td-address')?.textContent.trim() || row.dataset.address || 'N/A',
             landlord: row.querySelector('.td-landlord')?.textContent.trim() || row.dataset.landlord || 'N/A',
-            tenant: row.dataset.tenant || '-',
-            rent: row.dataset.price,
-            type: row.dataset.type,
-            status: row.dataset.status,
-            startDate: row.dataset.contractStart,
-            endDate: row.dataset.contractEnd,
-            frequency: row.dataset.frequency,
-            rooms: row.dataset.rooms,
-            bathrooms: row.dataset.bathrooms,
-            epc: row.dataset.epc,
-            pets: row.dataset.pets === "1" ? "Yes" : "No",
-            garden: row.dataset.garden === "1" ? "Yes" : "No",
-            council: row.dataset.council,
-            gasDate: row.dataset.gas,
-            electricDate: row.dataset.electric,
-            epcDate: row.dataset.epcDate,
-            landlordIdExpiry: row.dataset.landlordIdExpiry,
-            tenantIdExpiry: row.dataset.tenantIdExpiry
+            tenant: row.dataset.tenant || 'N/A',
+            rent: row.dataset.price || 'N/A',
+            type: row.dataset.type || 'N/A',
+            status: row.dataset.status || 'N/A',
+            startDate: row.dataset.contractStart || 'N/A',
+            endDate: row.dataset.contractEnd || 'N/A',
+            frequency: row.dataset.frequency || 'N/A',
+            rooms: row.dataset.rooms || 'N/A',
+            bathrooms: row.dataset.bathrooms || 'N/A',
+            epc: row.dataset.epc || 'N/A',
+            pets: row.dataset.pets ? (row.dataset.pets === "1" ? "Yes" : "No") : 'N/A',
+            garden: row.dataset.garden ? (row.dataset.garden === "1" ? "Yes" : "No") : 'N/A',
+            council: row.dataset.council || 'N/A',
+            gasDate: row.dataset.gas || 'N/A',
+            electricDate: row.dataset.electric || 'N/A',
+            epcDate: row.dataset.epcDate || 'N/A',
+            landlordIdExpiry: row.dataset.landlordIdExpiry || 'N/A',
+            tenantIdExpiry: row.dataset.tenantIdExpiry || 'N/A'
         };
     },
 
@@ -62,13 +72,37 @@ window.actionbtn = {
             name: container.querySelector('.card-name')?.textContent.trim() || container.dataset.name || 'N/A',
             phone: container.dataset.phone || 'N/A',
             email: container.dataset.email || 'N/A',
-            idtype: container.dataset.idtype || 'Passport',
+            idtype: row.dataset.idtype || 'N/A',
             idnumber: container.dataset.idnumber || 'N/A',
             idexpiry: container.dataset.idexpiry || 'N/A',
             address: container.dataset.address || 'N/A',
             contact: container.dataset.contact || 'N/A',
             properties: container.dataset.properties || 0
         };
+    },
+
+    // ======================
+    // Get Tenant Data
+    // ======================
+    getTenantData(btn) {
+        const row = btn.closest('tr') || btn.closest('.card');
+        return {
+            id: row.dataset.tenantId || 'N/A',
+            name: row.dataset.name || 'N/A',
+            phone: row.dataset.phone || 'N/A',
+            email: row.dataset.email || 'N/A',
+            address: row.dataset.address || 'N/A',
+            idtype: row.dataset.idtype || 'N/A',
+            idnumber: row.dataset.idnumber || 'N/A',
+            idexpiry: row.dataset.idexpiry || 'N/A',
+            contact: row.dataset.contact || 'N/A',
+            contractStart: row.dataset.contractStart || 'N/A',
+            contractEnd: row.dataset.contractEnd || 'N/A',
+            frequency: row.dataset.frequency || 'N/A',
+            landlord: row.dataset.landlord || 'N/A',
+            rent: row.dataset.rent || 'N/A',
+            status: row.dataset.status || 'N/A'
+            };
     },
 
     // ======================
@@ -84,14 +118,19 @@ window.actionbtn = {
         this.showModal();
     },
 
+    openTenantModal() {
+        this.modal = document.getElementById('viewTenantModal');
+        this.showModal();
+    },
+
     showModal() {
         if (this.modal) {
             this.modal.classList.add('active');
             document.body.style.overflow = 'hidden';
             // Close on overlay click
-            this.modal.addEventListener('click', (e) => {
-                if (e.target === this.modal) this.closeModal();
-            });
+            this.modal.onclick = (e) => {
+            if (e.target === this.modal) this.closeModal();
+            };
         }
     },
 
@@ -105,6 +144,7 @@ window.actionbtn = {
             this.modal = null;
             this.currentProperty = null;
             this.currentLandlord = null;
+            this.currentTenant = null;
         }
     },
 
@@ -227,21 +267,52 @@ window.actionbtn = {
     },
 
     // ======================
+    // Populate Tenant Data
+    // ======================
+    populateTenantData() {
+        const data = this.currentTenant;
+        if (!data) return;
+
+        document.getElementById('tenantName').textContent = data.name;
+        document.getElementById('t-tenant-name').textContent = data.name;
+        document.getElementById('t-tenant-phone').textContent = data.phone;
+        document.getElementById('t-tenant-email').textContent = data.email;
+        document.getElementById('t-tenant-idtype').textContent = data.idtype;
+        document.getElementById('t-tenant-idnumber').textContent = data.idnumber;
+        document.getElementById('l-tenant-idexpiry').textContent = data.idexpiry;
+        document.getElementById('l-tenant-address').textContent = data.address;
+        document.getElementById('t-tenant-contact').textContent = data.contact;
+        // current tenancy
+        document.getElementById('t-currentTenancy-address').textContent = data.address;
+        document.getElementById('t-currentTenancy-landlord').textContent = data.landlord;
+        document.getElementById('t-currentTenancy-contractStart').textContent = data.contractStart;
+        document.getElementById('t-currentTenancy-contractEnd').textContent = data.contractEnd;
+        document.getElementById('t-currentTenancy-rent').textContent = `£${parseInt(data.rent || 0).toLocaleString()}`;
+        document.getElementById('t-currentTenancy-status').textContent = data.status;
+    },
+
+    // ======================
     // Switch Tabs
     // ======================
     switchTab(tabId, event) {
-        if (!this.modal) return;
+    if (!this.modal) return;
 
-        const tabs = this.modal.querySelectorAll('.tab-content');
-        const btns = this.modal.querySelectorAll('.tab-btn');
+    const tabs = this.modal.querySelectorAll('.tab-content');
+    const btns = this.modal.querySelectorAll('.tab-btn');
 
-        tabs.forEach(tab => tab.classList.remove('active'));
-        btns.forEach(btn => btn.classList.remove('active'));
+    tabs.forEach(tab => tab.classList.remove('active'));
+    btns.forEach(btn => btn.classList.remove('active'));
 
-        const targetTab = this.modal.querySelector(`#${this.modal.id.startsWith('viewProperty') ? 'p-tab-' : 'l-tab-'}${tabId}`);
-        if (targetTab) targetTab.classList.add('active');
-        if (event) event.target.classList.add('active');
-    },
+    let prefix = 'l-tab-';
+
+    if (this.modal.id.startsWith('viewProperty')) prefix = 'p-tab-';
+    else if (this.modal.id.startsWith('viewTenant')) prefix = 't-tab-';
+
+    const targetTab = this.modal.querySelector(`#${prefix}${tabId}`);
+    if (targetTab) targetTab.classList.add('active');
+
+    if (event) event.target.classList.add('active');
+},
 
 
     // ======================

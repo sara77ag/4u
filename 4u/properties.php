@@ -194,7 +194,7 @@ $properties = $stmt->fetchAll(PDO::FETCH_ASSOC);
         <td class="td-address"><?= htmlspecialchars($p['property_address']) ?></td>
         <td><span class="td-type"><?= htmlspecialchars($p['property_type']) ?></span></td>
         <td class="td-landlord"><?= htmlspecialchars($landlord_name) ?></td>
-        <td class="td-rent">£<?= number_format($price, 0) ?></td>
+        <td class="rent">£<?= number_format($price, 0) ?></td>
         <td><?php if ($tenant_name): ?>
             <span class="td-tenant"><?= htmlspecialchars($tenant_name) ?></span>
         <?php else: ?>
@@ -248,7 +248,7 @@ $properties = $stmt->fetchAll(PDO::FETCH_ASSOC);
         <!-- Header -->
         <div class="action-modal-header">
             <div class="action-header-left">
-                <div class="house-icon">
+                <div class="action-modal-header-icon">
                     <i class="fa-solid fa-house"></i>
                 </div>
                 <h2 id="propertyTitle">-</h2>
@@ -261,10 +261,10 @@ $properties = $stmt->fetchAll(PDO::FETCH_ASSOC);
         <!-- Tabs Navigation -->
         <div class="action-tabs-nav">
             <button class="tab-btn active" data-tab="property">
-                <i class="fa-solid fa-house"></i> Property
+                <i class="fa-solid fa-house"></i> Property Details
             </button>
             <button class="tab-btn" data-tab="contract">
-                <i class="fa-solid fa-file-contract"></i> Contract
+                <i class="fa-solid fa-file-contract"></i> Contract Agreement
             </button>
             <button class="tab-btn" data-tab="dates">
                 <i class="fa-solid fa-calendar"></i> Important Dates
@@ -281,6 +281,10 @@ $properties = $stmt->fetchAll(PDO::FETCH_ASSOC);
         <div class="action-tabs-content">
             <!-- Property Tab -->
             <div id="p-tab-property" class="tab-content active">
+                <div class="tab-header">
+                    <i class="fa-solid fa-house"></i>
+                    <span>Property Details</span>
+                </div>
               <div class="details-grid">
                     <div class="detail-row">
                         <span class="detail-label">Landlord Name:</span>
@@ -327,6 +331,10 @@ $properties = $stmt->fetchAll(PDO::FETCH_ASSOC);
 
             <!-- Contract Tab -->
             <div id="p-tab-contract" class="tab-content">
+                <div class="tab-header">
+                    <i class="fa-solid fa-file-contract"></i>
+                    <span>Contract Agreement</span>
+                </div>
                 <div class="details-grid">
                     <div class="detail-row">
                         <span class="detail-label">Landlord Name:</span>
@@ -361,6 +369,10 @@ $properties = $stmt->fetchAll(PDO::FETCH_ASSOC);
 
             <!-- Important Dates Tab -->
             <div id="p-tab-dates" class="tab-content">
+                <div class="tab-header">
+                    <i class="fa-solid fa-calendar"></i>
+                    <span>Important Dates</span>
+                </div>
                 <div class="dates-list">
                     <div class="date-item">
                         <span class="date-label">Landlord's ID Expiry:</span>
@@ -391,6 +403,10 @@ $properties = $stmt->fetchAll(PDO::FETCH_ASSOC);
 
             <!-- Files Tab -->
             <div id="p-tab-files" class="tab-content">
+                <div class="tab-header">
+                    <i class="fa-solid fa-folder"></i>
+                    <span>Files</span>
+                </div>
                 <div class="files-list">
                     <div class="file-item">
                         <i class="fa-solid fa-file-pdf file-icon"></i>
@@ -417,6 +433,10 @@ $properties = $stmt->fetchAll(PDO::FETCH_ASSOC);
 
             <!-- Notes Tab -->
             <div id="p-tab-notes" class="tab-content">
+                <div class="tab-header">
+                    <i class="fa-solid fa-sticky-note"></i>
+                    <span>Notes</span>
+                </div>
                 <div class="notes-input-section">
                     <textarea id="p-noteTextarea" class="note-textarea" placeholder="Write your note here..."></textarea>
                     <button id="p-addNoteBtn" class="add-note-btn" onclick="window.actionbtn.addNote()">

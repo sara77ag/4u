@@ -146,8 +146,8 @@ $landlords = $stmt->fetchAll(PDO::FETCH_ASSOC);
         <!-- Header -->
         <div class="action-modal-header">
             <div class="action-header-left">
-                <div class="house-icon">
-                    <i class="fa-solid fa-user"></i>
+                <div class="action-modal-header-icon">
+                    <i class="fa-solid fa-user-tie"></i>
                 </div>
                 <h2 id="landlordName">Landlord Name</h2>
             </div>
@@ -159,10 +159,10 @@ $landlords = $stmt->fetchAll(PDO::FETCH_ASSOC);
         <!-- Tabs Navigation -->
         <div class="action-tabs-nav">
             <button class="tab-btn active" data-tab="landlord">
-                <i class="fa-solid fa-user-tie"></i> Landlord
+                <i class="fa-solid fa-user-tie"></i> Landlord Information
             </button>
             <button class="tab-btn" data-tab="properties">
-                <i class="fa-solid fa-house"></i> Properties
+                <i class="fa-solid fa-house"></i> Owned Properties
             </button>
             <button class="tab-btn" data-tab="files">
                 <i class="fa-solid fa-folder"></i> Files
@@ -176,6 +176,10 @@ $landlords = $stmt->fetchAll(PDO::FETCH_ASSOC);
         <div class="action-tabs-content">
             <!-- Landlord Tab -->
             <div id="l-tab-landlord" class="tab-content active">
+                <div class="tab-header">
+                    <i class="fa-solid fa-user-tie"></i>
+                    <span>Landlord Information</span>
+                </div>
               <div class="details-grid">
                     <div class="detail-row">
                         <span class="detail-label">Name:</span>
@@ -212,42 +216,60 @@ $landlords = $stmt->fetchAll(PDO::FETCH_ASSOC);
                 </div>
             </div>
 
-            <!-- Contract Tab -->
-            <div id="l-tab-contract" class="tab-content">
-                <div class="details-grid">
-                    <div class="detail-row">
-                        <span class="detail-label">Landlord Name</span>
-                        <span class="detail-value">-</span>
-                    </div>
-                    <div class="detail-row">
-                        <span class="detail-label">Tenant Name</span>
-                        <span id="l-contract-tenant" class="detail-value">-</span>
-                    </div>
-                    <div class="detail-row">
-                        <span class="detail-label">Rent Amount</span>
-                        <span id="l-contract-rent" class="detail-value">-</span>
-                    </div>
-                    <div class="detail-row">
-                        <span class="detail-label">Payment Frequency</span>
-                        <span id="l-contract-frequency" class="detail-value">-</span>
-                    </div>
-                    <div class="detail-row">
-                        <span class="detail-label">Payment Due Date</span>
-                        <span id="l-contract-duedate" class="detail-value">-</span>
-                    </div>
-                    <div class="detail-row">
-                        <span class="detail-label">Contract Start</span>
-                        <span id="l-contract-start" class="detail-value">-</span>
-                    </div>
-                    <div class="detail-row">
-                        <span class="detail-label">Contract End</span>
-                        <span id="l-contract-end" class="detail-value">-</span>
-                    </div>
+            <!-- Properties Tab -->
+            <div id="l-tab-properties" class="tab-content">
+                <div class="tab-header">
+                    <i class="fa-solid fa-house"></i>
+                    <span>Owned Properties</span>
+                    <span class="count-prperties">3</span>
                 </div>
-            </div>
+       
+            <!-- Properties List  -->
+            <div class="contant-row-p">
+                <!-- Header Row -->
+                <div class="data-row header">
+                    <div class="cell">Address</div>
+                    <div class="cell">Type</div>
+                    <div class="cell">Status</div>
+                    <div class="cell">Tenant</div>
+                    <div class="cell">Rent</div>
+                </div>
 
+                <!-- Data Row 1 -->
+                <div class="data-row">
+                    <div class="cell">221B Baker Street</div>
+                    <div class="cell" class="td-type">Flat</div>
+                    <div class="cell"><span class="status-badge status-occupied">Occupied</span></div>
+                    <div class="cell">John Smith</div>
+                    <div class="cell"><span class="rent">£1,200</span></div>
+                </div>
+
+                <!-- Data Row 2 -->
+                <div class="data-row">
+                    <div class="cell">Oxford Road 10</div>
+                    <div class="cell" class="td-type">House</div>
+                    <div class="cell"><span class="status-badge status-available">Vacant</span></div>
+                    <div class="cell"><span class="no-tenant">-</span></div>
+                    <div class="cell"><span class="rent">£950</span></div>
+                </div>
+
+                <!-- Data Row 3 -->
+                <div class="data-row">
+                    <div class="cell">Green Lane 5</div>
+                    <div class="cell" >Flat</div>
+                    <div class="cell"><span class="status-badge status-occupied">Occupied</span></div>
+                    <div class="cell">Sarah Ali</div>
+                    <div class="cell"><span class="rent">£800</span></div>
+                </div>
+         </div>
+            </div>
+            
             <!-- Files Tab -->
             <div id="l-tab-files" class="tab-content">
+                <div class="tab-header">
+                    <i class="fa-solid fa-folder"></i>
+                    <span>Files</span>
+                </div>
                 <div class="files-list">
                     <div class="file-item">
                         <i class="fa-solid fa-file-pdf file-icon"></i>
@@ -269,6 +291,10 @@ $landlords = $stmt->fetchAll(PDO::FETCH_ASSOC);
 
             <!-- Notes Tab -->
             <div id="l-tab-notes" class="tab-content">
+                <div class="tab-header">
+                    <i class="fa-solid fa-sticky-note"></i>
+                    <span>Notes</span>
+                </div>
                 <div class="notes-input-section">
                     <textarea id="l-noteTextarea" class="note-textarea" placeholder="Write your note here..."></textarea>
                     <button id="l-addNoteBtn" class="add-note-btn" onclick="actionbtn.addNote()">
