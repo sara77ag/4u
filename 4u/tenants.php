@@ -136,14 +136,14 @@ $tenants = $pdo -> query($query)->fetchAll(PDO::FETCH_ASSOC);
                                     <div class="action-buttons">
                                         <button class="action-btn action-btn-view" onclick="viewTenant(this)"><i class="fa-solid fa-eye"></i></button>
                                         
-                                        <?php if ($_SESSION['role'] !== 'read_only'): ?>
+                                        <?php // if ($_SESSION['role'] !== 'read_only'): ?>
                                             <button class="action-btn action-btn-edit" onclick="editTenant(this)"><i class="fa-solid fa-pen"></i></button>
                                             
                                             <form method="POST" style="display:inline;" onsubmit="return confirm('Archive <?= htmlspecialchars($t['name']) ?>?')">
                                                 <input type="hidden" name="archive_id" value="<?= $t['tenant_id'] ?>">
                                                 <button type="submit" class="action-btn action-btn-delete"><i class="fa-solid fa-trash"></i></button>
                                             </form>
-                                        <?php endif; ?>
+                                        <?php // endif; ?>
                                     </div>
                                 </td>
                             </tr>
