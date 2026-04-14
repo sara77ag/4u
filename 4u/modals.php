@@ -139,6 +139,9 @@ try {
 }
 ?>
 
+<!-- ============================================ -->
+<!-- Modal: Add Property -->
+<!-- ============================================ -->
 <div id="addPropertyModal" class="modal-overlay">
     <div class="modal-container">
         <div class="modal-header">
@@ -209,6 +212,9 @@ try {
     </div>
 </div>
 
+<!-- ============================================ -->
+<!-- Modal: Add Landlord -->
+<!-- ============================================ -->
 <div id="addLandlordModal" class="modal-overlay">
     <div class="modal-container">
         <div class="modal-header">
@@ -270,6 +276,9 @@ try {
     </div>
 </div>
 
+<!-- ============================================ -->
+<!-- Modal: Add Tenant -->
+<!-- ============================================ -->
 <div id="addTenantModal" class="modal-overlay">
     <div class="modal-container">
         <div class="modal-header">
@@ -347,6 +356,9 @@ try {
     </div>
 </div>
 
+<!-- ============================================ -->
+<!-- Modal: Book Viewing -->
+<!-- ============================================ -->
 <div id="bookViewingModal" class="modal-overlay">
     <div class="modal-container">
         <div class="modal-header">
@@ -407,6 +419,9 @@ try {
     </div>
 </div>
 
+<!-- ============================================ -->
+<!-- Modal: Add Payment -->
+<!-- ============================================ -->
 <div id="addPaymentModal" class="modal-overlay">
     <div class="modal-container">
         <div class="modal-header">
@@ -436,6 +451,9 @@ try {
     </div>
 </div>
 
+<!-- ============================================ -->
+<!-- Modal: Add Contract -->
+<!-- ============================================ -->
 <div id="addContractModal" class="modal-overlay">
     <div class="modal-container">
         <div class="modal-header">
@@ -465,6 +483,9 @@ try {
     </div>
 </div>
 
+<!-- ============================================ -->
+<!-- Modal: Add User -->
+<!-- ============================================ -->
 <div id="addUserModal" class="modal-overlay">
     <div class="modal-container">
         <div class="modal-header">
