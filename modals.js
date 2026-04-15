@@ -7,9 +7,20 @@ const modalConfig = {
     payment: { form: 'addPaymentForm', modal: 'addPaymentModal', hasFiles: true, filesKey: 'paymentFiles' },
     contract: { form: 'addContractForm', modal: 'addContractModal', hasFiles: true, filesKey: 'contractFiles' },
     user: { form: 'addUserForm', modal: 'addUserModal', hasFiles: false }
+    uploadFile: { form: 'uploadFileForm', modal: 'uploadFileModal', hasFiles: true },
+    viewUser:   { form: null,             modal: 'viewUserModal',   hasFiles: false },
+    editUser:   { form: 'editUserForm',   modal: 'editUserModal',   hasFiles: false },
 };
 
 const fileStorage = {};
+
+function openUploadFileModal()  { openModal('uploadFile'); }
+function closeUploadFileModal() { closeModal('uploadFile'); }
+function resetUploadFileForm()  { resetForm('uploadFile'); }
+function openViewUserModal()    { openModal('viewUser'); }
+function closeViewUserModal()   { closeModal('viewUser'); }
+function openEditUserModal()    { openModal('editUser'); }
+function closeEditUserModal()   { closeModal('editUser'); }
 
 function openModal(type) {
     const config = modalConfig[type];
