@@ -43,7 +43,8 @@ window.actionbtn = {
             address: row.querySelector('.td-address')?.textContent.trim() || row.dataset.address || 'N/A',
             landlord: row.querySelector('.td-landlord')?.textContent.trim() || row.dataset.landlord || 'N/A',
             tenant: row.dataset.tenant || 'N/A',
-            rent: row.dataset.price || 'N/A',
+            rent: row.dataset.contractRent || 'N/A',
+            price: row.dataset.price || 'N/A',            
             type: row.dataset.type || 'N/A',
             status: row.dataset.status || 'N/A',
             startDate: row.dataset.contractStart || 'N/A',
@@ -162,6 +163,7 @@ window.actionbtn = {
         statusEl.textContent = data.status.charAt(0).toUpperCase() + data.status.slice(1);
         statusEl.className = `status-badge status-${data.status}`;
 
+        document.getElementById('p-property-price').textContent = `£${parseInt(data.price || 0).toLocaleString()}`;
         document.getElementById('p-property-type').textContent = data.type;
         document.getElementById('p-property-tenant').textContent = data.tenant;
         document.getElementById('p-property-rooms').textContent = data.rooms || 'N/A';
@@ -173,11 +175,11 @@ window.actionbtn = {
 
         document.getElementById('p-contract-landlord').textContent = data.landlord;
         document.getElementById('p-contract-tenant').textContent = data.tenant;
-        document.getElementById('p-contract-rent').textContent = `£${parseInt(data.rent || 0).toLocaleString()}`;
+        document.getElementById('p-contract-rent').textContent = data.rent !== 'N/A'  ? `£${parseInt(data.rent).toLocaleString()}`: 'N/A';
         document.getElementById('p-contract-frequency').textContent = data.frequency || 'N/A';
         document.getElementById('p-contract-start').textContent = data.startDate || 'N/A';
         document.getElementById('p-contract-end').textContent = data.endDate || 'N/A';
-
+  
         document.getElementById('p-date-landlord-id').textContent = data.landlordIdExpiry || 'N/A';
         document.getElementById('p-date-tenant-id').textContent = data.tenantIdExpiry || 'N/A';
         document.getElementById('p-date-contract-end').textContent = data.endDate || 'N/A';
@@ -232,7 +234,7 @@ window.actionbtn = {
     // ==========================
     if (data.startDate && data.frequency) {
         const start = new Date(data.startDate);
-        const freq = data.frequency.toLowerCase();
+        const freq = (data.frequency || '').toLowerCase();
         const today = new Date();
         let due = new Date(start);
 
@@ -311,7 +313,7 @@ window.actionbtn = {
     const targetTab = this.modal.querySelector(`#${prefix}${tabId}`);
     if (targetTab) targetTab.classList.add('active');
 
-    if (event) event.target.classList.add('active');
+    if (event) event.currentTarget.classList.add('active');
 },
 
 

@@ -9,14 +9,46 @@ try {
     die('DB connection failed: ' . $e->getMessage());
 }
 
-$occupied  = $pdo->query("SELECT COUNT(DISTINCT p.property_id) FROM properties p JOIN tenants t ON t.property_id = p.property_id WHERE p.archived = 0 AND t.archived = 0")->fetchColumn();
+// Fetch stats
+$occupied = $pdo->query("SELECT COUNT(DISTINCT property_id) FROM contracts WHERE date('now') BETWEEN contract_start AND contract_end ")->fetchColumn();
 $totalProperties = $pdo->query("SELECT COUNT(*) FROM properties WHERE archived = 0")->fetchColumn();
 $vacant = $totalProperties - $occupied;
 $viewings  = $pdo->query("SELECT COUNT(*) FROM viewing_bookings WHERE status = 'scheduled' AND archived = 0")->fetchColumn();
 $payments  = $pdo->query("SELECT COUNT(*) FROM transactions WHERE status = 'pending' AND archived = 0")->fetchColumn();
 $late      = $pdo->query("SELECT COUNT(*) FROM transactions WHERE status = 'not complete' AND archived = 0")->fetchColumn();
-$deadlines = $pdo->query("SELECT COUNT(*) FROM tenants WHERE contract_end BETWEEN date('now') AND date('now', '+30 days') AND archived = 0")->fetchColumn();
-?>
+$deadlines = $pdo->query("
+    SELECT 
+    (
+        -- Gas Certificate
+        SELECT COUNT(*) FROM properties 
+        WHERE gas_cert_due BETWEEN date('now') AND date('now', '+30 days') 
+        AND archived = 0
+    ) + (
+        -- Electric Certificate
+        SELECT COUNT(*) FROM properties 
+        WHERE electric_cert_due BETWEEN date('now') AND date('now', '+30 days') 
+        AND archived = 0
+    ) + (
+        -- EPC
+        SELECT COUNT(*) FROM properties 
+        WHERE epc_due_date BETWEEN date('now') AND date('now', '+30 days') 
+        AND archived = 0
+    ) + (
+        -- Landlord ID Expiry
+        SELECT COUNT(*) FROM landlords 
+        WHERE id_expiry_date BETWEEN date('now') AND date('now', '+30 days') 
+        AND archived = 0
+    ) + (
+        -- Tenant ID Expiry
+        SELECT COUNT(*) FROM tenants 
+        WHERE id_expiry_date BETWEEN date('now') AND date('now', '+30 days') 
+        AND archived = 0
+    ) + (
+        -- Contract End
+        SELECT COUNT(*) FROM contracts 
+        WHERE contract_end BETWEEN date('now') AND date('now', '+30 days')
+    )
+")->fetchColumn();?>
 
 <!DOCTYPE html>
 <html lang="en">
