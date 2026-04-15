@@ -10,8 +10,10 @@ try {
 }
 
 // Fetch stats
-$occupied  = $pdo->query("SELECT COUNT(*) FROM tenants WHERE archived = 0")->fetchColumn();
-$vacant    = $pdo->query("SELECT COUNT(*) FROM properties WHERE archived = 0")->fetchColumn();
+$occupied  = $pdo->query("SELECT COUNT(DISTINCT p.property_id) FROM properties p JOIN tenants t ON t.property_id = p.property_id WHERE p.archived = 0 AND t.archived = 0")->fetchColumn();
+
+$totalProperties = $pdo->query("SELECT COUNT(*) FROM properties WHERE archived = 0")->fetchColumn();
+$vacant = $totalProperties - $occupied;
 $viewings  = $pdo->query("SELECT COUNT(*) FROM viewing_bookings WHERE status = 'scheduled' AND archived = 0")->fetchColumn();
 $payments  = $pdo->query("SELECT COUNT(*) FROM transactions WHERE status = 'pending' AND archived = 0")->fetchColumn();
 $late      = $pdo->query("SELECT COUNT(*) FROM transactions WHERE status = 'not complete' AND archived = 0")->fetchColumn();
