@@ -57,31 +57,50 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
         header('Location: landlords.php');
         exit();
     }
+// Handle tenant submission
+if (isset($_POST['tenant_name'])) {
+    $propertyId = (int)$_POST['tenant_property_id'];
+    $name = trim($_POST['tenant_name']);
+    $phone = trim($_POST['tenant_phone']);
+    $email = trim($_POST['tenant_email']);
+    $idType = trim($_POST['tenant_id_type'] ?? 'other');
+    $idNumber = trim($_POST['tenant_id_number']);
+    $idExpiry = $_POST['tenant_id_expiry'];
 
-    // Handle tenant submission
-    if (isset($_POST['tenant_name'])) {
-        $propertyId = (int)$_POST['tenant_property_id'];
-        $name = trim($_POST['tenant_name']);
-        $phone = trim($_POST['tenant_phone']);
-        $email = trim($_POST['tenant_email']);
-        $idNumber = trim($_POST['tenant_id_number']);
-        $idExpiry = $_POST['tenant_id_expiry'];
-        $contractStart = $_POST['tenant_contract_start'];
-        $contractEnd = $_POST['tenant_contract_end'];
-        $paymentFreq = $_POST['tenant_payment_frequency'];
-        
-        $stmt = $pdo->prepare("
-            INSERT INTO tenants (property_id, name, phone, email, id_number, id_expiry_date,
-                                contract_start, contract_end, payment_frequency, archived)
-            VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, 0)
-        ");
-        
-        $stmt->execute([$propertyId, $name, $phone, $email, $idNumber, $idExpiry, 
-                        $contractStart, $contractEnd, $paymentFreq]);
-        
-        header('Location: tenants.php');
-        exit();
-    }
+    $contractStart = $_POST['tenant_contract_start'];
+    $contractEnd = $_POST['tenant_contract_end'];
+    $paymentFreq = $_POST['tenant_payment_frequency'];
+    $rent = (float)$_POST['tenant_rent']; 
+
+    // 1. Insert tenant
+    $stmt = $pdo->prepare("
+        INSERT INTO tenants (name, phone, email, id_type, id_number, id_expiry_date, archived)
+        VALUES (?, ?, ?, ?, ?, ?, 0)
+    ");
+
+    $stmt->execute([
+        $propertyId,
+        $name,
+        $phone,
+        $email,
+        $idType,
+        $idNumber,
+        $idExpiry
+    ]);
+
+    $prop = $pdo->prepare("SELECT landlord_id FROM properties WHERE property_id = ?");
+    $prop->execute([$propertyId]);
+    $landlordId = $prop->fetchColumn();
+
+    $stmt = $pdo->prepare("
+        INSERT INTO contracts (tenant_id, property_id, landlord_id, contract_start, contract_end, rent, frequency, status)
+        VALUES (?, ?, ?, ?, ?, ?, ?, 'active')
+    ");
+    $stmt->execute([$tenantId, $propertyId, $landlordId, $contractStart, $contractEnd, $rent, $paymentFreq]);
+
+    header('Location: tenants.php');
+    exit();
+}
 
     // Handle viewing submission
     if (isset($_POST['viewer_name'])) {
@@ -319,12 +338,25 @@ try {
                     <input type="email" name="tenant_email" class="form-control" placeholder="Enter Tenant's Email" required>
                 </div>
                 <div class="form-group">
+                    <label>ID Type <span class="required">*</span></label>
+                    <select name="tenant_id_type" class="form-control" required>
+                        <option value="">Select ID Type</option>
+                        <option value="passport">Passport</option>
+                        <option value="driving_license">Driving License</option>
+                        <option value="national_id">National ID</option>
+                    </select>
+                </div>
+                <div class="form-group">
                     <label>ID Number <span class="required">*</span></label>
                     <input type="text" name="tenant_id_number" class="form-control" placeholder="Enter Tenant's ID Number" required>
                 </div>
                 <div class="form-group">
                     <label>ID Expiry Date <span class="required">*</span></label>
                     <input type="date" name="tenant_id_expiry" class="form-control" required>
+                </div>
+                <div class="form-group">
+                    <label>Rent <span class="required">*</span></label>
+                    <input type="number" name="tenant_rent" class="form-control" placeholder="Enter Monthly Rent Amount" required>
                 </div>
                 <div class="form-group">
                     <label>Contract Start <span class="required">*</span></label>
@@ -435,21 +467,81 @@ try {
                 <i class="fa-solid fa-xmark"></i>
             </button>
         </div>
-        <form id="addPaymentForm" class="modal-body" onsubmit="event.preventDefault();">
+        <form id="addPaymentForm" class="modal-body" method="POST" action="modals.php" enctype="multipart/form-data">
             <div class="modal-form-grid">
                 <div class="form-group">
                     <label>Tenant <span class="required">*</span></label>
-                    <input type="text" class="form-control" placeholder="Payment tracking not yet implemented" disabled>
+                    <select name="payment_tenant_id" class="form-control" required>
+                        <option value="">Select Tenant</option>
+                        <?php
+                        $tenants = $pdo->query("SELECT tenant_id, name FROM tenants WHERE archived = 0")->fetchAll();
+                        foreach ($tenants as $t) {
+                            echo '<option value="' . $t['tenant_id'] . '">' . htmlspecialchars($t['name']) . '</option>';
+                        }
+                        ?>
+                    </select>
+                </div>
+                <div class="form-group">
+                    <label>Property <span class="required">*</span></label>
+                    <select name="payment_property_id" class="form-control" required>
+                        <option value="">Select Property</option>
+                        <?php
+                        foreach ($properties as $prop) {
+                            echo '<option value="' . $prop['property_id'] . '">' . htmlspecialchars($prop['property_address']) . '</option>';
+                        }
+                        ?>
+                    </select>
+                </div>
+                <div class="form-group">
+                    <label>Amount <span class="required">*</span></label>
+                    <input type="number" name="payment_amount" class="form-control" placeholder="Enter Rent Amount Received" required>
+                </div>
+                <div class="form-group">
+                    <label>Period Covered <span class="required">*</span></label>
+                    <input type="text" name="payment_period" class="form-control" placeholder="e.g. Mar - Apr 2025" required>
+                </div>
+                <div class="form-group">
+                    <label>Payment Method <span class="required">*</span></label>
+                    <select name="payment_method" class="form-control" required>
+                        <option value="">Select Payment Method</option>
+                        <option value="bank_transfer">Bank Transfer</option>
+                        <option value="cash">Cash</option>
+                        <option value="card">Card Payment</option>
+                        <option value="cheque">Cheque</option>
+                    </select>
+                </div>
+                <div class="form-group">
+                    <label>Payment Date <span class="required">*</span></label>
+                    <input type="date" name="payment_date" class="form-control" required>
+                </div>
+                <div class="form-group">
+                    <label>Payment Time <span class="required">*</span></label>
+                    <input type="time" name="payment_time" class="form-control" required>
+                </div>
+                <div class="form-group">
+                    <label>Upload Files</label>
+                    <input type="file" id="paymentFileInput" name="payment_files[]" class="file-input" multiple accept=".pdf,.jpg,.jpeg,.png">
+                    <div class="file-upload-group" onclick="document.getElementById('paymentFileInput').click()">
+                        <i class="fa-solid fa-cloud-arrow-up"></i>
+                        <p>Upload Payment Proof & other files</p>
+                    </div>
+                    <div id="paymentFileCount" class="file-count"></div>
+                    <div id="paymentFileList"></div>
                 </div>
             </div>
             <div class="modal-footer">
-                <button type="button" class="modal-btn modal-btn-reset" onclick="closeAddPaymentModal()">
-                    <i class="fa-solid fa-xmark"></i> Close
+                <button type="button" class="modal-btn modal-btn-reset" onclick="resetAddPaymentForm()">
+                    <i class="fa-solid fa-xmark"></i> Reset
+                </button>
+                <button type="submit" class="modal-btn modal-btn-save">
+                    <i class="fa-solid fa-plus"></i> Add
                 </button>
             </div>
         </form>
     </div>
 </div>
+
+
 
 <!-- ============================================ -->
 <!-- Modal: Add Contract -->
@@ -467,16 +559,80 @@ try {
                 <i class="fa-solid fa-xmark"></i>
             </button>
         </div>
-        <form id="addContractForm" class="modal-body" onsubmit="event.preventDefault();">
+        <form id="addContractForm" class="modal-body" method="POST" action="modals.php" enctype="multipart/form-data">
             <div class="modal-form-grid">
                 <div class="form-group">
-                    <label>Note <span class="required">*</span></label>
-                    <input type="text" class="form-control" placeholder="Contracts are added via the Tenant form" disabled>
+                    <label>Property <span class="required">*</span></label>
+                    <select name="contract_property_id" class="form-control" required>
+                        <option value="">Select Property</option>
+                        <?php
+                        foreach ($properties as $prop) {
+                            echo '<option value="' . $prop['property_id'] . '">' . htmlspecialchars($prop['property_address']) . '</option>';
+                        }
+                        ?>
+                    </select>
+                </div>
+                <div class="form-group">
+                    <label>Landlord <span class="required">*</span></label>
+                    <select name="contract_landlord_id" class="form-control" required>
+                        <option value="">Select Landlord</option>
+                        <?php
+                        foreach ($landlords as $l) {
+                            echo '<option value="' . $l['landlord_id'] . '">' . htmlspecialchars($l['name']) . '</option>';
+                        }
+                        ?>
+                    </select>
+                </div>
+                <div class="form-group">
+                    <label>Tenant <span class="required">*</span></label>
+                    <select name="contract_tenant_id" class="form-control" required>
+                        <option value="">Select Tenant</option>
+                        <?php
+                        $tenants = $tenants ?? $pdo->query("SELECT tenant_id, name FROM tenants WHERE archived = 0")->fetchAll();
+                        foreach ($tenants as $t) {
+                            echo '<option value="' . $t['tenant_id'] . '">' . htmlspecialchars($t['name']) . '</option>';
+                        }
+                        ?>
+                    </select>
+                </div>
+                <div class="form-group">
+                    <label>Rent <span class="required">*</span></label>
+                    <input type="number" name="contract_rent" class="form-control" placeholder="Enter Rent Amount" required>
+                </div>
+                <div class="form-group">
+                    <label>Payment Frequency <span class="required">*</span></label>
+                    <select name="contract_frequency" class="form-control" required>
+                        <option value="">Select Frequency</option>
+                        <option value="weekly">Weekly</option>
+                        <option value="fortnightly">Fortnightly</option>
+                        <option value="monthly">Monthly</option>
+                    </select>
+                </div>
+                <div class="form-group">
+                    <label>Contract Start Date <span class="required">*</span></label>
+                    <input type="date" name="contract_start" class="form-control" required>
+                </div>
+                <div class="form-group">
+                    <label>Contract End Date <span class="required">*</span></label>
+                    <input type="date" name="contract_end" class="form-control" required>
+                </div>
+                <div class="form-group">
+                    <label>Upload Files</label>
+                    <input type="file" id="contractFileInput" name="contract_files[]" class="file-input" multiple accept=".pdf,.jpg,.jpeg,.png">
+                    <div class="file-upload-group" onclick="document.getElementById('contractFileInput').click()">
+                        <i class="fa-solid fa-cloud-arrow-up"></i>
+                        <p>Upload Contract & other files</p>
+                    </div>
+                    <div id="contractFileCount" class="file-count"></div>
+                    <div id="contractFileList"></div>
                 </div>
             </div>
             <div class="modal-footer">
-                <button type="button" class="modal-btn modal-btn-reset" onclick="closeAddContractModal()">
-                    <i class="fa-solid fa-xmark"></i> Close
+                <button type="button" class="modal-btn modal-btn-reset" onclick="resetAddContractForm()">
+                    <i class="fa-solid fa-xmark"></i> Reset
+                </button>
+                <button type="submit" class="modal-btn modal-btn-save">
+                    <i class="fa-solid fa-plus"></i> Create
                 </button>
             </div>
         </form>

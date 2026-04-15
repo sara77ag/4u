@@ -35,15 +35,18 @@ $stmt = $pdo->query("
         p.landlord_id_expiry_date,
         l.name AS landlord_name,
         t.name AS tenant_name,
-        t.contract_start,
-        t.contract_end,
-        t.payment_frequency,
+        c.contract_start,
+        c.contract_end,
+        c.rent AS contract_rent,
+        c.frequency,
         t.id_expiry_date
     FROM properties p
     LEFT JOIN landlords l ON p.landlord_id = l.landlord_id
-    LEFT JOIN tenants t ON p.property_id = t.property_id AND t.archived = 0
+    LEFT JOIN contracts c ON c.property_id = p.property_id
+    LEFT JOIN tenants t ON t.tenant_id = c.tenant_id
     WHERE p.archived = 0
 ");
+
 
 $properties = $stmt->fetchAll(PDO::FETCH_ASSOC);
 ?>
@@ -159,26 +162,28 @@ $properties = $stmt->fetchAll(PDO::FETCH_ASSOC);
                     $contract = $p['contract_start'] ? $p['contract_start'] . ' to ' . $p['contract_end'] : '-';
                     $tenant_name = $p['tenant_name'] ?? '';
                     $landlord_name = $p['landlord_name'] ?? '';
-                    $type = strtolower($p['property_type']);
+                    $type = strtolower($p['property_type'])?? '';
                     $price = $p['monthly_rent'];
+                    $contract_rent = $p['contract_rent'] ?? null;
                     $rooms = $p['room_count'] ?? 0;
                     $bathrooms = $p['bathroom_count'] ?? 0;
                     $epc = $p['epc_rating'] ?? '';
                     $garden = $p['has_garden'] ?? 0;
                     $pets = $p['allowed_pets'] ?? 0;
                     $council = $p['council_band'] ?? '';
-                    $frequency = $p['payment_frequency'] ?? '';
+                    $frequency = $p['frequency'] ?? '';
                 ?>
             <tr 
              data-id="<?= $p['property_id'] ?>"
              data-type="<?= htmlspecialchars($type) ?>"
              data-status="<?= $status ?>"
              data-price="<?= $price ?>"
+             data-contract-rent="<?= htmlspecialchars($contract_rent ?? '') ?>"
              data-landlord="<?= htmlspecialchars($landlord_name) ?>"
              data-tenant="<?= htmlspecialchars($tenant_name) ?>"
              data-contract-start="<?= $p['contract_start'] ?>"
              data-contract-end="<?= $p['contract_end'] ?>"
-             data-frequency="<?= htmlspecialchars($p['payment_frequency'] ?? '') ?>"
+             data-frequency="<?= htmlspecialchars($p['frequency'] ?? '') ?>"
              data-rooms="<?= $p['room_count'] ?>"
              data-bathrooms="<?= $p['bathroom_count'] ?>"
              data-epc="<?= htmlspecialchars($p['epc_rating']) ?>"
@@ -194,7 +199,9 @@ $properties = $stmt->fetchAll(PDO::FETCH_ASSOC);
         <td class="td-address"><?= htmlspecialchars($p['property_address']) ?></td>
         <td><span class="td-type"><?= htmlspecialchars($p['property_type']) ?></span></td>
         <td class="td-landlord"><?= htmlspecialchars($landlord_name) ?></td>
-        <td class="rent">£<?= number_format($price, 0) ?></td>
+        <td class="rent">
+            <?= $price ? '£' . number_format($price, 0) : '-' ?>
+        </td>        
         <td><?php if ($tenant_name): ?>
             <span class="td-tenant"><?= htmlspecialchars($tenant_name) ?></span>
         <?php else: ?>
@@ -297,6 +304,10 @@ $properties = $stmt->fetchAll(PDO::FETCH_ASSOC);
                     <div class="detail-row">
                         <span class="detail-label">Property Status:</span>
                         <span id="p-property-status" class="status-badge status-available">-</span>
+                    </div>
+                    <div class="detail-row">
+                        <span class="detail-label">Property Price:</span>
+                        <span id="p-property-price" class="detail-value">-</span>
                     </div>
                     <div class="detail-row">
                         <span class="detail-label">Tenant Name:</span>
