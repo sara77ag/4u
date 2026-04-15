@@ -6,7 +6,7 @@ const modalConfig = {
     viewing: { form: 'bookViewingForm', modal: 'bookViewingModal', hasFiles: false },
     payment: { form: 'addPaymentForm', modal: 'addPaymentModal', hasFiles: true, filesKey: 'paymentFiles' },
     contract: { form: 'addContractForm', modal: 'addContractModal', hasFiles: true, filesKey: 'contractFiles' },
-    user: { form: 'addUserForm', modal: 'addUserModal', hasFiles: false }
+    user: { form: 'addUserForm', modal: 'addUserModal', hasFiles: false },
     uploadFile: { form: 'uploadFileForm', modal: 'uploadFileModal', hasFiles: true },
     viewUser:   { form: null,             modal: 'viewUserModal',   hasFiles: false },
     editUser:   { form: 'editUserForm',   modal: 'editUserModal',   hasFiles: false },
