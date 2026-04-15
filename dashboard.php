@@ -229,7 +229,6 @@ $deadlines = $pdo->query("SELECT COUNT(*) FROM tenants WHERE contract_end BETWEE
             }
         });
 
-
     </script>
 </body>
 </html>

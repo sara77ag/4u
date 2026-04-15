@@ -1,4 +1,13 @@
 <?php
+session_start();
+
+
+if(!isset($_SESSION['user_id'])) {
+    header("Location: index.php");
+    exit();
+}
+
+
 $dbPath = __DIR__ . '/database.db';
 
 try {
@@ -16,9 +25,20 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST' && isset($_POST['archive_id'])) {
     exit();
 }
 
-$query  = "SELECT t.*, p.property_address
+$query  = "SELECT 
+        t.*,
+        c.contract_start,
+        c.contract_end,
+        c.rent,
+        c.frequency,
+        p.property_address
         FROM tenants t
-        LEFT JOIN properties p on t.property_id = p.property_id
+        LEFT JOIN contracts c ON c.tenant_id = t.tenant_id AND c.contract_id = ( 
+        SELECT contract_id FROM contracts 
+        WHERE tenant_id = t.tenant_id 
+        ORDER BY contract_end DESC LIMIT 1
+         )
+        LEFT JOIN properties p ON c.property_id = p.property_id
         WHERE t.archived = 0";
 
 $tenants = $pdo -> query($query)->fetchAll(PDO::FETCH_ASSOC);
@@ -35,6 +55,8 @@ $tenants = $pdo -> query($query)->fetchAll(PDO::FETCH_ASSOC);
     <link rel="stylesheet" href="tables.css">
     <script src="navbar.js" ></script>
     <script src="modals.js" ></script>
+    <script src="actionbtn.js" ></script>
+
     <style>
         /* Column specific widths */
         .col-name { width: 16%; }
@@ -114,29 +136,50 @@ $tenants = $pdo -> query($query)->fetchAll(PDO::FETCH_ASSOC);
                         </thead>
                         <tbody id="tableBody">
                             <?php foreach ($tenants as $t): ?>
-                            <tr data-name="<?= strtolower($t['name']) ?>" 
-                                data-status="" 
-                                data-contract="<?= $t['contract_start'] ?>">
+                            <tr 
+                                data-tenant-id="<?= $t['tenant_id'] ?>"
+                                data-name="<?= htmlspecialchars($t['name']) ?>"
+                                data-phone="<?= htmlspecialchars($t['phone']) ?>"
+                                data-email="<?= htmlspecialchars($t['email']) ?>"
+                                data-address="<?= htmlspecialchars($t['property_address'] ?? 'Unassigned') ?>"
+
+                                data-idtype="<?= htmlspecialchars($t['id_type']) ?>"
+                                data-idnumber="<?= htmlspecialchars($t['id_number']) ?>"
+                                data-idexpiry="<?= htmlspecialchars($t['id_expiry_date']) ?>"
+
+                                data-contract-start="<?= htmlspecialchars($t['contract_start']) ?>"
+                                data-contract-end="<?= htmlspecialchars($t['contract_end']) ?>" 
+                                data-frequency="<?= htmlspecialchars($t['frequency']) ?>"
+
+                                data-landlord="<?= htmlspecialchars($t['landlord_name'] ?? 'N/A') ?>"
+                                data-rent="<?= htmlspecialchars($t['rent'] ?? 0) ?>"   
+                                >
+
                                 <td class="tenant-name"><?= htmlspecialchars($t['name']) ?></td>
                                 <td><?= htmlspecialchars($t['phone']) ?></td>
                                 <td class="td-email"><?= htmlspecialchars($t['email']) ?></td>
                                 <td class="tenant-address"><?= htmlspecialchars($t['property_address'] ?? 'Unassigned') ?></td>
                                 <td><span class="status-badge"></span></td>
                                 <td class="contract-info">
-                                    <?= date('m/d/Y', strtotime($t['contract_start'])) ?> to <?= date('m/d/Y', strtotime($t['contract_end'])) ?>
+                                 <?php if (!empty($t['contract_start']) && !empty($t['contract_end'])): ?>
+                                     <?= date('m/d/Y', strtotime($t['contract_start'])) ?>
+                                     to
+                                     <?= date('m/d/Y', strtotime($t['contract_end'])) ?>
+                                 <?php else: ?>
+                                     No Contract
+                                 <?php endif; ?>
                                 </td>
                                 <td>
                                     <div class="action-buttons">
-                                        <button class="action-btn action-btn-view" onclick="viewTenant(this)"><i class="fa-solid fa-eye"></i></button>
-                                        
-                                        <?php // if ($_SESSION['role'] !== 'read_only'): ?>
+                                        <button class="action-btn action-btn-view" onclick="actionbtn.viewTenant(this)"><i class="fa-solid fa-eye"></i></button>
+                                        <?php if ($_SESSION['role'] !== 'read_only'): ?>
                                             <button class="action-btn action-btn-edit" onclick="editTenant(this)"><i class="fa-solid fa-pen"></i></button>
                                             
                                             <form method="POST" style="display:inline;" onsubmit="return confirm('Archive <?= htmlspecialchars($t['name']) ?>?')">
                                                 <input type="hidden" name="archive_id" value="<?= $t['tenant_id'] ?>">
                                                 <button type="submit" class="action-btn action-btn-delete"><i class="fa-solid fa-trash"></i></button>
                                             </form>
-                                        <?php // endif; ?>
+                                        <?php endif; ?>
                                     </div>
                                 </td>
                             </tr>
@@ -150,6 +193,208 @@ $tenants = $pdo -> query($query)->fetchAll(PDO::FETCH_ASSOC);
 
         <!-- Modals Container -->
     <div id="modals-container"></div>
+
+    
+<!-- ============================================ -->
+<!-- Action Buttons Modal: View Tenant -->
+<!-- ============================================ -->
+<div id="viewTenantModal" class="action-modal-overlay">
+    <div class="action-modal-container">
+        <!-- Header -->
+        <div class="action-modal-header">
+            <div class="action-header-left">
+                <div class="action-modal-header-icon">
+                    <i class="fa-solid fa-user"></i>
+                </div>
+                <h2 id="tenantName">Tenant Name</h2>
+            </div>
+            <button class="action-modal-close" onclick="actionbtn.closeModal()">
+                <i class="fa-solid fa-xmark"></i>
+            </button>
+        </div>
+
+        <!-- Tabs Navigation -->
+        <div class="action-tabs-nav">
+            <button class="tab-btn active" data-tab="tenant">
+                <i class="fa-solid fa-user"></i> Tenant Information
+            </button>
+            <button class="tab-btn" data-tab="tenancyHistory">
+                <i class="fa-solid fa-address-book"></i>Tenancy History
+            </button>
+            <button class="tab-btn" data-tab="currentTenancy">
+                <i class="fa-solid fa-house"></i> Current Tenancy
+            </button>
+            <button class="tab-btn" data-tab="files">
+                <i class="fa-solid fa-folder"></i> Files
+            </button>
+            <button class="tab-btn" data-tab="notes">
+                <i class="fa-solid fa-sticky-note"></i> Notes
+            </button>
+        </div>
+
+        <!-- Tab Content -->
+        <div class="action-tabs-content">
+            <!-- Tenant Tab -->
+            <div id="t-tab-tenant" class="tab-content active">
+                <div class="tab-header">
+                    <i class="fa-solid fa-user"></i>
+                    <span>Tenant Information</span>
+                </div>
+              <div class="details-grid">
+                    <div class="detail-row">
+                        <span class="detail-label">Name:</span>
+                        <span id="t-tenant-name" class="detail-value">-</span>
+                    </div>
+                    <div class="detail-row">
+                        <span class="detail-label">Phone:</span>
+                        <span id="t-tenant-phone" class="detail-value">-</span>
+                    </div>
+                    <div class="detail-row">
+                        <span class="detail-label">Email:</span>
+                        <span id="t-tenant-email" class="detail-value">-</span>
+                    </div>
+                    <div class="detail-row">
+                        <span class="detail-label">ID Type:</span>
+                        <span id="t-tenant-idtype" class="detail-value">-</span>
+                    </div>
+                    <div class="detail-row">
+                        <span class="detail-label">ID Number:</span>
+                        <span id="t-tenant-idnumber" class="detail-value">-</span>
+                    </div>
+                    <div class="detail-row">
+                        <span class="detail-label">ID Expiry:</span>
+                        <span id="l-tenant-idexpiry" class="detail-value">-</span>
+                    </div>
+                    <div class="detail-row">
+                        <span class="detail-label">Address:</span>
+                        <span id="l-tenant-address" class="detail-value">-</span>
+                    </div>
+                    <div class="detail-row">
+                        <span class="detail-label">Preferred Contact Method:</span>
+                        <span id="t-tenant-contact" class="detail-value">-</span>
+                    </div>
+                </div>
+            </div>
+
+            <!-- Tenancy History Tab -->
+            <div id="t-tab-tenancyHistory" class="tab-content">
+                <div class="tab-header">
+                    <i class="fa-solid fa-address-book"></i>
+                    <span>Tenancy History</span>
+                </div>
+       
+            <!-- Tenancy History List  -->
+            <div class="contant-row-t">
+                <!-- Header Row -->
+                <div class="data-row header">
+                    <div class="cell">Address</div>
+                    <div class="cell">Landlord</div>
+                    <div class="cell">Move in</div>
+                    <div class="cell">Move out</div>
+                    <div class="cell">Status</div>
+                </div>
+
+                <!-- Data Row 1 -->
+                <div class="data-row">
+                    <div class="cell">221B Baker Street</div>
+                    <div class="cell">Alex</div>
+                    <div class="cell">01/01/2023</div>
+                    <div class="cell">01/01/2024</div>
+                    <div class="cell"><span class="status-badge status-previous">Previous</span></div>
+                </div>
+
+                <!-- Data Row 2 -->
+                <div class="data-row">
+                    <div class="cell">Oxford Road 10</div>                    
+                    <div class="cell">Alex</div>
+                    <div class="cell">01/01/2024</div>
+                    <div class="cell">01/01/2025</div>
+                    <div class="cell"><span class="status-badge status-previous">Previous</span></div>
+                </div>
+
+                <!-- Data Row 3 -->
+                <div class="data-row">
+                    <div class="cell">Green Lane 5</div>                    
+                    <div class="cell">Alex</div>
+                    <div class="cell" >01/01/2025</div>
+                    <div class="cell"> - </div>
+                    <div class="cell"><span class="status-badge status-active">Current</span></div>
+                </div>
+         </div>
+            </div>
+            
+            <!-- Current Tenancy Tab -->
+            <div id="t-tab-currentTenancy" class="tab-content">
+                <div class="tab-header">
+                    <i class="fa-solid fa-house"></i>
+                    <span>Current Tenancy</span>
+                </div>
+              <div class="details-grid">
+                    <div class="detail-row">
+                        <span class="detail-label">Address:</span>
+                        <span id="t-currentTenancy-address" class="detail-value">-</span>
+                    </div>
+                    <div class="detail-row">
+                        <span class="detail-label">Landlord:</span>
+                        <span id="t-currentTenancy-landlord" class="detail-value">-</span>
+                    </div>
+                    <div class="detail-row">
+                        <span class="detail-label">Contract Start:</span>
+                        <span id="t-currentTenancy-contractStart" class="detail-value">-</span>
+                    </div>
+                    <div class="detail-row">
+                        <span class="detail-label">Contract End:</span>
+                        <span id="t-currentTenancy-contractEnd" class="detail-value">-</span>
+                    </div>
+                    <div class="detail-row">
+                        <span class="detail-label">Status:</span>
+                        <span id="t-currentTenancy-status" class="detail-value">-</span>
+                    </div>
+                    <div class="detail-row">
+                        <span class="detail-label">Rent:</span>
+                        <span id="t-currentTenancy-rent" class="detail-value">-</span>
+                    </div>
+                </div>
+            </div>
+
+            <!-- Files Tab -->
+            <div id="t-tab-files" class="tab-content">
+                <div class="tab-header">
+                    <i class="fa-solid fa-folder"></i>
+                    <span>Files</span>
+                </div>
+                <div class="files-list">
+                    <div class="file-item">
+                        <i class="fa-solid fa-file-pdf file-icon"></i>
+                        <span class="file-name">Tenancy Contract</span>
+                        <button class="file-open-btn" onclick="openFile('tenancy')">Open</button>
+                    </div>
+                    <div class="file-item">
+                        <i class="fa-solid fa-file-pdf file-icon"></i>
+                        <span class="file-name">Copy of ID / Passport</span>
+                        <button class="file-open-btn" onclick="openFile('gas')">Open</button>
+                    </div>
+                </div>
+            </div>
+
+            <!-- Notes Tab -->
+            <div id="t-tab-notes" class="tab-content">
+                <div class="tab-header">
+                    <i class="fa-solid fa-sticky-note"></i>
+                    <span>Notes</span>
+                </div>
+                <div class="notes-input-section">
+                    <textarea id="t-noteTextarea" class="note-textarea" placeholder="Write your note here..."></textarea>
+                    <button id="t-addNoteBtn" class="add-note-btn" onclick="actionbtn.addNote()">
+                        <i class="fa-solid fa-plus"></i> Add Note
+                    </button>
+                </div>
+                <div id="t-note-notesList" class="notes-list">
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
 
     <script>
 
@@ -287,55 +532,55 @@ $tenants = $pdo -> query($query)->fetchAll(PDO::FETCH_ASSOC);
 
         // Update all tenant statuses dynamically based on contract dates
         function updateAllStatuses() {
-            const rows = document.querySelectorAll('#tableBody tr');
-            const today = new Date();
+    const rows = document.querySelectorAll('#tableBody tr');
+    const today = new Date();
 
-            rows.forEach(row => {
-                const contractCell = row.querySelector('.contract-info');
-                const statusCell = row.querySelector('.status-badge');
-                if (!contractCell || !statusCell) return;
+    rows.forEach(row => {
+        const statusCell = row.querySelector('.status-badge');
+        const startRaw = row.dataset.contractStart;
+        const endRaw = row.dataset.contractEnd;
 
-                const contractText = contractCell.textContent.trim();
-                if (contractText === '-' || contractText === '') {
-                    // No contract -> New
-                    statusCell.innerHTML = '<i class="fa-solid fa-play-circle"></i> New';
-                    statusCell.className = 'status-badge status-new';
-                    row.dataset.status = 'new';
-                    return;
-                }
-
-                const [startStr, endStr] = contractText.split(' to ');
-                if (!startStr || !endStr) return;
-
-                // Parse MM/DD/YYYY -> Date (assume current year if needed, but samples have full year)
-                const parseDate = (dateStr) => {
-                    const [month, day, year] = dateStr.split('/').map(Number);
-                    return new Date(year, month - 1, day); // JS months 0-indexed
-                };
-
-                const startDate = parseDate(startStr.trim());
-                const endDate = parseDate(endStr.trim());
-
-                let status, statusKey, icon;
-                if (today >= startDate && today <= endDate) {
-                    status = 'Active';
-                    statusKey = 'active';
-                    icon = 'fa-circle-check';
-                } else if (today > endDate) {
-                    status = 'Former';
-                    statusKey = 'former';
-                    icon = 'fa-clock';
-                } else {
-                    status = 'new';
-                    statusKey = 'new';
-                    icon = 'fa-play-circle';
-                }
-
-                statusCell.innerHTML = `<i class="fa-solid ${icon}"></i> ${status}`;
-                statusCell.className = `status-badge status-${statusKey}`;
-                row.dataset.status = statusKey;
-            });
+        // No contract
+        if (!startRaw || !endRaw) {
+            statusCell.innerHTML = '<i class="fa-solid fa-user-plus"></i> New';
+            statusCell.className = 'status-badge status-new';
+            row.dataset.status = 'new';
+            return;
         }
+
+        const startDate = new Date(startRaw);
+        const endDate = new Date(endRaw);
+
+        if (isNaN(startDate) || isNaN(endDate)) {
+            statusCell.innerHTML = '<i class="fa-solid fa-question"></i> Unknown';
+            statusCell.className = 'status-badge status-unknown';
+            row.dataset.status = 'unknown';
+            return;
+        }
+
+        let status = '';
+        let key = '';
+        let icon = '';
+
+        if (today >= startDate && today <= endDate) {
+            status = 'Active';
+            key = 'active';
+            icon = 'fa-circle-check';
+        } else if (today > endDate) {
+            status = 'Former';
+            key = 'former';
+            icon = 'fa-clock';
+        } else {
+            status = 'New';
+            key = 'new';
+            icon = 'fa-user-plus';
+        }
+
+        statusCell.innerHTML = `<i class="fa-solid ${icon}"></i> ${status}`;
+        statusCell.className = `status-badge status-${key}`;
+        row.dataset.status = key;
+    });
+}
 
         // Tenant action functions
         function viewTenant(btn) {

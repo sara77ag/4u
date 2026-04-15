@@ -43,6 +43,7 @@ $landlords = $stmt->fetchAll(PDO::FETCH_ASSOC);
     <link rel="stylesheet" href="tables.css">
     <script src="navbar.js"></script>
     <script src="modals.js"></script>
+    <script src="actionbtn.js" ></script>
 </head>
 <body onload="CallNavbar(); loadModals();">
     <div id="navbar-container"></div>
@@ -113,7 +114,7 @@ $landlords = $stmt->fetchAll(PDO::FETCH_ASSOC);
                             <div class="blue-badge"><?= htmlspecialchars($propText) ?></div>
                         </div>
                         <div class="action-buttons">
-                            <button class="action-btn action-btn-view" title="View" onclick="viewLandlord(this)">
+                            <button class="action-btn action-btn-view" title="View" onclick="actionbtn.viewLandlord(this)">
                                 <i class="fa-solid fa-eye"></i>
                             </button>
                             <button class="action-btn action-btn-edit" title="Edit" onclick="editLandlord(this)">
@@ -135,6 +136,178 @@ $landlords = $stmt->fetchAll(PDO::FETCH_ASSOC);
     </main>
 
     <div id="modals-container"></div>
+
+    
+<!-- ============================================ -->
+<!-- Action Buttons Modal: View Landlord -->
+<!-- ============================================ -->
+<div id="viewLandlordModal" class="action-modal-overlay">
+    <div class="action-modal-container">
+        <!-- Header -->
+        <div class="action-modal-header">
+            <div class="action-header-left">
+                <div class="action-modal-header-icon">
+                    <i class="fa-solid fa-user-tie"></i>
+                </div>
+                <h2 id="landlordName">Landlord Name</h2>
+            </div>
+            <button class="action-modal-close" onclick="actionbtn.closeModal()">
+                <i class="fa-solid fa-xmark"></i>
+            </button>
+        </div>
+
+        <!-- Tabs Navigation -->
+        <div class="action-tabs-nav">
+            <button class="tab-btn active" data-tab="landlord">
+                <i class="fa-solid fa-user-tie"></i> Landlord Information
+            </button>
+            <button class="tab-btn" data-tab="properties">
+                <i class="fa-solid fa-house"></i> Owned Properties
+            </button>
+            <button class="tab-btn" data-tab="files">
+                <i class="fa-solid fa-folder"></i> Files
+            </button>
+            <button class="tab-btn" data-tab="notes">
+                <i class="fa-solid fa-sticky-note"></i> Notes
+            </button>
+        </div>
+
+        <!-- Tab Content -->
+        <div class="action-tabs-content">
+            <!-- Landlord Tab -->
+            <div id="l-tab-landlord" class="tab-content active">
+                <div class="tab-header">
+                    <i class="fa-solid fa-user-tie"></i>
+                    <span>Landlord Information</span>
+                </div>
+              <div class="details-grid">
+                    <div class="detail-row">
+                        <span class="detail-label">Name:</span>
+                        <span id="l-landlord-name" class="detail-value">-</span>
+                    </div>
+                    <div class="detail-row">
+                        <span class="detail-label">Phone:</span>
+                        <span id="l-landlord-phone" class="detail-value">-</span>
+                    </div>
+                    <div class="detail-row">
+                        <span class="detail-label">Email:</span>
+                        <span id="l-landlord-email" class="detail-value">-</span>
+                    </div>
+                    <div class="detail-row">
+                        <span class="detail-label">ID Type:</span>
+                        <span id="l-landlord-idtype" class="detail-value">-</span>
+                    </div>
+                    <div class="detail-row">
+                        <span class="detail-label">ID Number:</span>
+                        <span id="l-landlord-idnumber" class="detail-value">-</span>
+                    </div>
+                    <div class="detail-row">
+                        <span class="detail-label">ID Expiry:</span>
+                        <span id="l-landlord-idexpiry" class="detail-value">-</span>
+                    </div>
+                    <div class="detail-row">
+                        <span class="detail-label">Address:</span>
+                        <span id="l-landlord-address" class="detail-value">-</span>
+                    </div>
+                    <div class="detail-row">
+                        <span class="detail-label">Preferred Contact Method:</span>
+                        <span id="l-landlord-contact" class="detail-value">-</span>
+                    </div>
+                </div>
+            </div>
+
+            <!-- Properties Tab -->
+            <div id="l-tab-properties" class="tab-content">
+                <div class="tab-header">
+                    <i class="fa-solid fa-house"></i>
+                    <span>Owned Properties</span>
+                    <span class="count-prperties">3</span>
+                </div>
+       
+            <!-- Properties List  -->
+            <div class="contant-row-p">
+                <!-- Header Row -->
+                <div class="data-row header">
+                    <div class="cell">Address</div>
+                    <div class="cell">Type</div>
+                    <div class="cell">Status</div>
+                    <div class="cell">Tenant</div>
+                    <div class="cell">Rent</div>
+                </div>
+
+                <!-- Data Row 1 -->
+                <div class="data-row">
+                    <div class="cell">221B Baker Street</div>
+                    <div class="cell" class="td-type">Flat</div>
+                    <div class="cell"><span class="status-badge status-occupied">Occupied</span></div>
+                    <div class="cell">John Smith</div>
+                    <div class="cell"><span class="rent">£1,200</span></div>
+                </div>
+
+                <!-- Data Row 2 -->
+                <div class="data-row">
+                    <div class="cell">Oxford Road 10</div>
+                    <div class="cell" class="td-type">House</div>
+                    <div class="cell"><span class="status-badge status-available">Vacant</span></div>
+                    <div class="cell"><span class="no-tenant">-</span></div>
+                    <div class="cell"><span class="rent">£950</span></div>
+                </div>
+
+                <!-- Data Row 3 -->
+                <div class="data-row">
+                    <div class="cell">Green Lane 5</div>
+                    <div class="cell" >Flat</div>
+                    <div class="cell"><span class="status-badge status-occupied">Occupied</span></div>
+                    <div class="cell">Sarah Ali</div>
+                    <div class="cell"><span class="rent">£800</span></div>
+                </div>
+         </div>
+            </div>
+            
+            <!-- Files Tab -->
+            <div id="l-tab-files" class="tab-content">
+                <div class="tab-header">
+                    <i class="fa-solid fa-folder"></i>
+                    <span>Files</span>
+                </div>
+                <div class="files-list">
+                    <div class="file-item">
+                        <i class="fa-solid fa-file-pdf file-icon"></i>
+                        <span class="file-name">Tenancy Contract</span>
+                        <button class="file-open-btn" onclick="openFile('tenancy')">Open</button>
+                    </div>
+                    <div class="file-item">
+                        <i class="fa-solid fa-file-pdf file-icon"></i>
+                        <span class="file-name">Copy of ID / Passport</span>
+                        <button class="file-open-btn" onclick="openFile('gas')">Open</button>
+                    </div>
+                    <div class="file-item">
+                        <i class="fa-solid fa-file-pdf file-icon"></i>
+                        <span class="file-name">Ownership Proof</span>
+                        <button class="file-open-btn" onclick="openFile('electrical')">Open</button>
+                    </div>
+                </div>
+            </div>
+
+            <!-- Notes Tab -->
+            <div id="l-tab-notes" class="tab-content">
+                <div class="tab-header">
+                    <i class="fa-solid fa-sticky-note"></i>
+                    <span>Notes</span>
+                </div>
+                <div class="notes-input-section">
+                    <textarea id="l-noteTextarea" class="note-textarea" placeholder="Write your note here..."></textarea>
+                    <button id="l-addNoteBtn" class="add-note-btn" onclick="actionbtn.addNote()">
+                        <i class="fa-solid fa-plus"></i> Add Note
+                    </button>
+                </div>
+                <div id="l-note-notesList" class="notes-list">
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+
 
     <script>
         function toggleFilter() {
@@ -192,12 +365,6 @@ $landlords = $stmt->fetchAll(PDO::FETCH_ASSOC);
 
             const cards = document.querySelectorAll('.card');
             cards.forEach(card => card.style.display = '');
-        }
-
-        function viewLandlord(btn) {
-            const card = btn.closest('.card');
-            const name = card.querySelector('.card-name').textContent.trim();
-            alert('View Landlord: ' + name);
         }
 
         function editLandlord(btn) {
