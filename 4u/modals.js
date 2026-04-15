@@ -9,12 +9,8 @@ const modalConfig = {
     user: { form: 'addUserForm', modal: 'addUserModal', hasFiles: false }
 };
 
-// file storage object
 const fileStorage = {};
 
-// Modal Functions
-
-// open modal
 function openModal(type) {
     const config = modalConfig[type];
     if (config) {
@@ -23,7 +19,6 @@ function openModal(type) {
     }
 }
 
-// close modal
 function closeModal(type) {
     const config = modalConfig[type];
     if (config) {
@@ -32,7 +27,6 @@ function closeModal(type) {
     }
 }
 
-// reset form
 function resetForm(type) {
     const config = modalConfig[type];
     if (config) {
@@ -44,7 +38,6 @@ function resetForm(type) {
     }
 }
 
-// save with validation
 function saveForm(type, successMessage) {
     const config = modalConfig[type];
     const form = document.getElementById(config.form);
@@ -57,7 +50,6 @@ function saveForm(type, successMessage) {
     }
 }
 
-// file upload functions
 function handleFiles(type, files) {
     const config = modalConfig[type];
     if (!config || !config.hasFiles) return;
@@ -65,7 +57,7 @@ function handleFiles(type, files) {
     const key = config.filesKey;
     if (!fileStorage[key]) fileStorage[key] = [];
 
-      const allowedTypes = [
+    const allowedTypes = [
         'application/pdf',
         'application/msword',
         'application/vnd.openxmlformats-officedocument.wordprocessingml.document',
@@ -98,12 +90,10 @@ function updateFileDisplay(type, filesArray) {
     
     if (!fileCountEl || !fileListEl) return;
     
-    // update count
     fileCountEl.innerHTML = filesArray.length > 0 
         ? '<span class="file-count-badge">' + filesArray.length + ' file(s) uploaded</span>' 
         : '';
     
-    // update list
     fileListEl.innerHTML = '';
     filesArray.forEach((file, index) => {
         const fileItem = document.createElement('div');
@@ -115,7 +105,6 @@ function updateFileDisplay(type, filesArray) {
     });
 }
 
-// save functions 
 function saveProperty() { saveForm('property', 'Property saved successfully!'); }
 function saveLandlord() { saveForm('landlord', 'Landlord saved successfully!'); }
 function saveTenant() { saveForm('tenant', 'Tenant saved successfully!'); }
@@ -124,7 +113,6 @@ function savePayment() { saveForm('payment', 'Payment saved successfully!'); }
 function saveContract() { saveForm('contract', 'Contract created successfully!'); }
 function saveUser() { saveForm('user', 'User added successfully!'); }
 
-// open functions
 function openAddPropertyModal() { openModal('property'); }
 function openAddLandlordModal() { openModal('landlord'); }
 function openAddTenantModal() { openModal('tenant'); }
@@ -133,7 +121,6 @@ function openAddPaymentModal() { openModal('payment'); }
 function openAddContractModal() { openModal('contract'); }
 function openAddUserModal() { openModal('user'); }
 
-// close functions
 function closeAddPropertyModal() { closeModal('property'); }
 function closeAddLandlordModal() { closeModal('landlord'); }
 function closeAddTenantModal() { closeModal('tenant'); }
@@ -142,7 +129,6 @@ function closeAddPaymentModal() { closeModal('payment'); }
 function closeAddContractModal() { closeModal('contract'); }
 function closeAddUserModal() { closeModal('user'); }
 
-// reset functions
 function resetAddPropertyForm() { resetForm('property'); }
 function resetAddLandlordForm() { resetForm('landlord'); }
 function resetAddTenantForm() { resetForm('tenant'); }
@@ -151,41 +137,34 @@ function resetAddPaymentForm() { resetForm('payment'); }
 function resetAddContractForm() { resetForm('contract'); }
 function resetAddUserForm() { resetForm('user'); }
 
+let currentSort = {
+    column: null,
+    direction: 'asc'
+};
 
+function toggleFilter() {
+    const dropdowns = document.getElementById('filterDropdowns');
+    const btn = document.getElementById('filterToggle');
+    
+    if (dropdowns.style.display === 'none') {
+        dropdowns.style.display = 'flex';
+        btn.classList.add('active');
+    } else {
+        dropdowns.style.display = 'none';
+        btn.classList.remove('active');
+    }
+}
 
-        let currentSort = {
-            column: null,
-            direction: 'asc'
+function loadModals() {
+    const modalsContainer = document.getElementById('modals-container');
+    if (modalsContainer) {
+        const xhr = new XMLHttpRequest();
+        xhr.open('GET', 'modals.php', true);
+        xhr.onreadystatechange = function() {
+            if (xhr.readyState === 4 && xhr.status === 200) {
+                modalsContainer.innerHTML = xhr.responseText;
+            }
         };
-
-        // Toggle Filter Panel
-        function toggleFilter() {
-            const dropdowns = document.getElementById('filterDropdowns');
-            const btn = document.getElementById('filterToggle');
-            
-            if (dropdowns.style.display === 'none') {
-                dropdowns.style.display = 'flex';
-                btn.classList.add('active');
-            } else {
-                dropdowns.style.display = 'none';
-                btn.classList.remove('active');
-            }
-        }
-
-        
-        // Function to load modals from external file
-        function loadModals() {
-            const modalsContainer = document.getElementById('modals-container');
-            if (modalsContainer) {
-                // Create XMLHttpRequest to load the modals.html file
-                const xhr = new XMLHttpRequest();
-                xhr.open('GET', 'modals.html', true);
-                xhr.onreadystatechange = function() {
-                    if (xhr.readyState === 4 && xhr.status === 200) {
-                        modalsContainer.innerHTML = xhr.responseText;
-
-                    }
-                };
-                xhr.send();
-            }
-        }
+        xhr.send();
+    }
+}
