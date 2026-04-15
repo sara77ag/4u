@@ -43,6 +43,7 @@ $stmt = $pdo->query("
     FROM properties p
     LEFT JOIN landlords l ON p.landlord_id = l.landlord_id
     LEFT JOIN contracts c ON c.property_id = p.property_id
+    AND date('now') BETWEEN c.contract_start AND c.contract_end    
     LEFT JOIN tenants t ON t.tenant_id = c.tenant_id
     WHERE p.archived = 0
 ");
@@ -158,7 +159,7 @@ $properties = $stmt->fetchAll(PDO::FETCH_ASSOC);
                         </thead>
                         <tbody id="tableBody">
                 <?php foreach ($properties as $p):
-                    $status = $p['tenant_name'] ? 'occupied' : 'available';
+                    $status = $p['contract_start'] ? 'occupied' : 'available';
                     $contract = $p['contract_start'] ? $p['contract_start'] . ' to ' . $p['contract_end'] : '-';
                     $tenant_name = $p['tenant_name'] ?? '';
                     $landlord_name = $p['landlord_name'] ?? '';
