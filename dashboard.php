@@ -15,7 +15,11 @@ $totalProperties = $pdo->query("SELECT COUNT(*) FROM properties WHERE archived =
 $vacant = $totalProperties - $occupied;
 $viewings  = $pdo->query("SELECT COUNT(*) FROM viewing_bookings WHERE status = 'scheduled' AND archived = 0")->fetchColumn();
 $payments  = $pdo->query("SELECT COUNT(*) FROM transactions WHERE status = 'pending' AND archived = 0")->fetchColumn();
-$late      = $pdo->query("SELECT COUNT(*) FROM transactions WHERE status = 'not complete' AND archived = 0")->fetchColumn();
+$late = $pdo->query("
+    SELECT COUNT(*) FROM transactions 
+    WHERE (status = 'not complete' OR (status = 'pending' AND next_due < date('now')))
+    AND archived = 0
+")->fetchColumn();
 $deadlines = $pdo->query("
     SELECT 
     (

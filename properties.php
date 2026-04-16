@@ -518,8 +518,8 @@ $properties = $stmt->fetchAll(PDO::FETCH_ASSOC);
                         bVal = b.dataset.status;
                         break;
                     case 'contract':
-                        aVal = a.dataset.contract || '';
-                        bVal = b.dataset.contract || '';
+                        aVal = a.dataset.contractStart || '';
+                        bVal = b.dataset.contractStart || '';
                         break;
                     default:
                         return 0;

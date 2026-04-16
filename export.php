@@ -11,7 +11,7 @@ try {
 $properties = $pdo->query("
     SELECT p.property_id, p.property_address, p.property_type, p.monthly_rent,
            l.name AS landlord_name, t.name AS tenant_name,
-           t.contract_start, t.contract_end, t.payment_frequency,
+           c.contract_start, c.contract_end, c.frequency AS payment_frequency,
            p.gas_cert_due, p.electric_cert_due, p.epc_due_date,
            p.room_count, p.bathroom_count, p.epc_rating,
            CASE WHEN p.has_garden = 1 THEN 'Yes' ELSE 'No' END AS has_garden,
@@ -19,7 +19,8 @@ $properties = $pdo->query("
            p.council_band
     FROM properties p
     LEFT JOIN landlords l ON p.landlord_id = l.landlord_id
-    LEFT JOIN tenants t ON p.property_id = t.property_id AND t.archived = 0
+    LEFT JOIN contracts c ON p.property_id = c.property_id AND date('now') BETWEEN c.contract_start AND c.contract_end
+    LEFT JOIN tenants t ON c.tenant_id = t.tenant_id
     WHERE p.archived = 0
     ORDER BY p.property_address
 ")->fetchAll(PDO::FETCH_ASSOC);
@@ -35,12 +36,25 @@ $landlords = $pdo->query("
 $tenants = $pdo->query("
     SELECT t.tenant_id, t.name, t.phone, t.email,
            t.id_type, t.id_number, t.id_expiry_date,
-           t.contract_start, t.contract_end, t.payment_frequency,
+           c.contract_start, c.contract_end, c.frequency AS payment_frequency,
            p.property_address
     FROM tenants t
-    LEFT JOIN properties p ON t.property_id = p.property_id
+    LEFT JOIN contracts c ON t.tenant_id = c.tenant_id AND date('now') BETWEEN c.contract_start AND c.contract_end
+    LEFT JOIN properties p ON c.property_id = p.property_id
     WHERE t.archived = 0
     ORDER BY t.name
+")->fetchAll(PDO::FETCH_ASSOC);
+
+$transactions = $pdo->query("
+    SELECT tr.transaction_id, tr.transaction_amount, tr.date_of_transaction,
+           tr.payment_period, tr.next_due, tr.status,
+           t.name AS tenant_name,
+           p.property_address
+    FROM transactions tr
+    LEFT JOIN tenants t ON tr.tenant_id = t.tenant_id
+    LEFT JOIN properties p ON tr.property_id = p.property_id
+    WHERE tr.archived = 0
+    ORDER BY tr.date_of_transaction DESC
 ")->fetchAll(PDO::FETCH_ASSOC);
 
 $viewings = $pdo->query("
@@ -55,38 +69,39 @@ $viewings = $pdo->query("
     ORDER BY vb.date_time DESC
 ")->fetchAll(PDO::FETCH_ASSOC);
 
-$filename = 'iLet4You_Export_' . date('Y-m-d') . '.xls';
-
-header('Content-Type: application/vnd.ms-excel');
+$filename = 'iLet4You_Export_' . date('Y-m-d') . '.csv';
+header('Content-Type: text/csv; charset=utf-8');
 header('Content-Disposition: attachment; filename="' . $filename . '"');
 header('Cache-Control: max-age=0');
 
-function xlsRow(array $cells): string {
-    $row = '';
-    foreach ($cells as $cell) {
-        $cell = str_replace(["\t", "\n", "\r"], ' ', $cell ?? '');
-        $row .= "\t" === $cell ? ' ' : $cell;
-        $row .= "\t";
-    }
-    return rtrim($row, "\t") . "\n";
+// BOM for Excel UTF-8 compatibility
+echo "\xEF\xBB\xBF";
+
+function csvRow(array $cells): string {
+    return implode(',', array_map(function($cell) {
+        $cell = str_replace(["\n", "\r"], ' ', $cell ?? '');
+        return '"' . str_replace('"', '""', $cell) . '"';
+    }, $cells)) . "\n";
 }
 
-echo xlsRow(['iLet4You Export — ' . date('d/m/Y')]);
+// Header
+echo csvRow(['iLet4You Export — ' . date('d/m/Y')]);
 echo "\n";
 
-echo xlsRow(['PROPERTIES']);
-echo xlsRow([
+// Properties
+echo csvRow(['PROPERTIES']);
+echo csvRow([
     'ID', 'Address', 'Type', 'Monthly Rent', 'Landlord', 'Tenant',
     'Contract Start', 'Contract End', 'Payment Frequency',
     'Gas Cert Due', 'Electric Cert Due', 'EPC Due',
     'Rooms', 'Bathrooms', 'EPC Rating', 'Garden', 'Pets', 'Council Band'
 ]);
 foreach ($properties as $r) {
-    echo xlsRow([
+    echo csvRow([
         $r['property_id'], $r['property_address'], $r['property_type'],
         '£' . number_format($r['monthly_rent'], 2),
         $r['landlord_name'], $r['tenant_name'] ?? 'Vacant',
-        $r['contract_start'], $r['contract_end'], $r['payment_frequency'],
+        $r['contract_start'] ?? '', $r['contract_end'] ?? '', $r['payment_frequency'] ?? '',
         $r['gas_cert_due'], $r['electric_cert_due'], $r['epc_due_date'],
         $r['room_count'], $r['bathroom_count'], $r['epc_rating'],
         $r['has_garden'], $r['allowed_pets'], $r['council_band']
@@ -94,42 +109,65 @@ foreach ($properties as $r) {
 }
 
 echo "\n";
-echo xlsRow(['LANDLORDS']);
-echo xlsRow([
+
+// Landlords
+echo csvRow(['LANDLORDS']);
+echo csvRow([
     'ID', 'Name', 'Phone', 'Email', 'Address',
     'ID Type', 'ID Number', 'ID Expiry', 'Number of Properties'
 ]);
 foreach ($landlords as $r) {
-    echo xlsRow([
+    echo csvRow([
         $r['landlord_id'], $r['name'], $r['phone'], $r['email'], $r['address'],
         $r['id_type'], $r['id_number'], $r['id_expiry_date'], $r['number_of_properties']
     ]);
 }
 
 echo "\n";
-echo xlsRow(['TENANTS']);
-echo xlsRow([
+
+// Tenants
+echo csvRow(['TENANTS']);
+echo csvRow([
     'ID', 'Name', 'Phone', 'Email', 'Property',
     'ID Type', 'ID Number', 'ID Expiry',
     'Contract Start', 'Contract End', 'Payment Frequency'
 ]);
 foreach ($tenants as $r) {
-    echo xlsRow([
-        $r['tenant_id'], $r['name'], $r['phone'], $r['email'], $r['property_address'],
+    echo csvRow([
+        $r['tenant_id'], $r['name'], $r['phone'], $r['email'], $r['property_address'] ?? '',
         $r['id_type'], $r['id_number'], $r['id_expiry_date'],
-        $r['contract_start'], $r['contract_end'], $r['payment_frequency']
+        $r['contract_start'] ?? '', $r['contract_end'] ?? '', $r['payment_frequency'] ?? ''
     ]);
 }
 
 echo "\n";
-echo xlsRow(['VIEWINGS']);
-echo xlsRow([
+
+// Transactions
+echo csvRow(['TRANSACTIONS']);
+echo csvRow([
+    'ID', 'Tenant', 'Property', 'Amount', 'Date',
+    'Period Covered', 'Next Due', 'Status'
+]);
+foreach ($transactions as $r) {
+    echo csvRow([
+        $r['transaction_id'], $r['tenant_name'], $r['property_address'],
+        '£' . number_format($r['transaction_amount'], 2),
+        $r['date_of_transaction'], $r['payment_period'],
+        $r['next_due'], $r['status']
+    ]);
+}
+
+echo "\n";
+
+// Viewings
+echo csvRow(['VIEWINGS']);
+echo csvRow([
     'ID', 'Viewer Name', 'Phone', 'Email',
     'Property', 'Date/Time', 'Status', 'Agent'
 ]);
 foreach ($viewings as $r) {
-    echo xlsRow([
+    echo csvRow([
         $r['booking_id'], $r['viewer_name'], $r['viewer_phone'], $r['email'],
-        $r['property_address'], $r['date_time'], $r['status'], $r['agent_name']
+        $r['property_address'], $r['date_time'], $r['status'], $r['agent_name'] ?? ''
     ]);
 }
