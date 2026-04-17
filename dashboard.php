@@ -52,7 +52,14 @@ $deadlines = $pdo->query("
         SELECT COUNT(*) FROM contracts 
         WHERE contract_end BETWEEN date('now') AND date('now', '+30 days')
     )
-")->fetchColumn();?>
+")->fetchColumn();
+$todos = $pdo->query("
+    SELECT note_id, note_text FROM notes
+    WHERE archived = 0
+    AND type = 'todo'
+    ORDER BY created_at ASC
+")->fetchAll(PDO::FETCH_ASSOC);
+?>
 
 <!DOCTYPE html>
 <html lang="en">
@@ -183,44 +190,67 @@ $deadlines = $pdo->query("
     <div id="modals-container"></div>
 
     <script>
-        function addTodo() {
-            const input = document.getElementById('todo-input');
-            const todoList = document.getElementById('todo-list');
-            const taskText = input.value.trim();
+    function afterModalsLoaded() {
+        console.log('afterModalsLoaded fired');
+        const todoList = document.getElementById('todo-list');
+        console.log('todoList element:', todoList);
+        const todos = <?= json_encode($todos) ?>;
+        console.log('todos from PHP:', todos);
 
-            if (taskText) {
-                const emptyMsg = todoList.querySelector('.empty-todo');
-                if (emptyMsg) emptyMsg.remove();
-
-                const li = document.createElement('li');
-                li.className = 'todo-item';
-                li.innerHTML = `
-                    <input type="checkbox" class="todo-checkbox" onchange="toggleTodo(this)">
-                    <span class="todo-text">${taskText}</span>
-                    <button class="delete-todo" onclick="deleteTodo(this)">
-                        <i class="fa-solid fa-trash"></i>
-                    </button>
-                `;
-                todoList.appendChild(li);
-                input.value = '';
-            }
+        if (todos.length > 0) {
+            todoList.innerHTML = '';
+            todos.forEach(function(todo) {
+                todoList.appendChild(makeTodoItem(todo.note_id, todo.note_text));
+            });
         }
+    }
 
-        function toggleTodo(checkbox) {
-            checkbox.parentElement.classList.toggle('completed');
-        }
+    function makeTodoItem(id, text) {
+        const li = document.createElement('li');
+        li.className = 'todo-item';
+        li.dataset.id = id;
+        li.innerHTML = `
+            <input type="checkbox" class="todo-checkbox" onchange="toggleTodo(this)">
+            <span class="todo-text">${text}</span>
+            <button class="delete-todo" onclick="deleteTodo(this)">
+                <i class="fa-solid fa-trash"></i>
+            </button>
+        `;
+        return li;
+    }
 
-        function deleteTodo(btn) {
-            const todoList = document.getElementById('todo-list');
-            btn.parentElement.remove();
-            if (todoList.children.length === 0) {
-                todoList.innerHTML = '<li class="empty-todo">No tasks yet. Add one above!</li>';
-            }
-        }
+    function addTodo() {
+        const input = document.getElementById('todo-input');
+        const taskText = input.value.trim();
+        if (!taskText) return;
 
-        document.getElementById('todo-input').addEventListener('keypress', function(e) {
-            if (e.key === 'Enter') addTodo();
-        });
-    </script>
+        const form = document.createElement('form');
+        form.method = 'POST';
+        form.action = 'modals.php';
+        form.innerHTML = `<input type="hidden" name="todo_text" value="${taskText.replace(/"/g, '&quot;')}">`;
+        document.body.appendChild(form);
+        form.submit();
+    }
+
+    function deleteTodo(btn) {
+        const li = btn.closest('.todo-item');
+        const id = li.dataset.id;
+
+        const form = document.createElement('form');
+        form.method = 'POST';
+        form.action = 'modals.php';
+        form.innerHTML = `<input type="hidden" name="delete_todo_id" value="${id}">`;
+        document.body.appendChild(form);
+        form.submit();
+    }
+
+    function toggleTodo(checkbox) {
+        checkbox.parentElement.classList.toggle('completed');
+    }
+
+    document.getElementById('todo-input').addEventListener('keypress', function(e) {
+        if (e.key === 'Enter') addTodo();
+    });
+</script>
 </body>
 </html>
