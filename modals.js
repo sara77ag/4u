@@ -172,8 +172,11 @@ function loadModals() {
         const xhr = new XMLHttpRequest();
         xhr.open('GET', 'modals.php', true);
         xhr.onreadystatechange = function() {
-            if (xhr.readyState === 4 && xhr.status === 200) {
-                modalsContainer.innerHTML = xhr.responseText;
+        if (xhr.readyState === 4 && xhr.status === 200) {
+            modalsContainer.innerHTML = xhr.responseText;
+            if (typeof afterModalsLoaded === 'function') {
+                afterModalsLoaded();
+            }
             }
         };
         xhr.send();

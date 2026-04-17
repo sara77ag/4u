@@ -13,8 +13,8 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
     // ── TODO: Add ──────────────────────────────────────────────
     if (isset($_POST['todo_text'])) {
         $stmt = $pdo->prepare("
-            INSERT INTO notes (note_text, created_at, property_id, landlord_id, tenant_id, archived)
-            VALUES (?, datetime('now'), NULL, NULL, NULL, 0)
+            INSERT INTO notes (note_text, created_at, created_by, type, property_id, landlord_id, tenant_id, payment_id, viewing_id, date_id, user_id, archived)
+            VALUES (?, datetime('now'), 'system', 'todo', NULL, NULL, NULL, NULL, NULL, NULL, NULL, 0)
         ");
         $stmt->execute([trim($_POST['todo_text'])]);
         header('Location: dashboard.php');

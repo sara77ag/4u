@@ -186,12 +186,7 @@ $viewings = $stmt->fetchAll(PDO::FETCH_ASSOC);
 
     <div id="modals-container"></div>
 
-    <script>
-        let currentSort = {
-            column: null,
-            direction: 'asc'
-        };
-
+    <script>        
         function toggleFilter() {
             const filterToggle = document.getElementById('filterToggle');
             const filterDropdowns = document.getElementById('filterDropdowns');
