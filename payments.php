@@ -215,7 +215,6 @@ function formatDateValue($value) {
 
     <script>
         const months = ["Jan","Feb","Mar","Apr","May","Jun","Jul","Aug","Sep","Oct","Nov","Dec"];
-        let currentSort = { column: null, direction: 'asc' };
 
         function toggleFilter() {
             const dropdown = document.getElementById('filterDropdowns');

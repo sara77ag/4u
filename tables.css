@@ -284,7 +284,12 @@
             color: #4a5568;
         }
 
-        .status-badge {
+        .status-badge-modal {
+            height: 38px;
+            cursor: default;
+        }
+
+        .status-badge-modal, .status-badge {
             display: inline-flex;
             align-items: center;
             gap: 5px;

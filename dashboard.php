@@ -13,7 +13,7 @@ try {
 $occupied = $pdo->query("SELECT COUNT(DISTINCT property_id) FROM contracts WHERE date('now') BETWEEN contract_start AND contract_end ")->fetchColumn();
 $totalProperties = $pdo->query("SELECT COUNT(*) FROM properties WHERE archived = 0")->fetchColumn();
 $vacant = $totalProperties - $occupied;
-$viewings  = $pdo->query("SELECT COUNT(*) FROM viewing_bookings WHERE status = 'scheduled' AND archived = 0")->fetchColumn();
+$viewings  = $pdo->query("SELECT COUNT(*) FROM viewing_bookings WHERE date_time BETWEEN date('now') AND date('now', '+7 days') AND archived = 0")->fetchColumn();
 $payments  = $pdo->query("SELECT COUNT(*) FROM transactions WHERE status = 'pending' AND archived = 0")->fetchColumn();
 $late = $pdo->query("
     SELECT COUNT(*) FROM transactions 
