@@ -24,4 +24,3 @@ function CallNavbar() {
 // Make function available globally
 window.CallNavbar = CallNavbar;
 
-//s

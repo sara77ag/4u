@@ -91,10 +91,10 @@ $properties = $stmt->fetchAll(PDO::FETCH_ASSOC);
                         <label>Type</label>
                         <select id="filterType" onchange="filterProperties()">
                             <option value="">All Types</option>
-                            <option value="flat">Flat</option>
-                            <option value="house">House</option>
-                            <option value="apartment">Apartment</option>
-                            <option value="bungalow">Bungalow</option>
+                            <option value="Flat">Flat</option>
+                            <option value="House">House</option>
+                            <option value="Apartment">Apartment</option>
+                            <option value="Bungalow">Bungalow</option>
                         </select>
                     </div>
                     <div class="filter-group">
@@ -160,10 +160,10 @@ $properties = $stmt->fetchAll(PDO::FETCH_ASSOC);
                         <tbody id="tableBody">
                 <?php foreach ($properties as $p):
                     $status = $p['contract_start'] ? 'occupied' : 'available';
-                    $contract = $p['contract_start'] ? $p['contract_start'] . ' to ' . $p['contract_end'] : '-';
+                    $contract = $p['contract_start'] ? date('d/m/Y', strtotime($p['contract_start'])) . ' to ' . date('d/m/Y', strtotime($p['contract_end'])) : '-';                    
                     $tenant_name = $p['tenant_name'] ?? '';
                     $landlord_name = $p['landlord_name'] ?? '';
-                    $type = strtolower($p['property_type'])?? '';
+                    $type = $p['property_type'] ?? '';
                     $price = $p['monthly_rent'];
                     $contract_rent = $p['contract_rent'] ?? null;
                     $rooms = $p['room_count'] ?? 0;
@@ -225,7 +225,7 @@ $properties = $stmt->fetchAll(PDO::FETCH_ASSOC);
                 <button class="action-btn action-btn-view" title="View" onclick="actionbtn.viewProperty(this)">
                     <i class="fa-solid fa-eye"></i>
                 </button>
-                <button class="action-btn action-btn-edit" title="Edit" onclick="editProperty(this)">
+                <button class="action-btn action-btn-edit" title="Edit" onclick="actionbtn.editProperty(this)">
                     <i class="fa-solid fa-pen"></i>
                 </button>
                 <form method="POST" style="display:inline;">
@@ -261,7 +261,7 @@ $properties = $stmt->fetchAll(PDO::FETCH_ASSOC);
                 </div>
                 <h2 id="propertyTitle">-</h2>
             </div>
-            <button class="action-modal-close" onclick="actionbtn.closeModal()">
+            <button class="modal-close-btn" onclick="actionbtn.closeModal()">
                 <i class="fa-solid fa-xmark"></i>
             </button>
         </div>
@@ -304,7 +304,7 @@ $properties = $stmt->fetchAll(PDO::FETCH_ASSOC);
                     </div>
                     <div class="detail-row">
                         <span class="detail-label">Property Status:</span>
-                        <span id="p-property-status" class="status-badge status-available">-</span>
+                        <span id="p-property-status" class="status-badge-modal status-available">-</span>
                     </div>
                     <div class="detail-row">
                         <span class="detail-label">Property Price:</span>
@@ -395,7 +395,7 @@ $properties = $stmt->fetchAll(PDO::FETCH_ASSOC);
                         <span  id="p-date-tenant-id" class="date-value">-</span>
                     </div>
                     <div class="date-item">
-                        <span class="date-label">Contract End:</span>
+                        <span class="date-label ">Contract End:</span>
                         <span id="p-date-contract-end" class="date-value">-</span>
                     </div>
                     <div class="date-item">

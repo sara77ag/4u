@@ -132,17 +132,17 @@ $viewings = $stmt->fetchAll(PDO::FETCH_ASSOC);
                             </tr>
                         </thead>
                         <tbody id="tableBody">
-<?php foreach ($viewings as $v): 
-    $statusClass = 'status-' . str_replace('_', '', $v['status']);
-    $statusDisplay = ucfirst(str_replace('_', ' ', $v['status']));
-    $statusIcon = match($v['status']) {
-        'scheduled' => 'fa-calendar',
-        'completed' => 'fa-circle-check',
-        'cancelled' => 'fa-circle-xmark',
-        'no_show' => 'fa-triangle-exclamation',
-        default => 'fa-calendar'
-    };
-?>
+                         <?php foreach ($viewings as $v): 
+                             $statusClass = 'status-' . str_replace('_', '', $v['status']);
+                             $statusDisplay = ucfirst(str_replace('_', ' ', $v['status']));
+                             $statusIcon = match($v['status']) {
+                                 'scheduled' => 'fa-calendar',
+                                 'completed' => 'fa-circle-check',
+                                 'cancelled' => 'fa-circle-xmark',
+                                 'no_show' => 'fa-triangle-exclamation',
+                                 default => 'fa-calendar'
+                             };
+                         ?>
                             <tr data-name="<?= strtolower($v['viewer_name']) ?>" 
                                 data-status="<?= htmlspecialchars($v['status']) ?>"
                                 data-datetime="<?= date('c', strtotime($v['date_time'])) ?>">
