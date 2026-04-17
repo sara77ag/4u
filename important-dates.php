@@ -86,7 +86,7 @@ function formatDateValue($date) {
                 <div class="filter-dropdowns" id="filterDropdowns" style="display: none;">
                     <div class="filter-group">
                         <label>Property</label>
-                        <input type="text" id="filterProperty" onchange="filterImportantDates()">
+                        <input type="text" id="filterProperty" onchange="filterImportantDates()" placeholder = "Enter Property Name">
                     </div>
                     <button class="filter-btn-reset" onclick="resetFilters()">
                         <i class="fa-solid fa-rotate-left"></i>
@@ -172,10 +172,6 @@ function formatDateValue($date) {
     <div id="modals-container"></div>
 
     <script>
-        let currentSort = {
-            column: null,
-            direction: 'asc'
-        };
 
         function toggleFilter() {
             const filterToggle = document.getElementById('filterToggle');
