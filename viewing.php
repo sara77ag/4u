@@ -74,7 +74,7 @@ $viewings = $stmt->fetchAll(PDO::FETCH_ASSOC);
                 <div class="filter-dropdowns" id="filterDropdowns" style="display: none;">
                     <div class="filter-group">
                         <label>Status</label>
-                        <select id="filterStatus" onchange="filterViewings()">
+                        <select id="filterStatus" oninput="filterViewings()">
                             <option value="">All Statuses</option>
                             <option value="scheduled">Scheduled</option>
                             <option value="no_show">No Show</option>
@@ -84,13 +84,13 @@ $viewings = $stmt->fetchAll(PDO::FETCH_ASSOC);
                     </div>
                     <div class="filter-group">
                         <label>Date/Time</label>
-                        <input type="datetime-local" id="filterDateTime" onchange="filterViewings()">
+                        <input type="datetime-local" id="filterDateTime" oninput="filterViewings()">
                     </div>
                     <div class="filter-group">
                         <label>Agent</label>
-                        <input type="text" id="filterAgent" onchange="filterViewings()">
+                        <input type="text" id="filterAgent" oninput="filterViewings()" placeholder="Enter agent name">
                     </div>
-                    <button class="filter-btn-reset" onclick="resetFilters()">
+                    <button type="button" class="filter-btn-reset" onclick="resetFilters()">
                         <i class="fa-solid fa-rotate-left"></i>
                     </button>
                 </div>
@@ -145,7 +145,7 @@ $viewings = $stmt->fetchAll(PDO::FETCH_ASSOC);
 ?>
                             <tr data-name="<?= strtolower($v['viewer_name']) ?>" 
                                 data-status="<?= htmlspecialchars($v['status']) ?>"
-                                data-datetime="<?= htmlspecialchars($v['date_time']) ?>">
+                                data-datetime="<?= date('c', strtotime($v['date_time'])) ?>">
                                 <td class="viewer-name"><?= htmlspecialchars($v['viewer_name']) ?></td>
                                 <td><?= htmlspecialchars($v['viewer_phone']) ?></td>
                                 <td class="viewer-email"><?= htmlspecialchars($v['email']) ?></td>
@@ -187,10 +187,7 @@ $viewings = $stmt->fetchAll(PDO::FETCH_ASSOC);
     <div id="modals-container"></div>
 
     <script>
-        let currentSort = {
-            column: null,
-            direction: 'asc'
-        };
+        
 
         function toggleFilter() {
             const filterToggle = document.getElementById('filterToggle');
@@ -271,7 +268,7 @@ $viewings = $stmt->fetchAll(PDO::FETCH_ASSOC);
 
             const rows = document.querySelectorAll('#tableBody tr');
 
-            rows.forEach(row => {
+            document.querySelectorAll('#tableBody tr').forEach(row => {
                 let show = true;
 
                 if (statusFilter && row.dataset.status !== statusFilter) {
@@ -281,7 +278,8 @@ $viewings = $stmt->fetchAll(PDO::FETCH_ASSOC);
                 if (datetimeFilter) {
                     const viewingDate = new Date(row.dataset.datetime);
                     const filterDate = new Date(datetimeFilter);
-                    if (viewingDate < filterDate) {
+
+                    if (viewingDate.toDateString() !== filterDate.toDateString()) {
                         show = false;
                     }
                 }
@@ -302,8 +300,7 @@ $viewings = $stmt->fetchAll(PDO::FETCH_ASSOC);
             document.getElementById('filterDateTime').value = '';
             document.getElementById('filterAgent').value = '';
 
-            const rows = document.querySelectorAll('#tableBody tr');
-            rows.forEach(row => row.style.display = '');
+            document.querySelectorAll('#tableBody tr').forEach(row => row.style.display = '');
 
             document.querySelectorAll('table th').forEach(th => {
                 th.classList.remove('sorted');
