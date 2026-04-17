@@ -151,7 +151,7 @@ $landlords = $stmt->fetchAll(PDO::FETCH_ASSOC);
                 </div>
                 <h2 id="landlordName">Landlord Name</h2>
             </div>
-            <button class="action-modal-close" onclick="actionbtn.closeModal()">
+            <button class="modal-close-btn" onclick="actionbtn.closeModal()">
                 <i class="fa-solid fa-xmark"></i>
             </button>
         </div>

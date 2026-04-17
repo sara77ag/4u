@@ -184,10 +184,10 @@ try {
                     <label>Property Type <span class="required">*</span></label>
                     <select name="property_type" class="form-control" required>
                         <option value="">Select Property Type</option>
-                        <option value="flat">Flat</option>
-                        <option value="house">House</option>
-                        <option value="apartment">Apartment</option>
-                        <option value="bungalow">Bungalow</option>
+                        <option value="Flat">Flat</option>
+                        <option value="House">House</option>
+                        <option value="Apartment">Apartment</option>
+                        <option value="Bungalow">Bungalow</option>
                     </select>
                 </div>
                 <div class="form-group">
