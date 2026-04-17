@@ -102,7 +102,7 @@ $deadlines = $pdo->query("
                     <div class="quick-card" onclick="openAddTenantModal()">
                         <div class="quick-card-icon"><i class="fa-solid fa-user"></i></div>
                         <h4 class="quick-card-title">Add Tenant</h4>
-                        <p class="quick-card-desc">Register a new <br> tenant</p>
+                        <p class="quick-card-desc">Register a new tenant</p>
                     </div>
                     <div class="quick-card" onclick="openAddContractModal()">
                         <div class="quick-card-icon"><i class="fa-solid fa-file-contract"></i></div>
