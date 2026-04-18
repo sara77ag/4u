@@ -1,9 +1,4 @@
 <?php
-session_start();
-if(!isset($_SESSION['user_id'])) {
-    header("Location: index.php");
-    exit();
-}
 $dbPath = __DIR__ . '/database.db';
 
 try {
@@ -168,14 +163,9 @@ $viewings = $stmt->fetchAll(PDO::FETCH_ASSOC);
                                         <button class="action-btn action-btn-view" title="View" onclick="viewViewing(this)">
                                             <i class="fa-solid fa-eye"></i>
                                         </button>
-                                        
-                                        <?php if (in_array($_SESSION['role'], ['admin', 'agent'])): ?>
                                         <button class="action-btn action-btn-edit" title="Edit" onclick="editViewing(this)">
                                             <i class="fa-solid fa-pen"></i>
                                         </button>
-                                        <?php endif; ?>
-                                        
-                                        <?php if ($_SESSION['role'] === 'admin'): ?>
                                         <form method="POST" style="display:inline;">
                                             <input type="hidden" name="archive_id" value="<?= $v['booking_id'] ?>">
                                             <button type="submit" class="action-btn action-btn-delete" title="Archive"
@@ -183,7 +173,6 @@ $viewings = $stmt->fetchAll(PDO::FETCH_ASSOC);
                                                 <i class="fa-solid fa-trash"></i>
                                             </button>
                                         </form>
-                                        <?php endif; ?>
                                     </div>
                                 </td>
                             </tr>

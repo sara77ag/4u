@@ -1,9 +1,4 @@
 <?php
-session_start();
-if(!isset($_SESSION['user_id'])) {
-    header("Location: index.php");
-    exit();
-}
 $dbPath = __DIR__ . '/database.db';
 
 try {
@@ -122,22 +117,16 @@ $landlords = $stmt->fetchAll(PDO::FETCH_ASSOC);
                             <button class="action-btn action-btn-view" title="View" onclick="actionbtn.viewLandlord(this)">
                                 <i class="fa-solid fa-eye"></i>
                             </button>
-                           
-                            <?php if (in_array($_SESSION['role'], ['admin', 'agent'])): ?>
-                                <button class="action-btn action-btn-edit" title="Edit" onclick="editLandlord(this)">
-                                    <i class="fa-solid fa-pen"></i>
+                            <button class="action-btn action-btn-edit" title="Edit" onclick="editLandlord(this)">
+                                <i class="fa-solid fa-pen"></i>
+                            </button>
+                            <form method="POST" style="display:inline;">
+                                <input type="hidden" name="archive_id" value="<?= $landlord['landlord_id'] ?>">
+                                <button type="submit" class="action-btn action-btn-delete" title="Archive"
+                                    onclick="return confirm('Archive this landlord?\n<?= htmlspecialchars($landlord['name']) ?>')">
+                                    <i class="fa-solid fa-trash"></i>
                                 </button>
-                            <?php endif; ?>
-
-                            <?php if ($_SESSION['role'] === 'admin'): ?>
-                                <form method="POST" style="display:inline;">
-                                    <input type="hidden" name="archive_id" value="<?= $landlord['landlord_id'] ?>">
-                                    <button type="submit" class="action-btn action-btn-delete" title="Archive"
-                                        onclick="return confirm('Archive this landlord?\n<?= htmlspecialchars($landlord['name']) ?>')">
-                                        <i class="fa-solid fa-trash"></i>
-                                    </button>
-                                </form>
-                            <?php endif; ?> 
+                            </form>
                         </div>
                     </div>
 <?php endforeach; ?>
