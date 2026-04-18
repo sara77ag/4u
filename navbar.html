@@ -4,9 +4,9 @@
         <h1 class="company-name">iLet4You</h1>
     </div>
     <div class="header-center">
-        <div class="search-bar">
-            <input type="text" placeholder="Search by name, address, or postcode" class="search-input">
-            <button class="search-btn">
+        <div class="search-bar" id="searchBarWrapper">
+            <input type="text" id="globalSearch" placeholder="Search by name, address, or postcode" class="search-input" autocomplete="off">
+            <button class="search-btn" id="searchBtn">
                 <i class="fa-solid fa-magnifying-glass"></i>
             </button>
         </div>
@@ -17,7 +17,6 @@
                 <i class="fa-regular fa-user"></i>
             </div>
             <div class="user-dropdown">
-                <a href="#"><i class="fa-regular fa-user"></i> View Profile</a>
                 <a href="archive.php"><i class="fa-solid fa-box-archive"></i> View Archived</a>
                 <a href="logout.php"><i class="fa-solid fa-right-from-bracket"></i> Logout</a>
             </div>
