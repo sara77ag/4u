@@ -1,5 +1,10 @@
 <?php
 session_start();
+
+if(!isset($_SESSION['user_id'])) {
+    header("Location: index.php");
+    exit();
+}
 $dbPath = __DIR__ . '/database.db';
 
 try {
@@ -137,26 +142,23 @@ $tenants = $pdo->query("
                                 <td class="tenant-address"><?= htmlspecialchars($t['property_address'] ?? 'Unassigned') ?></td>
                                 <td><span class="status-badge"></span></td>
                                 <td class="contract-info">
-                                    <?php if (!empty($t['contract_start']) && !empty($t['contract_end'])): ?>
-                                        <?= date('d/m/Y', strtotime($t['contract_start'])) ?> to <?= date('d/m/Y', strtotime($t['contract_end'])) ?>
-                                    <?php else: ?>
-                                        No Contract
-                                    <?php endif; ?>
+                                 <?php if (!empty($t['contract_start']) && !empty($t['contract_end'])): ?>
+                                     <?= date('m/d/Y', strtotime($t['contract_start'])) ?>
+                                     to
+                                     <?= date('m/d/Y', strtotime($t['contract_end'])) ?>
+                                 <?php else: ?>
+                                     No Contract
+                                 <?php endif; ?>
                                 </td>
                                 <td>
                                     <div class="action-buttons">
-                                        <button class="action-btn action-btn-view" onclick="actionbtn.viewTenant(this)">
-                                            <i class="fa-solid fa-eye"></i>
-                                        </button>
-                                        <?php if (!isset($_SESSION['role']) || $_SESSION['role'] !== 'read_only'): ?>
-                                            <button class="action-btn action-btn-edit" onclick="editTenant(this)">
-                                                <i class="fa-solid fa-pen"></i>
-                                            </button>
-                                            <form method="POST" style="display:inline;" onsubmit="return confirm('Archive <?= htmlspecialchars(addslashes($t['name'])) ?>?')">
+                                        <button class="action-btn action-btn-view" onclick="actionbtn.viewTenant(this)"><i class="fa-solid fa-eye"></i></button>
+                                        <?php if ($_SESSION['role'] !== 'read_only'): ?>
+                                            <button class="action-btn action-btn-edit" onclick="editTenant(this)"><i class="fa-solid fa-pen"></i></button>
+                                            
+                                            <form method="POST" style="display:inline;" onsubmit="return confirm('Archive <?= htmlspecialchars($t['name']) ?>?')">
                                                 <input type="hidden" name="archive_id" value="<?= $t['tenant_id'] ?>">
-                                                <button type="submit" class="action-btn action-btn-delete">
-                                                    <i class="fa-solid fa-trash"></i>
-                                                </button>
+                                                <button type="submit" class="action-btn action-btn-delete"><i class="fa-solid fa-trash"></i></button>
                                             </form>
                                         <?php endif; ?>
                                     </div>

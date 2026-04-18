@@ -1,6 +1,17 @@
 function CallNavbar() {
-    fetch('navbar.html')
-        .then(response => response.text())
+    fetch('navbar.php', {
+        credentials: 'same-origin',
+        headers: {
+            'X-Requested-With': 'XMLHttpRequest'
+        }
+    })
+        .then(response => {
+            if (!response.ok) {
+                throw new Error(`Failed to load navbar: ${response.status}`);
+            }
+
+            return response.text();
+        })
         .then(data => {
             document.getElementById('navbar-container').innerHTML = data;
 

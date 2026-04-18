@@ -1,3 +1,13 @@
+<?php
+session_start();
+
+if (!isset($_SESSION['user_id'])) {
+    http_response_code(401);
+    exit();
+}
+
+$role = $_SESSION['role'] ?? '';
+?>
 <!-- Header -->
 <header class="main-header">
     <div class="header-left">
@@ -17,6 +27,10 @@
                 <i class="fa-regular fa-user"></i>
             </div>
             <div class="user-dropdown">
+                <a href="#"><i class="fa-regular fa-user"></i> View Profile</a>
+                <?php if ($role === 'admin'): ?>
+                <a href="#"><i class="fa-solid fa-box-archive"></i> View Archived</a>
+                <?php endif; ?>
                 <a href="archive.php"><i class="fa-solid fa-box-archive"></i> View Archived</a>
                 <a href="logout.php"><i class="fa-solid fa-right-from-bracket"></i> Logout</a>
             </div>
@@ -69,16 +83,11 @@
                 <span>Important Dates</span>
             </a>
         </li>
+        <?php if ($role === 'admin'): ?>
         <li>
             <a href="users.php">
                 <i class="fa-solid fa-users"></i>
                 <span>Users</span>
-            </a>
-        </li>
-        <li>
-            <a href="archive.php">
-                <i class="fa-solid fa-box-archive"></i>
-                <span>Archive</span>
             </a>
         </li>
     </ul>
