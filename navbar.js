@@ -1,23 +1,35 @@
 function CallNavbar() {
-    fetch('navbar.html')
-        .then(response => response.text())
-        .then(data => {
-            document.getElementById('navbar-container').innerHTML = data;
 
-            // Active sidebar link
-            const currentPage = window.location.pathname.split('/').pop();
-            document.querySelectorAll('.sidebar-menu li a').forEach(item => {
-                const href = item.getAttribute('href');
-                if (href === currentPage || (currentPage === '' && href === 'dashboard.php')) {
-                    item.parentElement.classList.add('active');
-                } else {
-                    item.parentElement.classList.remove('active');
-                }
-            });
+    fetch('navbar.php', {
+        credentials: 'same-origin',
+        headers: {
+            'X-Requested-With': 'XMLHttpRequest'
+        }
+    })
+    .then(response => {
+        if (!response.ok) throw new Error(`Navbar load failed: ${response.status}`);
+        return response.text();
+    })
+    .then(data => {
 
-            initSearch();
-        })
-        .catch(error => console.error('Error loading navbar:', error));
+        document.getElementById('navbar-container').innerHTML = data;
+
+
+        const currentPage = window.location.pathname.split('/').pop();
+        const menuItems = document.querySelectorAll('.sidebar-menu li a');
+        
+        menuItems.forEach(item => {
+            const href = item.getAttribute('href');
+            if (href === currentPage || (currentPage === '' && href === 'dashboard.php')) {
+                item.parentElement.classList.add('active');
+            } else {
+                item.parentElement.classList.remove('active');
+            }
+        });
+
+        initSearch();
+    })
+    .catch(error => console.error('Error loading navbar:', error));
 }
 
 function initSearch() {
