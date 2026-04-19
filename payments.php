@@ -1,4 +1,9 @@
 <?php
+session_start();
+if(!isset($_SESSION['user_id'])) {
+    header("Location: index.php");
+    exit();
+}
 $dbPath = __DIR__ . '/database.db';
 
 try {
@@ -186,9 +191,14 @@ function formatDateValue($value) {
                 <button class="action-btn action-btn-view" title="View" onclick="viewPayment(this)">
                     <i class="fa-solid fa-eye"></i>
                 </button>
-                <button class="action-btn action-btn-edit" title="Edit" onclick="editPayment(this)">
-                    <i class="fa-solid fa-pen"></i>
-                </button>
+                
+                <?php if (in_array($_SESSION['role'], ['admin', 'agent'])): ?>
+                    <button class="action-btn action-btn-edit" title="Edit" onclick="editPayment(this)">
+                        <i class="fa-solid fa-pen"></i>
+                    </button>
+                <?php endif; ?>
+                
+                <?php if ($_SESSION['role'] === 'admin'): ?>
                 <form method="POST" style="display:inline;">
                     <input type="hidden" name="archive_id" value="<?= (int)$p['transaction_id'] ?>">
                     <button
@@ -200,6 +210,7 @@ function formatDateValue($value) {
                         <i class="fa-solid fa-trash"></i>
                     </button>
                 </form>
+                <?php endif; ?>
             </div>
         </td>
     </tr>
@@ -215,6 +226,7 @@ function formatDateValue($value) {
 
     <script>
         const months = ["Jan","Feb","Mar","Apr","May","Jun","Jul","Aug","Sep","Oct","Nov","Dec"];
+        let currentSort = { column: null, direction: 'asc' };
 
         function toggleFilter() {
             const dropdown = document.getElementById('filterDropdowns');

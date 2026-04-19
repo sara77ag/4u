@@ -10,18 +10,18 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
         die('DB connection failed: ' . $e->getMessage());
     }
 
-    // ── TODO: Add ──────────────────────────────────────────────
+    // TODO: Add
     if (isset($_POST['todo_text'])) {
         $stmt = $pdo->prepare("
-            INSERT INTO notes (note_text, created_at, property_id, landlord_id, tenant_id, archived)
-            VALUES (?, datetime('now'), NULL, NULL, NULL, 0)
+            INSERT INTO notes (note_text, created_at, created_by, type, property_id, landlord_id, tenant_id, payment_id, viewing_id, date_id, user_id, archived)
+            VALUES (?, datetime('now'), 'system', 'todo', NULL, NULL, NULL, NULL, NULL, NULL, NULL, 0)
         ");
         $stmt->execute([trim($_POST['todo_text'])]);
         header('Location: dashboard.php');
         exit();
     }
 
-    // ── TODO: Delete ───────────────────────────────────────────
+    // TODO: Delete
     if (isset($_POST['delete_todo_id'])) {
         $stmt = $pdo->prepare("
             UPDATE notes SET archived = 1, date_archived = date('now') WHERE note_id = ?
@@ -31,7 +31,7 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
         exit();
     }
 
-    // ── Add Property ───────────────────────────────────────────
+    // Add Property
     if (isset($_POST['property_address'])) {
         $stmt = $pdo->prepare("
             INSERT INTO properties (property_address, property_type, monthly_rent, landlord_id,
@@ -54,7 +54,7 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
         exit();
     }
 
-    // ── Add Landlord ───────────────────────────────────────────
+    // Add Landlord
     if (isset($_POST['landlord_name'])) {
         $stmt = $pdo->prepare("
             INSERT INTO landlords (name, phone, address, email, id_type, id_number,
@@ -73,52 +73,43 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
         header('Location: landlords.php');
         exit();
     }
-// Handle tenant submission
-if (isset($_POST['tenant_name'])) {
-    $propertyId = (int)$_POST['tenant_property_id'];
-    $name = trim($_POST['tenant_name']);
-    $phone = trim($_POST['tenant_phone']);
-    $email = trim($_POST['tenant_email']);
-    $idType = trim($_POST['tenant_id_type'] ?? 'other');
-    $idNumber = trim($_POST['tenant_id_number']);
-    $idExpiry = $_POST['tenant_id_expiry'];
 
-    $contractStart = $_POST['tenant_contract_start'];
-    $contractEnd = $_POST['tenant_contract_end'];
-    $paymentFreq = $_POST['tenant_payment_frequency'];
-    $rent = (float)$_POST['tenant_rent']; 
+    // Add Tenant
+    if (isset($_POST['tenant_name'])) {
+        $propertyId = (int)$_POST['tenant_property_id'];
+        $name = trim($_POST['tenant_name']);
+        $phone = trim($_POST['tenant_phone']);
+        $email = trim($_POST['tenant_email']);
+        $idType = trim($_POST['tenant_id_type'] ?? 'other');
+        $idNumber = trim($_POST['tenant_id_number']);
+        $idExpiry = $_POST['tenant_id_expiry'];
+        $contractStart = $_POST['tenant_contract_start'];
+        $contractEnd = $_POST['tenant_contract_end'];
+        $paymentFreq = $_POST['tenant_payment_frequency'];
+        $rent = (float)$_POST['tenant_rent'];
 
-    // 1. Insert tenant
-    $stmt = $pdo->prepare("
-        INSERT INTO tenants (name, phone, email, id_type, id_number, id_expiry_date, archived)
-        VALUES (?, ?, ?, ?, ?, ?, 0)
-    ");
+        $stmt = $pdo->prepare("
+            INSERT INTO tenants (name, phone, email, id_type, id_number, id_expiry_date, archived)
+            VALUES (?, ?, ?, ?, ?, ?, 0)
+        ");
+        $stmt->execute([$name, $phone, $email, $idType, $idNumber, $idExpiry]);
+        $tenantId = $pdo->lastInsertId();
 
-    $stmt->execute([
-        $propertyId,
-        $name,
-        $phone,
-        $email,
-        $idType,
-        $idNumber,
-        $idExpiry
-    ]);
+        $prop = $pdo->prepare("SELECT landlord_id FROM properties WHERE property_id = ?");
+        $prop->execute([$propertyId]);
+        $landlordId = $prop->fetchColumn();
 
-    $prop = $pdo->prepare("SELECT landlord_id FROM properties WHERE property_id = ?");
-    $prop->execute([$propertyId]);
-    $landlordId = $prop->fetchColumn();
+        $stmt = $pdo->prepare("
+            INSERT INTO contracts (tenant_id, property_id, landlord_id, contract_start, contract_end, rent, frequency, status)
+            VALUES (?, ?, ?, ?, ?, ?, ?, 'active')
+        ");
+        $stmt->execute([$tenantId, $propertyId, $landlordId, $contractStart, $contractEnd, $rent, $paymentFreq]);
 
-    $stmt = $pdo->prepare("
-        INSERT INTO contracts (tenant_id, property_id, landlord_id, contract_start, contract_end, rent, frequency, status)
-        VALUES (?, ?, ?, ?, ?, ?, ?, 'active')
-    ");
-    $stmt->execute([$tenantId, $propertyId, $landlordId, $contractStart, $contractEnd, $rent, $paymentFreq]);
+        header('Location: tenants.php');
+        exit();
+    }
 
-    header('Location: tenants.php');
-    exit();
-}
-
-    // ── Add Viewing ────────────────────────────────────────────
+    // Add Viewing
     if (isset($_POST['viewer_name'])) {
         $stmt = $pdo->prepare("
             INSERT INTO viewing_bookings (property_id, viewer_name, viewer_phone, email,
@@ -137,27 +128,7 @@ if (isset($_POST['tenant_name'])) {
         exit();
     }
 
-    // ── Edit Viewing ───────────────────────────────────────────
-    if (isset($_POST['edit_viewing_id'])) {
-        $stmt = $pdo->prepare("
-            UPDATE viewing_bookings
-            SET viewer_name = ?, viewer_phone = ?, email = ?,
-                date_time = ?, status = ?
-            WHERE booking_id = ?
-        ");
-        $stmt->execute([
-            trim($_POST['edit_viewing_name']),
-            trim($_POST['edit_viewing_phone']),
-            trim($_POST['edit_viewing_email']),
-            $_POST['edit_viewing_date'] . ' ' . $_POST['edit_viewing_time'],
-            $_POST['edit_viewing_status'],
-            (int)$_POST['edit_viewing_id']
-        ]);
-        header('Location: viewing.php');
-        exit();
-    }
-
-    // ── Add User ───────────────────────────────────────────────
+    // Add User
     if (isset($_POST['user_username'])) {
         $stmt = $pdo->prepare("
             INSERT INTO users (username, name, phone, email, password, password_reset_date,
@@ -177,7 +148,6 @@ if (isset($_POST['tenant_name'])) {
         header('Location: users.php');
         exit();
     }
-
 
     exit();
 }
@@ -280,7 +250,7 @@ try {
             <div class="modal-form-grid">
                 <div class="form-group">
                     <label>Full Name <span class="required">*</span></label>
-                    name="landlord_name" class="form-control" placeholder="Enter Landlord's Full Name" required>
+                    <input type="text" name="landlord_name" class="form-control" placeholder="Enter Landlord's Full Name" required>
                 </div>
                 <div class="form-group">
                     <label>Phone <span class="required">*</span></label>
@@ -440,7 +410,6 @@ try {
                     <select name="viewing_property_id" class="form-control" required>
                         <option value="">Select Property</option>
                         <?php
-                        $properties = $pdo->query("SELECT property_id, property_address FROM properties WHERE archived = 0")->fetchAll();
                         foreach ($properties as $prop) {
                             echo '<option value="' . $prop['property_id'] . '">' . htmlspecialchars($prop['property_address']) . '</option>';
                         }
@@ -517,7 +486,6 @@ try {
                     <select name="property_id" class="form-control">
                         <option value="">None</option>
                         <?php
-                        $properties = $pdo->query("SELECT property_id, property_address FROM properties WHERE archived = 0")->fetchAll();
                         foreach ($properties as $prop) {
                             echo '<option value="' . $prop['property_id'] . '">' . htmlspecialchars($prop['property_address']) . '</option>';
                         }
@@ -529,7 +497,6 @@ try {
                     <select name="landlord_id" class="form-control">
                         <option value="">None</option>
                         <?php
-                        $landlords = $pdo->query("SELECT landlord_id, name FROM landlords WHERE archived = 0")->fetchAll();
                         foreach ($landlords as $l) {
                             echo '<option value="' . $l['landlord_id'] . '">' . htmlspecialchars($l['name']) . '</option>';
                         }
@@ -582,7 +549,6 @@ try {
                     <select name="payment_tenant_id" class="form-control" required>
                         <option value="">Select Tenant</option>
                         <?php
-                        $tenants = $pdo->query("SELECT tenant_id, name FROM tenants WHERE archived = 0")->fetchAll();
                         foreach ($tenants as $t) {
                             echo '<option value="' . $t['tenant_id'] . '">' . htmlspecialchars($t['name']) . '</option>';
                         }
@@ -649,8 +615,6 @@ try {
     </div>
 </div>
 
-
-
 <!-- ============================================ -->
 <!-- Modal: Add Contract -->
 <!-- ============================================ -->
@@ -694,7 +658,6 @@ try {
                     <select name="contract_tenant_id" class="form-control" required>
                         <option value="">Select Tenant</option>
                         <?php
-                        $tenants = $tenants ?? $pdo->query("SELECT tenant_id, name FROM tenants WHERE archived = 0")->fetchAll();
                         foreach ($tenants as $t) {
                             echo '<option value="' . $t['tenant_id'] . '">' . htmlspecialchars($t['name']) . '</option>';
                         }

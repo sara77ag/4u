@@ -1,4 +1,9 @@
 <?php
+session_start();
+if(!isset($_SESSION['user_id'])) {
+    header("Location: index.php");
+    exit();
+}
 $dbPath = __DIR__ . '/database.db';
 
 try {
@@ -91,10 +96,10 @@ $properties = $stmt->fetchAll(PDO::FETCH_ASSOC);
                         <label>Type</label>
                         <select id="filterType" onchange="filterProperties()">
                             <option value="">All Types</option>
-                            <option value="Flat">Flat</option>
-                            <option value="House">House</option>
-                            <option value="Apartment">Apartment</option>
-                            <option value="Bungalow">Bungalow</option>
+                            <option value="flat">Flat</option>
+                            <option value="house">House</option>
+                            <option value="apartment">Apartment</option>
+                            <option value="bungalow">Bungalow</option>
                         </select>
                     </div>
                     <div class="filter-group">
@@ -160,10 +165,10 @@ $properties = $stmt->fetchAll(PDO::FETCH_ASSOC);
                         <tbody id="tableBody">
                 <?php foreach ($properties as $p):
                     $status = $p['contract_start'] ? 'occupied' : 'available';
-                    $contract = $p['contract_start'] ? date('d/m/Y', strtotime($p['contract_start'])) . ' to ' . date('d/m/Y', strtotime($p['contract_end'])) : '-';                    
+                    $contract = $p['contract_start'] ? $p['contract_start'] . ' to ' . $p['contract_end'] : '-';
                     $tenant_name = $p['tenant_name'] ?? '';
                     $landlord_name = $p['landlord_name'] ?? '';
-                    $type = $p['property_type'] ?? '';
+                    $type = strtolower($p['property_type'])?? '';
                     $price = $p['monthly_rent'];
                     $contract_rent = $p['contract_rent'] ?? null;
                     $rooms = $p['room_count'] ?? 0;
@@ -225,9 +230,14 @@ $properties = $stmt->fetchAll(PDO::FETCH_ASSOC);
                 <button class="action-btn action-btn-view" title="View" onclick="actionbtn.viewProperty(this)">
                     <i class="fa-solid fa-eye"></i>
                 </button>
-                <button class="action-btn action-btn-edit" title="Edit" onclick="actionbtn.editProperty(this)">
+                
+                <?php if (in_array($_SESSION['role'], ['admin', 'agent'])): ?>
+                <button class="action-btn action-btn-edit" title="Edit" onclick="editProperty(this)">
                     <i class="fa-solid fa-pen"></i>
                 </button>
+                <?php endif; ?>
+
+                <?php if ($_SESSION['role'] === 'admin'): ?>
                 <form method="POST" style="display:inline;">
                     <input type="hidden" name="archive_id" value="<?= $p['property_id'] ?>">
                     <button type="submit" class="action-btn action-btn-delete" title="Archive"
@@ -235,6 +245,7 @@ $properties = $stmt->fetchAll(PDO::FETCH_ASSOC);
                         <i class="fa-solid fa-trash"></i>
                     </button>
                 </form>
+                <?php endif; ?>
             </div>
         </td>
     </tr>
@@ -261,7 +272,7 @@ $properties = $stmt->fetchAll(PDO::FETCH_ASSOC);
                 </div>
                 <h2 id="propertyTitle">-</h2>
             </div>
-            <button class="modal-close-btn" onclick="actionbtn.closeModal()">
+            <button class="action-modal-close" onclick="actionbtn.closeModal()">
                 <i class="fa-solid fa-xmark"></i>
             </button>
         </div>
@@ -304,7 +315,7 @@ $properties = $stmt->fetchAll(PDO::FETCH_ASSOC);
                     </div>
                     <div class="detail-row">
                         <span class="detail-label">Property Status:</span>
-                        <span id="p-property-status" class="status-badge-modal status-available">-</span>
+                        <span id="p-property-status" class="status-badge status-available">-</span>
                     </div>
                     <div class="detail-row">
                         <span class="detail-label">Property Price:</span>
@@ -395,7 +406,7 @@ $properties = $stmt->fetchAll(PDO::FETCH_ASSOC);
                         <span  id="p-date-tenant-id" class="date-value">-</span>
                     </div>
                     <div class="date-item">
-                        <span class="date-label ">Contract End:</span>
+                        <span class="date-label">Contract End:</span>
                         <span id="p-date-contract-end" class="date-value">-</span>
                     </div>
                     <div class="date-item">
@@ -518,8 +529,8 @@ $properties = $stmt->fetchAll(PDO::FETCH_ASSOC);
                         bVal = b.dataset.status;
                         break;
                     case 'contract':
-                        aVal = a.dataset.contractStart  || '';
-                        bVal = b.dataset.contractStart  || '';
+                        aVal = a.dataset.contractStart || '';
+                        bVal = b.dataset.contractStart || '';
                         break;
                     default:
                         return 0;

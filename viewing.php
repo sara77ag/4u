@@ -1,4 +1,9 @@
 <?php
+session_start();
+if(!isset($_SESSION['user_id'])) {
+    header("Location: index.php");
+    exit();
+}
 $dbPath = __DIR__ . '/database.db';
 
 try {
@@ -74,7 +79,7 @@ $viewings = $stmt->fetchAll(PDO::FETCH_ASSOC);
                 <div class="filter-dropdowns" id="filterDropdowns" style="display: none;">
                     <div class="filter-group">
                         <label>Status</label>
-                        <select id="filterStatus" oninput="filterViewings()">
+                        <select id="filterStatus" onchange="filterViewings()">
                             <option value="">All Statuses</option>
                             <option value="scheduled">Scheduled</option>
                             <option value="no_show">No Show</option>
@@ -84,13 +89,13 @@ $viewings = $stmt->fetchAll(PDO::FETCH_ASSOC);
                     </div>
                     <div class="filter-group">
                         <label>Date/Time</label>
-                        <input type="datetime-local" id="filterDateTime" oninput="filterViewings()">
+                        <input type="datetime-local" id="filterDateTime" onchange="filterViewings()">
                     </div>
                     <div class="filter-group">
                         <label>Agent</label>
-                        <input type="text" id="filterAgent" oninput="filterViewings()" placeholder="Enter agent name">
+                        <input type="text" id="filterAgent" onchange="filterViewings()">
                     </div>
-                    <button type="button" class="filter-btn-reset" onclick="resetFilters()">
+                    <button class="filter-btn-reset" onclick="resetFilters()">
                         <i class="fa-solid fa-rotate-left"></i>
                     </button>
                 </div>
@@ -132,20 +137,20 @@ $viewings = $stmt->fetchAll(PDO::FETCH_ASSOC);
                             </tr>
                         </thead>
                         <tbody id="tableBody">
-                         <?php foreach ($viewings as $v): 
-                             $statusClass = 'status-' . str_replace('_', '', $v['status']);
-                             $statusDisplay = ucfirst(str_replace('_', ' ', $v['status']));
-                             $statusIcon = match($v['status']) {
-                                 'scheduled' => 'fa-calendar',
-                                 'completed' => 'fa-circle-check',
-                                 'cancelled' => 'fa-circle-xmark',
-                                 'no_show' => 'fa-triangle-exclamation',
-                                 default => 'fa-calendar'
-                             };
-                         ?>
+<?php foreach ($viewings as $v): 
+    $statusClass = 'status-' . str_replace('_', '', $v['status']);
+    $statusDisplay = ucfirst(str_replace('_', ' ', $v['status']));
+    $statusIcon = match($v['status']) {
+        'scheduled' => 'fa-calendar',
+        'completed' => 'fa-circle-check',
+        'cancelled' => 'fa-circle-xmark',
+        'no_show' => 'fa-triangle-exclamation',
+        default => 'fa-calendar'
+    };
+?>
                             <tr data-name="<?= strtolower($v['viewer_name']) ?>" 
                                 data-status="<?= htmlspecialchars($v['status']) ?>"
-                                data-datetime="<?= date('c', strtotime($v['date_time'])) ?>">
+                                data-datetime="<?= htmlspecialchars($v['date_time']) ?>">
                                 <td class="viewer-name"><?= htmlspecialchars($v['viewer_name']) ?></td>
                                 <td><?= htmlspecialchars($v['viewer_phone']) ?></td>
                                 <td class="viewer-email"><?= htmlspecialchars($v['email']) ?></td>
@@ -163,9 +168,14 @@ $viewings = $stmt->fetchAll(PDO::FETCH_ASSOC);
                                         <button class="action-btn action-btn-view" title="View" onclick="viewViewing(this)">
                                             <i class="fa-solid fa-eye"></i>
                                         </button>
+                                        
+                                        <?php if (in_array($_SESSION['role'], ['admin', 'agent'])): ?>
                                         <button class="action-btn action-btn-edit" title="Edit" onclick="editViewing(this)">
                                             <i class="fa-solid fa-pen"></i>
                                         </button>
+                                        <?php endif; ?>
+                                        
+                                        <?php if ($_SESSION['role'] === 'admin'): ?>
                                         <form method="POST" style="display:inline;">
                                             <input type="hidden" name="archive_id" value="<?= $v['booking_id'] ?>">
                                             <button type="submit" class="action-btn action-btn-delete" title="Archive"
@@ -173,6 +183,7 @@ $viewings = $stmt->fetchAll(PDO::FETCH_ASSOC);
                                                 <i class="fa-solid fa-trash"></i>
                                             </button>
                                         </form>
+                                        <?php endif; ?>
                                     </div>
                                 </td>
                             </tr>
@@ -187,7 +198,10 @@ $viewings = $stmt->fetchAll(PDO::FETCH_ASSOC);
     <div id="modals-container"></div>
 
     <script>
-        
+        let currentSort = {
+            column: null,
+            direction: 'asc'
+        };
 
         function toggleFilter() {
             const filterToggle = document.getElementById('filterToggle');
@@ -268,7 +282,7 @@ $viewings = $stmt->fetchAll(PDO::FETCH_ASSOC);
 
             const rows = document.querySelectorAll('#tableBody tr');
 
-            document.querySelectorAll('#tableBody tr').forEach(row => {
+            rows.forEach(row => {
                 let show = true;
 
                 if (statusFilter && row.dataset.status !== statusFilter) {
@@ -278,8 +292,7 @@ $viewings = $stmt->fetchAll(PDO::FETCH_ASSOC);
                 if (datetimeFilter) {
                     const viewingDate = new Date(row.dataset.datetime);
                     const filterDate = new Date(datetimeFilter);
-
-                    if (viewingDate.toDateString() !== filterDate.toDateString()) {
+                    if (viewingDate < filterDate) {
                         show = false;
                     }
                 }
@@ -300,7 +313,8 @@ $viewings = $stmt->fetchAll(PDO::FETCH_ASSOC);
             document.getElementById('filterDateTime').value = '';
             document.getElementById('filterAgent').value = '';
 
-            document.querySelectorAll('#tableBody tr').forEach(row => row.style.display = '');
+            const rows = document.querySelectorAll('#tableBody tr');
+            rows.forEach(row => row.style.display = '');
 
             document.querySelectorAll('table th').forEach(th => {
                 th.classList.remove('sorted');

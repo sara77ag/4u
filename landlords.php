@@ -1,4 +1,9 @@
 <?php
+session_start();
+if(!isset($_SESSION['user_id'])) {
+    header("Location: index.php");
+    exit();
+}
 $dbPath = __DIR__ . '/database.db';
 
 try {
@@ -117,16 +122,22 @@ $landlords = $stmt->fetchAll(PDO::FETCH_ASSOC);
                             <button class="action-btn action-btn-view" title="View" onclick="actionbtn.viewLandlord(this)">
                                 <i class="fa-solid fa-eye"></i>
                             </button>
-                            <button class="action-btn action-btn-edit" title="Edit" onclick="editLandlord(this)">
-                                <i class="fa-solid fa-pen"></i>
-                            </button>
-                            <form method="POST" style="display:inline;">
-                                <input type="hidden" name="archive_id" value="<?= $landlord['landlord_id'] ?>">
-                                <button type="submit" class="action-btn action-btn-delete" title="Archive"
-                                    onclick="return confirm('Archive this landlord?\n<?= htmlspecialchars($landlord['name']) ?>')">
-                                    <i class="fa-solid fa-trash"></i>
+                           
+                            <?php if (in_array($_SESSION['role'], ['admin', 'agent'])): ?>
+                                <button class="action-btn action-btn-edit" title="Edit" onclick="editLandlord(this)">
+                                    <i class="fa-solid fa-pen"></i>
                                 </button>
-                            </form>
+                            <?php endif; ?>
+
+                            <?php if ($_SESSION['role'] === 'admin'): ?>
+                                <form method="POST" style="display:inline;">
+                                    <input type="hidden" name="archive_id" value="<?= $landlord['landlord_id'] ?>">
+                                    <button type="submit" class="action-btn action-btn-delete" title="Archive"
+                                        onclick="return confirm('Archive this landlord?\n<?= htmlspecialchars($landlord['name']) ?>')">
+                                        <i class="fa-solid fa-trash"></i>
+                                    </button>
+                                </form>
+                            <?php endif; ?> 
                         </div>
                     </div>
 <?php endforeach; ?>
@@ -151,7 +162,7 @@ $landlords = $stmt->fetchAll(PDO::FETCH_ASSOC);
                 </div>
                 <h2 id="landlordName">Landlord Name</h2>
             </div>
-            <button class="modal-close-btn" onclick="actionbtn.closeModal()">
+            <button class="action-modal-close" onclick="actionbtn.closeModal()">
                 <i class="fa-solid fa-xmark"></i>
             </button>
         </div>
