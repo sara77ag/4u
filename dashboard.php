@@ -10,11 +10,11 @@ try {
 }
 
 // Fetch stats
-$occupied = $pdo->query("SELECT COUNT(DISTINCT property_id) FROM contracts WHERE date('now') BETWEEN contract_start AND contract_end ")->fetchColumn();
+$occupied        = $pdo->query("SELECT COUNT(DISTINCT property_id) FROM contracts WHERE date('now') BETWEEN contract_start AND contract_end")->fetchColumn();
 $totalProperties = $pdo->query("SELECT COUNT(*) FROM properties WHERE archived = 0")->fetchColumn();
-$vacant = $totalProperties - $occupied;
-$viewings  = $pdo->query("SELECT COUNT(*) FROM viewing_bookings WHERE date_time BETWEEN date('now') AND date('now', '+7 days') AND archived = 0")->fetchColumn();
-$payments  = $pdo->query("SELECT COUNT(*) FROM transactions WHERE status = 'pending' AND archived = 0")->fetchColumn();
+$vacant          = $totalProperties - $occupied;
+$viewings        = $pdo->query("SELECT COUNT(*) FROM viewing_bookings WHERE status = 'scheduled' AND archived = 0 AND date_time >= date('now')")->fetchColumn();
+$payments        = $pdo->query("SELECT COUNT(*) FROM transactions WHERE status = 'pending' AND archived = 0")->fetchColumn();
 $late = $pdo->query("
     SELECT COUNT(*) FROM transactions 
     WHERE (status = 'not complete' OR (status = 'pending' AND next_due < date('now')))
@@ -22,43 +22,14 @@ $late = $pdo->query("
 ")->fetchColumn();
 $deadlines = $pdo->query("
     SELECT 
-    (
-        -- Gas Certificate
-        SELECT COUNT(*) FROM properties 
-        WHERE gas_cert_due BETWEEN date('now') AND date('now', '+30 days') 
-        AND archived = 0
-    ) + (
-        -- Electric Certificate
-        SELECT COUNT(*) FROM properties 
-        WHERE electric_cert_due BETWEEN date('now') AND date('now', '+30 days') 
-        AND archived = 0
-    ) + (
-        -- EPC
-        SELECT COUNT(*) FROM properties 
-        WHERE epc_due_date BETWEEN date('now') AND date('now', '+30 days') 
-        AND archived = 0
-    ) + (
-        -- Landlord ID Expiry
-        SELECT COUNT(*) FROM landlords 
-        WHERE id_expiry_date BETWEEN date('now') AND date('now', '+30 days') 
-        AND archived = 0
-    ) + (
-        -- Tenant ID Expiry
-        SELECT COUNT(*) FROM tenants 
-        WHERE id_expiry_date BETWEEN date('now') AND date('now', '+30 days') 
-        AND archived = 0
-    ) + (
-        -- Contract End
-        SELECT COUNT(*) FROM contracts 
-        WHERE contract_end BETWEEN date('now') AND date('now', '+30 days')
-    )
+    (SELECT COUNT(*) FROM properties WHERE gas_cert_due      BETWEEN date('now') AND date('now', '+30 days') AND archived = 0) +
+    (SELECT COUNT(*) FROM properties WHERE electric_cert_due BETWEEN date('now') AND date('now', '+30 days') AND archived = 0) +
+    (SELECT COUNT(*) FROM properties WHERE epc_due_date      BETWEEN date('now') AND date('now', '+30 days') AND archived = 0) +
+    (SELECT COUNT(*) FROM landlords  WHERE id_expiry_date    BETWEEN date('now') AND date('now', '+30 days') AND archived = 0) +
+    (SELECT COUNT(*) FROM tenants    WHERE id_expiry_date    BETWEEN date('now') AND date('now', '+30 days') AND archived = 0) +
+    (SELECT COUNT(*) FROM contracts  WHERE contract_end      BETWEEN date('now') AND date('now', '+30 days') AND archived = 0)
 ")->fetchColumn();
-$todos = $pdo->query("
-    SELECT note_id, note_text FROM notes
-    WHERE archived = 0
-    AND type = 'todo'
-    ORDER BY created_at ASC
-")->fetchAll(PDO::FETCH_ASSOC);
+$todos = $pdo->query("SELECT note_id, note_text FROM notes WHERE archived = 0 AND type = 'todo' ORDER BY created_at ASC")->fetchAll(PDO::FETCH_ASSOC);
 ?>
 
 <!DOCTYPE html>
