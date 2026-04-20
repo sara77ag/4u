@@ -22,7 +22,6 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST' && isset($_POST['unarchive_id'], $_POS
         'viewing_bookings'=> ['table' => 'viewing_bookings','pk' => 'booking_id'],
         'users'           => ['table' => 'users',           'pk' => 'user_id'],
         'notes'           => ['table' => 'notes',           'pk' => 'note_id'],
-        'files'           => ['table' => 'files',           'pk' => 'file_id'],
     ];
 
     if (isset($tableMap[$type])) {
@@ -49,7 +48,6 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST' && isset($_POST['delete_id'], $_POST['
         'viewing_bookings'=> ['table' => 'viewing_bookings','pk' => 'booking_id'],
         'users'           => ['table' => 'users',           'pk' => 'user_id'],
         'notes'           => ['table' => 'notes',           'pk' => 'note_id'],
-        'files'           => ['table' => 'files',           'pk' => 'file_id'],
     ];
 
     if (isset($tableMap[$type])) {
@@ -158,22 +156,6 @@ foreach ($rows as $r) {
                    'sub' => $r['sub'], 'related' => $r['related'], 'date' => $r['date_archived']];
 }
 
-// Files
-$rows = $pdo->query("
-    SELECT f.file_id AS id,
-           f.file_name AS label,
-           f.file_type AS sub,
-           f.date_archived,
-           p.property_address AS related
-    FROM files f
-    LEFT JOIN properties p ON f.property_id = p.property_id
-    WHERE f.archived = 1
-")->fetchAll(PDO::FETCH_ASSOC);
-foreach ($rows as $r) {
-    $archived[] = ['type' => 'files', 'id' => $r['id'], 'label' => $r['label'],
-                   'sub' => $r['sub'], 'related' => $r['related'], 'date' => $r['date_archived']];
-}
-
 // Sort by date_archived DESC (most recent first)
 usort($archived, function($a, $b) {
     return strcmp($b['date'] ?? '', $a['date'] ?? '');
@@ -189,7 +171,6 @@ $typeConfig = [
     'viewing_bookings' => ['label' => 'Viewing',         'icon' => 'fa-street-view',   'class' => 'type-viewing'],
     'users'            => ['label' => 'User',            'icon' => 'fa-users',         'class' => 'type-user'],
     'notes'            => ['label' => 'Note',            'icon' => 'fa-sticky-note',   'class' => 'type-note'],
-    'files'            => ['label' => 'File',            'icon' => 'fa-folder',        'class' => 'type-file'],
 ];
 ?>
 <!DOCTYPE html>
@@ -273,8 +254,7 @@ $typeConfig = [
                             <option value="transactions">Transaction</option>
                             <option value="viewing_bookings">Viewing</option>
                             <option value="users">User</option>
-                            <option value="notes">Note</option>
-                            <option value="files">File</option>
+                            <option value="notes">Note</option>                            
                         </select>
                     </div>
                     <div class="filter-group">

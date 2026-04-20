@@ -30,6 +30,14 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
         header('Location: dashboard.php');
         exit();
     }
+    
+    // TODO: Toggle complete
+    if (isset($_POST['toggle_todo_id'])) {
+        $stmt = $pdo->prepare("UPDATE notes SET completed = ? WHERE note_id = ?");
+        $stmt->execute([(int)$_POST['toggle_todo_completed'], (int)$_POST['toggle_todo_id']]);
+        header('Location: dashboard.php');
+        exit();
+    }
 
     // Add Property
     if (isset($_POST['property_address'])) {
