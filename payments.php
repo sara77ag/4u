@@ -64,7 +64,7 @@ function formatDateValue($value) {
     <script src="navbar.js" defer></script>
     <script src="modals.js" defer></script>
     <style>
-        .col-id { width: 8%; }
+       
         .col-tenant { width: 15%; }
         .col-property { width: 21%; }
         .col-amount { width: 8%; }
@@ -99,9 +99,15 @@ function formatDateValue($value) {
                         </select>
                     </div>
                     <div class="filter-group">
-                        <label>Period</label>
-                        <input type="month" id="filterPeriod" onchange="filterPayments()">
+                        <label>Date/Time</label>
+                        <input type="datetime-local" id="filterDateTime" onchange="filterPayments()">
                     </div>
+
+                    <div class="filter-group">
+                     <label>Period</label>
+                     <input type="month" id="filterPeriod" onchange="filterPayments()">
+                   </div>
+
                     <button class="filter-btn-reset" onclick="resetFilters()">
                         <i class="fa-solid fa-rotate-left"></i>
                     </button>
@@ -121,9 +127,7 @@ function formatDateValue($value) {
                     <table id="paymentsTable">
                         <thead>
                             <tr>
-                                <th class="sortable col-id" onclick="sortTable('id', this)">
-                                    Id <i class="fa-solid fa-sort sort-icon"></i>
-                                </th>
+                                
                                 <th class="sortable col-tenant" onclick="sortTable('tenant', this)">
                                     Tenant <i class="fa-solid fa-sort sort-icon"></i>
                                 </th>
@@ -176,7 +180,7 @@ function formatDateValue($value) {
         data-nextdue="<?= htmlspecialchars($p['next_due'] ?? '') ?>"
         data-status="<?= htmlspecialchars($status) ?>"
     >
-        <td class="payment-id"><?= (int)$p['transaction_id'] ?></td>
+
         <td class="tenant-name"><?= htmlspecialchars($p['tenant_name'] ?? '-') ?></td>
         <td class="property-address"><?= htmlspecialchars($p['property_address'] ?? '-') ?></td>
         <td class="rent-amount">£<?= number_format((float)$p['transaction_amount'], 0) ?></td>
@@ -230,6 +234,43 @@ function formatDateValue($value) {
         const months = ["Jan","Feb","Mar","Apr","May","Jun","Jul","Aug","Sep","Oct","Nov","Dec"];
         let currentSort = { column: null, direction: 'asc' };
 
+         function parseDateTimeValue(value) {
+         if (!value) return 0;
+         const normalised = value.replace(' ', 'T');
+         const timestamp = new Date(normalised).getTime();
+         return isNaN(timestamp) ? 0 : timestamp;
+        }
+
+        function parsePeriodValue(value) {
+        if (!value) return 0;
+
+        const monthMap = {
+        jan: 0, january: 0,
+        feb: 1, february: 1,
+        mar: 2, march: 2,
+        apr: 3, april: 3,
+        may: 4,
+        jun: 5, june: 5,
+        jul: 6, july: 6,
+        aug: 7, august: 7,
+        sep: 8, sept: 8, september: 8,
+        oct: 9, october: 9,
+        nov: 10, november: 10,
+        dec: 11, december: 11
+       };
+
+       const parts = value.trim().split(/\s+/);
+       if (parts.length < 2) return 0;
+
+       const month = monthMap[parts[0].toLowerCase()];
+       const year = parseInt(parts[1], 10);
+
+        if (month === undefined || isNaN(year)) return 0;
+
+        return new Date(year, month, 1).getTime();
+        }
+
+
         function toggleFilter() {
             const dropdown = document.getElementById('filterDropdowns');
             dropdown.style.display = dropdown.style.display === 'none' ? 'flex' : 'none';
@@ -264,10 +305,7 @@ function formatDateValue($value) {
                 let aVal, bVal;
 
                 switch (column) {
-                    case 'id':
-                        aVal = parseInt(a.dataset.id) || 0;
-                        bVal = parseInt(b.dataset.id) || 0;
-                        break;
+                    
                     case 'tenant':
                         aVal = (a.dataset.tenant || '').toLowerCase();
                         bVal = (b.dataset.tenant || '').toLowerCase();
@@ -281,12 +319,12 @@ function formatDateValue($value) {
                         bVal = parseFloat(b.dataset.amount) || 0;
                         break;
                     case 'datetime':
-                        aVal = a.dataset.datetime || '';
-                        bVal = b.dataset.datetime || '';
+                        aVal = parseDateTimeValue(a.dataset.datetime || '');
+                        bVal = parseDateTimeValue(b.dataset.datetime || '');
                         break;
                     case 'period':
-                        aVal = (a.dataset.period || '').toLowerCase();
-                        bVal = (b.dataset.period || '').toLowerCase();
+                        aVal = parsePeriodValue(a.dataset.period || '');
+                        bVal = parsePeriodValue(b.dataset.period || '');
                         break;
                     case 'nextdue':
                         aVal = a.dataset.nextdue || '';
@@ -308,50 +346,60 @@ function formatDateValue($value) {
             rows.forEach(row => tbody.appendChild(row));
             updateAllStatuses();
         }
-
         function filterPayments() {
-            const statusFilter = document.getElementById('filterStatus').value;
-            const periodFilter = document.getElementById('filterPeriod').value;
-            const rows = document.querySelectorAll('#tableBody tr');
+    const statusFilter = document.getElementById('filterStatus').value;
+    const dateTimeFilter = document.getElementById('filterDateTime').value;
+    const periodFilter = document.getElementById('filterPeriod').value;
+    const rows = document.querySelectorAll('#tableBody tr');
 
-            rows.forEach(row => {
-                let show = true;
+    rows.forEach(row => {
+        let show = true;
 
-                if (statusFilter && row.dataset.status !== statusFilter) {
-                    show = false;
-                }
+        if (statusFilter && row.dataset.status !== statusFilter) {
+            show = false;
+        }
 
-                if (periodFilter) {
-                    const [year, month] = periodFilter.split('-');
-                    const formattedFilter = months[parseInt(month, 10) - 1] + " " + year;
+        if (dateTimeFilter) {
+            const rowDateTime = parseDateTimeValue(row.dataset.datetime || '');
+            const selectedDateTime = new Date(dateTimeFilter).getTime();
 
-                    if ((row.dataset.period || '').trim() !== formattedFilter) {
-                        show = false;
-                    }
-                }
+            if (!rowDateTime || rowDateTime < selectedDateTime) {
+                show = false;
+            }
+        }
 
-                row.style.display = show ? '' : 'none';
-            });
+        if (periodFilter) {
+            const [year, month] = periodFilter.split('-');
+            const formattedFilter = months[parseInt(month, 10) - 1] + " " + year;
+
+            if ((row.dataset.period || '').trim() !== formattedFilter) {
+                show = false;
+            }
+        }
+
+        row.style.display = show ? '' : 'none';
+           });
         }
 
         function resetFilters() {
-            document.getElementById('filterStatus').value = '';
-            document.getElementById('filterPeriod').value = '';
+        document.getElementById('filterStatus').value = '';
+        document.getElementById('filterDateTime').value = '';
+        document.getElementById('filterPeriod').value = '';
 
-            document.querySelectorAll('#tableBody tr').forEach(row => row.style.display = '');
+        document.querySelectorAll('#tableBody tr').forEach(row => row.style.display = '');
 
-            document.querySelectorAll('table th').forEach(th => {
-                th.classList.remove('sorted');
-                const icon = th.querySelector('.sort-icon');
-                if (icon) {
-                    icon.classList.remove('asc', 'desc');
-                }
-            });
-
-            currentSort = { column: null, direction: 'asc' };
-            updateAllStatuses();
+        document.querySelectorAll('table th').forEach(th => {
+        th.classList.remove('sorted');
+        const icon = th.querySelector('.sort-icon');
+        if (icon) {
+            icon.classList.remove('asc', 'desc');
         }
+           });
 
+    currentSort = { column: null, direction: 'asc' };
+    updateAllStatuses();
+        }
+        
         function updateAllStatuses() {
             const rows = document.querySelectorAll('#tableBody tr');
             const today = new Date();
@@ -391,13 +439,13 @@ function formatDateValue($value) {
 
         function viewPayment(btn) {
             const row = btn.closest('tr');
-            const id = row.querySelector('.payment-id').textContent;
+            const id = row.dateset.id;
             alert('View Payment: ' + id);
         }
 
         function editPayment(btn) {
             const row = btn.closest('tr');
-            const id = row.querySelector('.payment-id').textContent;
+            const id = row.dateset.id;
             alert('Edit Payment: ' + id);
         }
 
