@@ -1,5 +1,11 @@
 <?php
 
+session_start();
+if(!isset($_SESSION['user_id'])) {
+    header("Location: index.php");
+    exit();
+}
+
 $dbPath = __DIR__ . '/database.db';
 
 try {
@@ -67,6 +73,7 @@ $todos = $pdo->query("SELECT note_id, note_text FROM notes WHERE archived = 0 AN
 
             <div class="quick-cards-container">
                 <div class="quick-cards-row">
+                <?php if (in_array($_SESSION['role'], ['admin', 'agent'])): ?>
                     <div class="quick-card" onclick="openAddPropertyModal()">
                         <div class="quick-card-icon"><i class="fa-solid fa-house"></i></div>
                         <h4 class="quick-card-title">Add Property</h4>
@@ -80,39 +87,48 @@ $todos = $pdo->query("SELECT note_id, note_text FROM notes WHERE archived = 0 AN
                     <div class="quick-card" onclick="openAddTenantModal()">
                         <div class="quick-card-icon"><i class="fa-solid fa-user"></i></div>
                         <h4 class="quick-card-title">Add Tenant</h4>
-                        <p class="quick-card-desc">Register a new tenant</p>
+                        <p class="quick-card-desc">Register a <br> new tenant</p>
                     </div>
+                    
+                <?php if ($_SESSION['role'] === 'admin'): ?>
+                    <div class="quick-card" onclick="openAddUserModal()">
+                        <div class="quick-card-icon"><i class="fa-solid fa-user-plus"></i></div>
+                        <h4 class="quick-card-title">Add User</h4>
+                        <p class="quick-card-desc">Create a new user account</p>
+                    </div>
+                <?php endif; ?>
+
+    
+
                     <div class="quick-card" onclick="openAddContractModal()">
                         <div class="quick-card-icon"><i class="fa-solid fa-file-contract"></i></div>
                         <h4 class="quick-card-title">New Contract</h4>
                         <p class="quick-card-desc">Create a new rental contract</p>
                     </div>
-                </div>
-
-                <div class="quick-cards-row">
                     <div class="quick-card" onclick="openAddPaymentModal()">
                         <div class="quick-card-icon"><i class="fa-solid fa-credit-card"></i></div>
                         <h4 class="quick-card-title">New Payment</h4>
-                        <p class="quick-card-desc">Register a payment received</p>
+                        <p class="quick-card-desc">Record a payment received</p>
                     </div>
                     <div class="quick-card" onclick="openBookViewingModal()">
                         <div class="quick-card-icon"><i class="fa-solid fa-calendar-plus"></i></div>
                         <h4 class="quick-card-title">Book Viewing</h4>
                         <p class="quick-card-desc">Schedule a property viewing</p>
                     </div>
+                    <?php endif; ?>
+
                     <div class="quick-card" onclick="window.location.href='important-dates.php'">
                         <div class="quick-card-icon"><i class="fa-solid fa-calendar-days"></i></div>
                         <h4 class="quick-card-title">Due Dates</h4>
                         <p class="quick-card-desc">Check upcoming deadlines</p>
                     </div>
+           
+                
                     <div class="quick-card" onclick="window.location.href='export.php'">
                         <div class="quick-card-icon"><i class="fa-solid fa-chart-line"></i></div>
                         <h4 class="quick-card-title">Export Report</h4>
                         <p class="quick-card-desc">Export monthly summary</p>
                     </div>
-                </div>
-
-                <div class="quick-cards-row">
                     <div class="quick-card" onclick="alert('WhatsApp integration coming soon.')">
                         <div class="quick-card-icon"><i class="fa-brands fa-whatsapp"></i></div>
                         <h4 class="quick-card-title">Open WhatsApp</h4>
@@ -123,7 +139,6 @@ $todos = $pdo->query("SELECT note_id, note_text FROM notes WHERE archived = 0 AN
                         <h4 class="quick-card-title">Report an Issue</h4>
                         <p class="quick-card-desc">Log a maintenance request</p>
                     </div>
-                </div>
             </div>
         </section>
 
@@ -183,7 +198,7 @@ $todos = $pdo->query("SELECT note_id, note_text FROM notes WHERE archived = 0 AN
         li.innerHTML = `
             <input type="checkbox" class="todo-checkbox" onchange="toggleTodo(this)">
             <span class="todo-text">${text}</span>
-            <button class="delete-todo" onclick="deleteTodo(this)">
+            <button class="delete-btn" onclick="deleteTodo(this)">
                 <i class="fa-solid fa-trash"></i>
             </button>
         `;

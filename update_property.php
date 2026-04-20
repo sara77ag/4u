@@ -9,19 +9,49 @@ try {
 } catch (PDOException $e) {
     echo json_encode(['error' => 'DB connection failed']);
     exit;
-}
-
-// ======================
-// Get JSON Input
-// ======================
-$input = json_decode(file_get_contents('php://input'), true);
-
-if (!$input || empty($input['id'])) {
-    echo json_encode(['error' => 'Invalid input']);
-    exit;
-}
-
-$id = $input['id'];
+    }
+    
+    // ======================
+    // Get JSON Input
+    // ======================
+    $input = json_decode(file_get_contents('php://input'), true);
+    
+    if (!$input || empty($input['id'])) {
+        echo json_encode(['error' => 'Invalid input']);
+        exit;
+        }
+        
+        $id = $input['id'];
+        
+        if (isset($input['type']) && $input['type'] === 'landlord') {
+            $stmt = $pdo->prepare("
+                UPDATE landlords SET
+                    name = ?,
+                    phone = ?,
+                    email = ?,
+                    address = ?,
+                    id_type = ?,
+                    id_number = ?,
+                    id_expiry_date = ?,
+                    contact_method = ?
+                WHERE landlord_id = ?
+            ");
+        
+            $stmt->execute([
+                $input['name']           ?? '',
+                $input['phone']          ?? '',
+                $input['email']          ?? '',
+                $input['address']        ?? '',
+                $input['id_type']        ?? '',
+                $input['id_number']      ?? '',
+                $input['id_expiry_date'] ?? '',
+                $input['contact_method'] ?? '',
+                $id
+            ]);
+        
+            echo json_encode(['success' => true]);
+            exit;
+        }
 
 // ======================
 // UPDATE PROPERTIES
@@ -44,23 +74,24 @@ $stmt = $pdo->prepare("
 ");
 
 $stmt->execute([
-    $input['type'],
-    $input['price'],
-    $input['rooms'],
-    $input['bathrooms'],
-    $input['epc'],
-    ($input['pets'] === 'Yes' ? 1 : 0),
-    ($input['garden'] === 'Yes' ? 1 : 0),
-    $input['council'],
-    $input['gas'],
-    $input['electric'],
-    $input['epcDate'],
-    $input['landlordId'],
+    $input['type']      ?? '',
+    $input['price']     ?? 0,
+    $input['rooms']     ?? 0,
+    $input['bathrooms'] ?? 0,
+    $input['epc']       ?? '',
+    ($input['pets']   ?? '') === 'Yes' ? 1 : 0,
+    ($input['garden'] ?? '') === 'Yes' ? 1 : 0,
+    $input['council']   ?? '',
+    $input['gas']       ?? '',
+    $input['electric']  ?? '',
+    $input['epcDate']   ?? '',
+    $input['landlordId'] ?? '',
     $id
 ]);
 
+
 // ======================
-// UPDATE CONTRACT (IF EXISTS)
+// UPDATE CONTRACT 
 // ======================
 $check = $pdo->prepare("SELECT contract_id FROM contracts WHERE property_id = ?");
 $check->execute([$id]);
@@ -75,12 +106,11 @@ if ($contract) {
             contract_end = ?
         WHERE property_id = ?
     ");
-
-    $stmt->execute([
-        $input['rent'],
-        $input['frequency'],
-        $input['start'],
-        $input['end'],
+        $stmt->execute([
+        $input['rent']      ?? '',
+        $input['frequency'] ?? '',
+        $input['start']     ?? '',
+        $input['end']       ?? '',
         $id
     ]);
 }

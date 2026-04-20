@@ -13,7 +13,6 @@ try {
     die('DB connection failed: ' . $e->getMessage());
 }
 
-// Handle archive request
 if ($_SERVER['REQUEST_METHOD'] === 'POST' && isset($_POST['archive_id'])) {
     $stmt = $pdo->prepare("UPDATE landlords SET archived = 1, date_archived = date('now') WHERE landlord_id = ?");
     $stmt->execute([$_POST['archive_id']]);
@@ -21,7 +20,6 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST' && isset($_POST['archive_id'])) {
     exit();
 }
 
-// Fetch all landlords
 $stmt = $pdo->query("
     SELECT 
         landlord_id,
@@ -29,6 +27,10 @@ $stmt = $pdo->query("
         phone,
         email,
         address,
+        id_type,
+        id_number,
+        id_expiry_date,
+        contact_method,
         number_of_properties
     FROM landlords
     WHERE archived = 0
@@ -48,7 +50,7 @@ $landlords = $stmt->fetchAll(PDO::FETCH_ASSOC);
     <link rel="stylesheet" href="tables.css">
     <script src="navbar.js"></script>
     <script src="modals.js"></script>
-    <script src="actionbtn.js" ></script>
+    <script src="actionbtn.js"></script>
 </head>
 <body onload="CallNavbar(); loadModals();">
     <div id="navbar-container"></div>
@@ -88,18 +90,30 @@ $landlords = $stmt->fetchAll(PDO::FETCH_ASSOC);
 
                 <div class="controls-spacer"></div>
 
+                <?php if (in_array($_SESSION['role'], ['admin', 'agent'])): ?>
                 <button class="btn-add blue" onclick="openAddLandlordModal()">
                     <i class="fa-solid fa-plus"></i> Landlord
                 </button>
+                <?php endif; ?>
             </div>
 
             <div class="cards-container">
                 <div class="cards-grid" id="landlordsGrid">
-<?php foreach ($landlords as $landlord): 
-    $numProps = (int)$landlord['number_of_properties'];
-    $propText = $numProps === 1 ? '1 Property' : $numProps . ' Properties';
-?>
-                    <div class="card" data-name="<?= strtolower($landlord['name']) ?>" data-properties="<?= $numProps ?>">
+               <?php foreach ($landlords as $landlord): 
+                   $numProps = (int)$landlord['number_of_properties'];
+                   $propText = $numProps === 1 ? '1 Property' : $numProps . ' Properties';
+               ?>
+                    <div class="card"
+                        data-id="<?= $landlord['landlord_id'] ?>"
+                        data-name="<?= htmlspecialchars($landlord['name']) ?>"
+                        data-phone="<?= htmlspecialchars($landlord['phone']) ?>"
+                        data-email="<?= htmlspecialchars($landlord['email']) ?>"
+                        data-address="<?= htmlspecialchars($landlord['address']) ?>"
+                        data-idtype="<?= htmlspecialchars($landlord['id_type']) ?>"
+                        data-idnumber="<?= htmlspecialchars($landlord['id_number']) ?>"
+                        data-idexpiry="<?= htmlspecialchars($landlord['id_expiry_date']) ?>"
+                        data-contact-method="<?= htmlspecialchars($landlord['contact_method']) ?>"
+                        data-properties="<?= $numProps ?>">
                         <div class="card-header">
                             <div class="card-name"><?= htmlspecialchars($landlord['name']) ?></div>
                         </div>
@@ -124,7 +138,7 @@ $landlords = $stmt->fetchAll(PDO::FETCH_ASSOC);
                             </button>
                            
                             <?php if (in_array($_SESSION['role'], ['admin', 'agent'])): ?>
-                                <button class="action-btn action-btn-edit" title="Edit" onclick="editLandlord(this)">
+                                <button class="action-btn action-btn-edit" title="Edit" onclick="actionbtn.editLandlord(this)">
                                     <i class="fa-solid fa-pen"></i>
                                 </button>
                             <?php endif; ?>
@@ -140,7 +154,7 @@ $landlords = $stmt->fetchAll(PDO::FETCH_ASSOC);
                             <?php endif; ?> 
                         </div>
                     </div>
-<?php endforeach; ?>
+                <?php endforeach; ?>
                 </div>
             </div>
         </div>
@@ -148,13 +162,11 @@ $landlords = $stmt->fetchAll(PDO::FETCH_ASSOC);
 
     <div id="modals-container"></div>
 
-    
 <!-- ============================================ -->
 <!-- Action Buttons Modal: View Landlord -->
 <!-- ============================================ -->
 <div id="viewLandlordModal" class="action-modal-overlay">
     <div class="action-modal-container">
-        <!-- Header -->
         <div class="action-modal-header">
             <div class="action-header-left">
                 <div class="action-modal-header-icon">
@@ -162,12 +174,11 @@ $landlords = $stmt->fetchAll(PDO::FETCH_ASSOC);
                 </div>
                 <h2 id="landlordName">Landlord Name</h2>
             </div>
-            <button class="action-modal-close" onclick="actionbtn.closeModal()">
+            <button class="modal-close-btn" onclick="actionbtn.closeModal()">
                 <i class="fa-solid fa-xmark"></i>
             </button>
         </div>
 
-        <!-- Tabs Navigation -->
         <div class="action-tabs-nav">
             <button class="tab-btn active" data-tab="landlord">
                 <i class="fa-solid fa-user-tie"></i> Landlord Information
@@ -183,15 +194,15 @@ $landlords = $stmt->fetchAll(PDO::FETCH_ASSOC);
             </button>
         </div>
 
-        <!-- Tab Content -->
         <div class="action-tabs-content">
+
             <!-- Landlord Tab -->
             <div id="l-tab-landlord" class="tab-content active">
                 <div class="tab-header">
                     <i class="fa-solid fa-user-tie"></i>
                     <span>Landlord Information</span>
                 </div>
-              <div class="details-grid">
+                <div class="details-grid">
                     <div class="detail-row">
                         <span class="detail-label">Name:</span>
                         <span id="l-landlord-name" class="detail-value">-</span>
@@ -222,7 +233,7 @@ $landlords = $stmt->fetchAll(PDO::FETCH_ASSOC);
                     </div>
                     <div class="detail-row">
                         <span class="detail-label">Preferred Contact Method:</span>
-                        <span id="l-landlord-contact" class="detail-value">-</span>
+                        <span id="l-landlord-contact-method" class="detail-value">-</span>
                     </div>
                 </div>
             </div>
@@ -232,49 +243,22 @@ $landlords = $stmt->fetchAll(PDO::FETCH_ASSOC);
                 <div class="tab-header">
                     <i class="fa-solid fa-house"></i>
                     <span>Owned Properties</span>
-                    <span class="count-prperties">3</span>
+                    <span class="count-prperties" id="l-properties-count">0</span>
                 </div>
-       
-            <!-- Properties List  -->
-            <div class="contant-row-p">
-                <!-- Header Row -->
-                <div class="data-row header">
-                    <div class="cell">Address</div>
-                    <div class="cell">Type</div>
-                    <div class="cell">Status</div>
-                    <div class="cell">Tenant</div>
-                    <div class="cell">Rent</div>
-                </div>
+                <div class="contant-row-p">
+                    <!-- Header Row -->
+                    <div class="data-row header">
+                        <div class="cell">Address</div>
+                        <div class="cell">Type</div>
+                        <div class="cell">Status</div>
+                        <div class="cell">Tenant</div>
+                        <div class="cell">Rent</div>
+                    </div>
+                    <!-- Dynamic rows injected here -->
 
-                <!-- Data Row 1 -->
-                <div class="data-row">
-                    <div class="cell">221B Baker Street</div>
-                    <div class="cell" class="td-type">Flat</div>
-                    <div class="cell"><span class="status-badge status-occupied">Occupied</span></div>
-                    <div class="cell">John Smith</div>
-                    <div class="cell"><span class="rent">£1,200</span></div>
                 </div>
-
-                <!-- Data Row 2 -->
-                <div class="data-row">
-                    <div class="cell">Oxford Road 10</div>
-                    <div class="cell" class="td-type">House</div>
-                    <div class="cell"><span class="status-badge status-available">Vacant</span></div>
-                    <div class="cell"><span class="no-tenant">-</span></div>
-                    <div class="cell"><span class="rent">£950</span></div>
-                </div>
-
-                <!-- Data Row 3 -->
-                <div class="data-row">
-                    <div class="cell">Green Lane 5</div>
-                    <div class="cell" >Flat</div>
-                    <div class="cell"><span class="status-badge status-occupied">Occupied</span></div>
-                    <div class="cell">Sarah Ali</div>
-                    <div class="cell"><span class="rent">£800</span></div>
-                </div>
-         </div>
             </div>
-            
+
             <!-- Files Tab -->
             <div id="l-tab-files" class="tab-content">
                 <div class="tab-header">
@@ -290,12 +274,12 @@ $landlords = $stmt->fetchAll(PDO::FETCH_ASSOC);
                     <div class="file-item">
                         <i class="fa-solid fa-file-pdf file-icon"></i>
                         <span class="file-name">Copy of ID / Passport</span>
-                        <button class="file-open-btn" onclick="openFile('gas')">Open</button>
+                        <button class="file-open-btn" onclick="openFile('id')">Open</button>
                     </div>
                     <div class="file-item">
                         <i class="fa-solid fa-file-pdf file-icon"></i>
                         <span class="file-name">Ownership Proof</span>
-                        <button class="file-open-btn" onclick="openFile('electrical')">Open</button>
+                        <button class="file-open-btn" onclick="openFile('ownership')">Open</button>
                     </div>
                 </div>
             </div>
@@ -306,19 +290,20 @@ $landlords = $stmt->fetchAll(PDO::FETCH_ASSOC);
                     <i class="fa-solid fa-sticky-note"></i>
                     <span>Notes</span>
                 </div>
+                <?php if (in_array($_SESSION['role'], ['admin', 'agent'])): ?>
                 <div class="notes-input-section">
                     <textarea id="l-noteTextarea" class="note-textarea" placeholder="Write your note here..."></textarea>
                     <button id="l-addNoteBtn" class="add-note-btn" onclick="actionbtn.addNote()">
                         <i class="fa-solid fa-plus"></i> Add Note
                     </button>
                 </div>
-                <div id="l-note-notesList" class="notes-list">
-                </div>
+                <?php endif; ?>
+                <div data-notes-list class="notes-list"></div>
             </div>
+
         </div>
     </div>
 </div>
-
 
     <script>
         function toggleFilter() {
@@ -330,18 +315,14 @@ $landlords = $stmt->fetchAll(PDO::FETCH_ASSOC);
 
         function filterLandlords() {
             const propsFilter = document.getElementById('filterProperties').value;
-
-            const cards = document.querySelectorAll('.card');
-            cards.forEach(card => {
+            document.querySelectorAll('.card').forEach(card => {
                 let show = true;
-
                 if (propsFilter) {
                     const numProps = parseInt(card.dataset.properties);
                     if (propsFilter === '0' && numProps !== 0) show = false;
                     if (propsFilter === '1-5' && (numProps < 1 || numProps > 5)) show = false;
                     if (propsFilter === '6+' && numProps < 6) show = false;
                 }
-
                 card.style.display = show ? '' : 'none';
             });
         }
@@ -358,9 +339,8 @@ $landlords = $stmt->fetchAll(PDO::FETCH_ASSOC);
                     bVal = b.dataset.name.toLowerCase();
                 } else {
                     aVal = parseInt(a.dataset.properties);
-                    bVal = parseInt(a.dataset.properties);
+                    bVal = parseInt(b.dataset.properties);
                 }
-
                 if (aVal < bVal) return direction === 'asc' ? -1 : 1;
                 if (aVal > bVal) return direction === 'asc' ? 1 : -1;
                 return 0;
@@ -373,15 +353,7 @@ $landlords = $stmt->fetchAll(PDO::FETCH_ASSOC);
         function resetFilters() {
             document.getElementById('filterProperties').value = '';
             document.getElementById('sortBy').value = 'name-asc';
-
-            const cards = document.querySelectorAll('.card');
-            cards.forEach(card => card.style.display = '');
-        }
-
-        function editLandlord(btn) {
-            const card = btn.closest('.card');
-            const name = card.querySelector('.card-name').textContent.trim();
-            alert('Edit Landlord: ' + name);
+            document.querySelectorAll('.card').forEach(card => card.style.display = '');
         }
     </script>
 </body>

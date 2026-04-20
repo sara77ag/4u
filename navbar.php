@@ -29,7 +29,7 @@ $role = $_SESSION['role'] ?? '';
             <div class="user-dropdown">
                 <a href="#"><i class="fa-regular fa-user"></i> View Profile</a>
                 <?php if ($role === 'admin'): ?>
-                <a href="#"><i class="fa-solid fa-box-archive"></i> View Archived</a>
+                <a href="archive.php"><i class="fa-solid fa-box-archive"></i> View Archived</a>
                 <?php endif; ?>
                 <a href="logout.php"><i class="fa-solid fa-right-from-bracket"></i> Logout</a>
             </div>

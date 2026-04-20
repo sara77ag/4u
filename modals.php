@@ -95,15 +95,15 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
         $stmt->execute([$name, $phone, $email, $idType, $idNumber, $idExpiry]);
         $tenantId = $pdo->lastInsertId();
 
-        $prop = $pdo->prepare("SELECT landlord_id FROM properties WHERE property_id = ?");
+        $prop = $pdo->prepare("SELECT property_id FROM properties WHERE property_id = ?");
         $prop->execute([$propertyId]);
-        $landlordId = $prop->fetchColumn();
+        $propertyId = $prop->fetchColumn();
 
         $stmt = $pdo->prepare("
-            INSERT INTO contracts (tenant_id, property_id, landlord_id, contract_start, contract_end, rent, frequency, status)
-            VALUES (?, ?, ?, ?, ?, ?, ?, 'active')
+            INSERT INTO contracts (tenant_id, property_id, contract_start, contract_end, rent, frequency)
+            VALUES (?, ?, ?, ?, ?, ?)
         ");
-        $stmt->execute([$tenantId, $propertyId, $landlordId, $contractStart, $contractEnd, $rent, $paymentFreq]);
+        $stmt->execute([$tenantId, $propertyId, $contractStart, $contractEnd, $rent, $paymentFreq]);
 
         header('Location: tenants.php');
         exit();
@@ -148,6 +148,59 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
         header('Location: users.php');
         exit();
     }
+
+    // Add Contract
+if (isset($_POST['contract_property_id'])) {
+
+    $propertyId = (int)$_POST['contract_property_id'];
+    $tenantId = (int)$_POST['contract_tenant_id'];
+    $start = $_POST['contract_start'];
+    $end = $_POST['contract_end'];
+    $rent = (float)$_POST['contract_rent'];
+    $frequency = $_POST['contract_frequency'];
+
+    // Basic validation
+    if (!$propertyId || !$tenantId || !$start || !$end) {
+        die('Missing required fields');
+    }
+
+    if ($start >= $end) {
+        die('Invalid contract dates');
+    }
+
+    // Check conflict
+    $check = $pdo->prepare("
+        SELECT COUNT(*) FROM contracts
+        WHERE property_id = ?
+        AND (
+            (? <= contract_end) AND (? >= contract_start)
+        )
+    ");
+    $check->execute([$propertyId, $start, $end]);
+
+    if ($check->fetchColumn() > 0) {
+        header("Location: properties.php?contract=conflict&msg=overlap");
+        exit();
+    }
+
+    // Insert contract
+    $stmt = $pdo->prepare("
+        INSERT INTO contracts (tenant_id, property_id, contract_start, contract_end, rent, frequency)
+        VALUES (?, ?, ?, ?, ?, ?)
+    ");
+
+    $stmt->execute([
+        $tenantId,
+        $propertyId,
+        $start,
+        $end,
+        $rent,
+        $frequency
+    ]);
+
+    header('Location: properties.php');
+    exit();
+}
 
     exit();
 }
@@ -449,40 +502,6 @@ try {
         </form>
     </div>
 </div>
-
-<!-- ============================================ -->
-<!-- Modal: View Important Date -->
-<!-- ============================================ -->
-<div id="viewDateModal" class="modal-overlay">
-    <div class="modal-container">
-        <div class="modal-header">
-            <div class="modal-header-title">
-                <div class="modal-header-title-icon"><i class="fa-solid fa-calendar-days"></i></div>
-                <h3>Important Dates</h3>
-            </div>
-            <button class="modal-close-btn" onclick="closeViewDateModal()">
-                <i class="fa-solid fa-xmark"></i>
-            </button>
-        </div>
-        <div class="modal-body">
-            <div class="modal-form-grid">
-                <div class="form-group"><label>Property</label><div class="form-control" id="viewDate_property"></div></div>
-                <div class="form-group"><label>Gas Cert Due</label><div class="form-control" id="viewDate_gas"></div></div>
-                <div class="form-group"><label>Electric Cert Due</label><div class="form-control" id="viewDate_electric"></div></div>
-                <div class="form-group"><label>EPC Due</label><div class="form-control" id="viewDate_epc"></div></div>
-                <div class="form-group"><label>Landlord ID Expiry</label><div class="form-control" id="viewDate_idlandlord"></div></div>
-                <div class="form-group"><label>Tenant ID Expiry</label><div class="form-control" id="viewDate_idtenant"></div></div>
-                <div class="form-group"><label>Contract End</label><div class="form-control" id="viewDate_contract"></div></div>
-            </div>
-            <div class="modal-footer">
-                <button type="button" class="modal-btn modal-btn-reset" onclick="closeViewDateModal()">
-                    <i class="fa-solid fa-xmark"></i> Close
-                </button>
-            </div>
-        </div>
-    </div>
-</div>
-
 <!-- ============================================ -->
 <!-- Modal: Upload File -->
 <!-- ============================================ -->

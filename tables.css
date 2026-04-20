@@ -285,7 +285,7 @@
         }
 
         .status-badge-modal {
-            height: 38px;
+            height: auto;
             cursor: default;
         }
 

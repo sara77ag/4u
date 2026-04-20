@@ -361,7 +361,7 @@ body.login-page {
     word-break: break-word;
 }
 
-.delete-todo {
+.delete-btn {
     background: none;
     border: none;
     color: #a0aec0;
@@ -370,7 +370,7 @@ body.login-page {
     transition: color 0.3s ease;
 }
 
-.delete-todo:hover {
+.delete-btn:hover {
     color: #e53e3e;
 }
 
@@ -678,7 +678,7 @@ body.login-page {
     box-shadow: 0 20px 40px rgba(0, 0, 0, 0.2);
     width: 100%;
     max-width: 900px;
-    max-height: 90vh;
+    max-height: 95vh;
     overflow-y: auto;
     animation: modalSlideIn 0.3s ease;
 }
@@ -700,7 +700,6 @@ body.login-page {
     justify-content: space-between;
     padding: 20px 25px;
     border-bottom: 1px solid #f7fafc;
-    position: sticky;
     top: 0;
     background: #ffffff;
     border-radius: 12px 12px 0 0;
@@ -922,6 +921,7 @@ input.form-control[type="time"] {
     border-top: 1px solid #f7fafc;
     background: #f7fafc;
     border-radius: 0 0 12px 12px;
+    margin-top: 25px;
 }
 
 .action-modal-footer {
@@ -1100,7 +1100,6 @@ input.form-control[type="time"] {
 Action Button Style
    ============================================ */
 
-/* Overlay with blur */
 .action-modal-overlay {
     display: none;
     position: fixed;
@@ -1176,7 +1175,6 @@ Action Button Style
     color: #1a365d;
 }
 
-/* Tabs Navigation */
 .action-tabs-nav {
     display: flex;
     padding: 0 28px;
@@ -1205,10 +1203,7 @@ Action Button Style
     font-size: 16px;
     width: 20px;
     flex-shrink: 0;
-}
-
-.tab-btn i {
-    font-size: 16px;
+    cursor: pointer;
 }
 
 .tab-btn:hover {
@@ -1229,7 +1224,6 @@ Action Button Style
     border-radius: 2px;
 }
 
-/* Tab Content */
 .action-tabs-content {
     padding: 28px;
     background: #ffffff;
@@ -1248,51 +1242,63 @@ Action Button Style
 
 }
 
-/* Grids */
 .details-grid {
     display: grid;
     grid-template-columns: repeat(3, 1fr);
-    gap: 16px;
+    gap: 35px 16px;
 }
-
 
 .detail-row {
     display: flex;
-    flex-direction: column;
+    flex-direction: row;
+    align-items: center;
     gap: 6px;
 }
 
-/* label */
 .detail-label {
     font-size: 13px;
     font-weight: 600;
     color: #64748b;
     cursor: default;
+    white-space: nowrap;
 }
 
-/* value box (view mode) */
-.detail-value {
+.detail-value input[type="number"] {
     width: 100%;
-    padding: 10px 12px;
-    border: 1.5px solid #e2e8f0;
-    border-radius: 10px;
-    background: #f8fafc;
+    -moz-appearance: textfield;
+    appearance: textfield;
+}
+
+.detail-value input[type="number"]::-webkit-outer-spin-button,
+.detail-value input[type="number"]::-webkit-inner-spin-button {
+    -webkit-appearance: none;
+     margin: 0;
+}
+
+.detail-value {
+    width: auto;
     font-size: 14px;
     color: #1a365d;
-    min-height: 38px;
-    display: flex;
+    display: block;
     align-items: center;
     cursor: default;
 }
 
+.detail-value input[type="number"] {
+    width: auto;
+}
+
 .detail-value input,
 .detail-value select {
-    width: 100%;
+    width: auto;
     border: none;
     outline: none;
     background: transparent;
     font-size: 14px;
     color: #1a365d;
+    padding: 0;
+    margin: 0;
+    line-height: 1;
 }
 
 .detail-value input {
@@ -1327,17 +1333,6 @@ Action Button Style
     cursor: pointer;
 }
 
-
-/* Firefox fix */
-.date-input::-moz-focus-inner {
-    border: 0;
-}
-
-/* optional hover */
-.date-input:hover {
-    text-decoration: underline;
-}
-
 /* Important Dates */
 .dates-list {
     display: flex;
@@ -1370,6 +1365,7 @@ Action Button Style
     letter-spacing: 0.5px;
     margin-right: 10px;
 }
+
 
 /* Files List */
 .files-list {
@@ -1444,8 +1440,8 @@ Action Button Style
 .add-note-btn {
     height: 120px;
     padding: 16px 24px;
-    background: linear-gradient(135deg, #10b981, #059669);
-    color: white;
+    background: #266c49;
+    color: #ffffff;
     border: none;
     border-radius: 12px;
     font-size: 14px;
@@ -1461,11 +1457,11 @@ Action Button Style
 
 .add-note-btn:hover {
     transform: translateY(-2px);
-    box-shadow: 0 10px 20px rgba(16, 185, 129, 0.3);
-}
+    background: #1e5439;}
 
 .add-note-btn i {
     font-size: 18px;
+    cursor: pointer;
 }
 
 .notes-list {
@@ -1555,7 +1551,6 @@ Action Button Style
     }
 }
 
-/* Responsive Modal */
 @media (max-width: 768px) {
     .modal-form-grid {
         grid-template-columns: repeat(2, 1fr);
@@ -1572,21 +1567,6 @@ Action Button Style
     }
 }
 
-
-
-.btn-save {
-    background: #10b981;
-    color: white;
-    padding: 12px 20px;
-    border: none;
-    border-radius: 8px;
-    cursor: pointer;
-}
-
-/* =========================
-   Modal Form Inputs
-========================= */
-
 .modal-input,
 .modal-select {
     width: 100%;
@@ -1600,7 +1580,6 @@ Action Button Style
     font-family: inherit;
 }
 
-/* Focus */
 .modal-input:focus,
 .modal-select:focus {
     outline: none;
@@ -1608,20 +1587,12 @@ Action Button Style
     box-shadow: 0 0 0 3px rgba(49, 130, 206, 0.15);
 }
 
-/* Hover */
 .modal-input:hover,
 .modal-select:hover {
     border-color: #cbd5e1;
 }
-
-/* Select arrow fix */
 .modal-select {
     appearance: none;
     cursor: pointer;
 }
 
-/* داخل detail-row */
-.detail-value input,
-.detail-value select {
-    margin-top: 6px;
-}

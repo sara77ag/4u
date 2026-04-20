@@ -125,12 +125,14 @@ $properties = $stmt->fetchAll(PDO::FETCH_ASSOC);
 
                 <div class="controls-spacer"></div>
 
+                <?php if (in_array($_SESSION['role'], ['admin', 'agent'])): ?>
                 <button class="btn-add green" onclick="openAddContractModal()">
                     <i class="fa-solid fa-plus"></i>Contract
                 </button>
                 <button class="btn-add blue" onclick="openAddPropertyModal()">
                     <i class="fa-solid fa-plus"></i>Property
                 </button>
+                <?php endif; ?>
             </div>
 
             <div class="table-container">
@@ -165,10 +167,9 @@ $properties = $stmt->fetchAll(PDO::FETCH_ASSOC);
                         <tbody id="tableBody">
                 <?php foreach ($properties as $p):
                     $status = $p['contract_start'] ? 'occupied' : 'available';
-                    $contract = $p['contract_start'] ? $p['contract_start'] . ' to ' . $p['contract_end'] : '-';
-                    $tenant_name = $p['tenant_name'] ?? '';
+                    $contract = $p['contract_start'] ? date('d/m/Y', strtotime($p['contract_start'])) . ' to ' . date('d/m/Y', strtotime($p['contract_end'])) : '';                    $tenant_name = $p['tenant_name'] ?? '';
                     $landlord_name = $p['landlord_name'] ?? '';
-                    $type = strtolower($p['property_type'])?? '';
+                    $type = $p['property_type'] ?? '';
                     $price = $p['monthly_rent'];
                     $contract_rent = $p['contract_rent'] ?? null;
                     $rooms = $p['room_count'] ?? 0;
@@ -224,15 +225,22 @@ $properties = $stmt->fetchAll(PDO::FETCH_ASSOC);
                 </span>
             <?php endif; ?>
         </td>
-        <td class="contract-info"><?= htmlspecialchars($contract) ?></td>
+        <td class="contract-info">
+    <?php if ($p['contract_start']): ?>
+        <span><?= htmlspecialchars($contract) ?></span>
+    <?php else: ?>
+        <span class="tenant-vacant">No contract</span>
+    <?php endif; ?>
+</td>
         <td>
+            
             <div class="action-buttons">
                 <button class="action-btn action-btn-view" title="View" onclick="actionbtn.viewProperty(this)">
                     <i class="fa-solid fa-eye"></i>
                 </button>
                 
                 <?php if (in_array($_SESSION['role'], ['admin', 'agent'])): ?>
-                <button class="action-btn action-btn-edit" title="Edit" onclick="editProperty(this)">
+                <button class="action-btn action-btn-edit" title="Edit" onclick="actionbtn.editProperty(this)">
                     <i class="fa-solid fa-pen"></i>
                 </button>
                 <?php endif; ?>
@@ -272,7 +280,7 @@ $properties = $stmt->fetchAll(PDO::FETCH_ASSOC);
                 </div>
                 <h2 id="propertyTitle">-</h2>
             </div>
-            <button class="action-modal-close" onclick="actionbtn.closeModal()">
+            <button class="modal-close-btn" onclick="actionbtn.closeModal()">
                 <i class="fa-solid fa-xmark"></i>
             </button>
         </div>
@@ -307,47 +315,47 @@ $properties = $stmt->fetchAll(PDO::FETCH_ASSOC);
               <div class="details-grid">
                     <div class="detail-row">
                         <span class="detail-label">Landlord Name:</span>
-                        <span id="p-property-landlord" class="detail-value">-</span>
+                        <span id="p-property-landlord" class="detail-value"></span>
                     </div>
                     <div class="detail-row">
                         <span class="detail-label">Property Type:</span>
-                        <span id="p-property-type" class="detail-value">-</span>
+                        <span id="p-property-type" class="detail-value"></span>
                     </div>
                     <div class="detail-row">
                         <span class="detail-label">Property Status:</span>
-                        <span id="p-property-status" class="status-badge status-available">-</span>
+                        <span id="p-property-status" class="status-badge-modal status-available"></span>
                     </div>
                     <div class="detail-row">
                         <span class="detail-label">Property Price:</span>
-                        <span id="p-property-price" class="detail-value">-</span>
+                        <span id="p-property-price" class="detail-value"></span>
                     </div>
                     <div class="detail-row">
                         <span class="detail-label">Tenant Name:</span>
-                        <span id="p-property-tenant" class="detail-value">-</span>
+                        <span id="p-property-tenant" class="detail-value"></span>
                     </div>
                     <div class="detail-row">
                         <span class="detail-label">Number of Rooms:</span>
-                        <span id="p-property-rooms" class="detail-value">-</span>
+                        <span id="p-property-rooms" class="detail-value"></span>
                     </div>
                     <div class="detail-row">
                         <span class="detail-label">Number of Bathrooms:</span>
-                        <span id="p-property-bathrooms" class="detail-value">-</span>
+                        <span id="p-property-bathrooms" class="detail-value"></span>
                     </div>
                     <div class="detail-row">
                         <span class="detail-label">EPC Rating:</span>
-                        <span id="p-property-epc" class="detail-value">-</span>
+                        <span id="p-property-epc" class="detail-value"></span>
                     </div>
                     <div class="detail-row">
                         <span class="detail-label">Pets Allowed:</span>
-                        <span id="p-property-pets" class="detail-value">-</span>
+                        <span id="p-property-pets" class="detail-value"></span>
                     </div>
                     <div class="detail-row">
                         <span class="detail-label">Garden:</span>
-                        <span id="p-property-garden" class="detail-value">-</span>
+                        <span id="p-property-garden" class="detail-value"></span>
                     </div>
                     <div class="detail-row">
                         <span class="detail-label">Council Band:</span>
-                        <span id="p-property-council" class="detail-value">-</span>
+                        <span id="p-property-council" class="detail-value"></span>
                     </div>
                 </div>
             </div>
@@ -361,31 +369,31 @@ $properties = $stmt->fetchAll(PDO::FETCH_ASSOC);
                 <div class="details-grid">
                     <div class="detail-row">
                         <span class="detail-label">Landlord Name:</span>
-                        <span id="p-contract-landlord" class="detail-value">-</span>
+                        <span id="p-contract-landlord" class="detail-value"></span>
                     </div>
                     <div class="detail-row">
                         <span class="detail-label">Tenant Name:</span>
-                        <span id="p-contract-tenant" class="detail-value">-</span>
+                        <span id="p-contract-tenant" class="detail-value"></span>
                     </div>
                     <div class="detail-row">
                         <span class="detail-label">Rent Amount:</span>
-                        <span id="p-contract-rent" class="detail-value">-</span>
+                        <span id="p-contract-rent" class="detail-value"></span>
                     </div>
                     <div class="detail-row">
                         <span class="detail-label">Payment Frequency:</span>
-                        <span id="p-contract-frequency" class="detail-value">-</span>
+                        <span id="p-contract-frequency" class="detail-value"></span>
                     </div>
                     <div class="detail-row">
                         <span class="detail-label">Payment Due Date:</span>
-                        <span id="p-contract-duedate" class="detail-value">-</span>
+                        <span id="p-contract-duedate" class="detail-value"></span>
                     </div>
                     <div class="detail-row">
                         <span class="detail-label">Contract Start:</span>
-                        <span id="p-contract-start" class="detail-value">-</span>
+                        <span id="p-contract-start" class="detail-value"></span>
                     </div>
                     <div class="detail-row">
                         <span class="detail-label">Contract End:</span>
-                        <span id="p-contract-end" class="detail-value">-</span>
+                        <span id="p-contract-end" class="detail-value"></span>
                     </div>
                 </div>
             </div>
@@ -399,27 +407,27 @@ $properties = $stmt->fetchAll(PDO::FETCH_ASSOC);
                 <div class="dates-list">
                     <div class="date-item">
                         <span class="date-label">Landlord's ID Expiry:</span>
-                        <span  id="p-date-landlord-id" class="date-value">-</span>
+                        <span  id="p-date-landlord-id" class="date-value"></span>
                     </div>
                     <div class="date-item">
                         <span class="date-label">Tenant's ID Expiry:</span>
-                        <span  id="p-date-tenant-id" class="date-value">-</span>
+                        <span  id="p-date-tenant-id" class="date-value"></span>
                     </div>
                     <div class="date-item">
                         <span class="date-label">Contract End:</span>
-                        <span id="p-date-contract-end" class="date-value">-</span>
+                        <span id="p-date-contract-end" class="date-value"></span>
                     </div>
                     <div class="date-item">
                         <span class="date-label">Gas Certificate Due Date:</span>
-                        <span id="p-date-gas" class="date-value">-</span>
+                        <span id="p-date-gas" class="date-value"></span>
                     </div>
                     <div class="date-item">
                         <span class="date-label">Electric Certificate Due Date:</span>
-                        <span id="p-date-electric" class="date-value">-</span>
+                        <span id="p-date-electric" class="date-value"></span>
                     </div>
                     <div class="date-item">
                         <span class="date-label">EPC Due Date:</span>
-                        <span id="p-date-epc" class="date-value">-</span>
+                        <span id="p-date-epc" class="date-value"></span>
                     </div>
                 </div>
             </div>
@@ -434,22 +442,22 @@ $properties = $stmt->fetchAll(PDO::FETCH_ASSOC);
                     <div class="file-item">
                         <i class="fa-solid fa-file-pdf file-icon"></i>
                         <span class="file-name">Tenancy Contract</span>
-                        <button class="file-open-btn" onclick="openFile('tenancy')">Open</button>
+                        <button class="file-open-btn" >Open</button>
                     </div>
                     <div class="file-item">
                         <i class="fa-solid fa-file-pdf file-icon"></i>
                         <span class="file-name">Gas Safety Certificate</span>
-                        <button class="file-open-btn" onclick="openFile('gas')">Open</button>
+                        <button class="file-open-btn">Open</button>
                     </div>
                     <div class="file-item">
                         <i class="fa-solid fa-file-pdf file-icon"></i>
                         <span class="file-name">Electrical Installation Certificate</span>
-                        <button class="file-open-btn" onclick="openFile('electrical')">Open</button>
+                        <button class="file-open-btn">Open</button>
                     </div>
                     <div class="file-item">
                         <i class="fa-solid fa-file-pdf file-icon"></i>
                         <span class="file-name">EPC Certificate</span>
-                        <button class="file-open-btn" onclick="openFile('epc')">Open</button>
+                        <button class="file-open-btn">Open</button>
                     </div>
                 </div>
             </div>
@@ -460,13 +468,15 @@ $properties = $stmt->fetchAll(PDO::FETCH_ASSOC);
                     <i class="fa-solid fa-sticky-note"></i>
                     <span>Notes</span>
                 </div>
+                <?php if (in_array($_SESSION['role'], ['admin', 'agent'])): ?>
                 <div class="notes-input-section">
                     <textarea id="p-noteTextarea" class="note-textarea" placeholder="Write your note here..."></textarea>
                     <button id="p-addNoteBtn" class="add-note-btn" onclick="window.actionbtn.addNote()">
                         <i class="fa-solid fa-plus"></i> Add Note
                     </button>
                 </div>
-                <div id="p-notesList" class="notes-list">
+                <?php endif; ?>
+                <div data-notes-list class="notes-list">
                 </div>
             </div>
         </div>
@@ -474,6 +484,12 @@ $properties = $stmt->fetchAll(PDO::FETCH_ASSOC);
 </div>
 
     <script>
+
+        const url = new URLSearchParams(window.location.search);
+        if (url.get('contract') === 'conflict') {
+            alert('This property already has a contract in this period.');
+        }
+
 
         function toggleFilter() {
             const dropdown = document.getElementById('filterDropdowns');
@@ -583,12 +599,6 @@ $properties = $stmt->fetchAll(PDO::FETCH_ASSOC);
                 if (icon) icon.classList.remove('asc', 'desc');
             });
             currentSort = { column: null, direction: 'asc' };
-        }
-
-        function editProperty(btn) {
-            const row = btn.closest('tr');
-            const address = row.querySelector('.td-address').textContent;
-            alert('Edit Property: ' + address);
         }
 
         function deleteProperty(btn) {

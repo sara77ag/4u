@@ -98,12 +98,6 @@ function formatDateValue($date) {
                     </button>
                 </div>
 
-                <div class="controls-spacer"></div>
-
-                <button class="btn-add blue" onclick="showImportantDatesInfo()">
-                    <i class="fa-solid fa-plus"></i> Important Dates
-                </button>
-            </div>
 
             <div class="table-container">
                 <div class="table-wrapper">
