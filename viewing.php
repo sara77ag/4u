@@ -160,10 +160,10 @@ $viewings = $stmt->fetchAll(PDO::FETCH_ASSOC);
                                 </td>
                                 <td>
                                     <div class="action-buttons">
-                                        <button class="action-btn action-btn-view" title="View" onclick="viewViewing(this)">
-                                            <i class="fa-solid fa-eye"></i>
+                                        <button class="action-btn action-btn-notes" title="View" onclick="actionbtn.Viewingnote(this)">
+                                            <i class="far fa-sticky-note"></i>
                                         </button>
-                                        <button class="action-btn action-btn-edit" title="Edit" onclick="editViewing(this)">
+                                        <button class="action-btn action-btn-edit" title="Edit" onclick="actionbtn.editViewing(this)">
                                             <i class="fa-solid fa-pen"></i>
                                         </button>
                                         <form method="POST" style="display:inline;">
@@ -185,6 +185,153 @@ $viewings = $stmt->fetchAll(PDO::FETCH_ASSOC);
     </main>
 
     <div id="modals-container"></div>
+
+    <!-- ============================================ -->
+    <!-- Action Buttons: View Viewings -->
+    <!-- ============================================ -->
+    <div id="viewViewingModal" class="action-modal-overlay">
+        <div class="action-modal-container">
+            <!-- Header -->
+            <div class="action-modal-header">
+                <div class="action-header-left">
+                    <div class="action-modal-header-icon">
+                        <i class="fa-solid fa-house"></i>
+                    </div>
+                    <h2 id="viewier-name">-</h2>
+                </div>
+                <button class="modal-close-btn" onclick="actionbtn.closeModal()">
+                    <i class="fa-solid fa-xmark"></i>
+                </button>
+            </div>
+
+            <!-- Tabs Navigation -->
+            <div class="action-tabs-nav">
+                <button class="tab-btn active" data-tab="viewing">
+                    <i class="fa-solid fa-house"></i> Viewing Details
+                </button>
+                <button class="tab-btn" data-tab="property">
+                    <i class="fa-solid fa-house"></i> Property Details
+                </button>
+                <button class="tab-btn" data-tab="notes">
+                    <i class="fa-solid fa-sticky-note"></i> Notes
+                </button>
+            </div>
+
+            <!-- Tab Content -->
+            <div class="action-tabs-content">
+                <!-- Viewing Tab -->
+                 <div id="v-tab-viewing" class="tab-content active">
+                    <div class="tab-header">
+                        <i class="fa-solid fa-house"></i>
+                        <span>Viewing Details</span>
+                    </div>
+                    <div class="details-grid">
+                        <div class="detail-row">
+                            <span class="detail-label">Viewer Name</span>
+                            <span id="v-viewing-viewer" class="detail-value">-</span>
+                        </div>
+                        <div class="detail-row">
+                            <span class="detail-label">Viewer Phone Number</span>
+                            <span id="v-viewing-phone" class="detail-value">-</span>
+                        </div>
+                        <div class="detail-row">
+                            <span class="detail-label">Viewing Status</span>
+                            <span id="v-viewing-status" class="detail-value">-</span>
+                        </div>
+                        <div class="detail-row">
+                            <span class="detail-label">Viewer Date/Time</span>
+                            <span id="v-viewing-datetime" class="detail-value">-</span>
+                        </div>
+                        <div class="detail-row">
+                            <span class="detail-label">Staff ID</span>
+                            <span id="v-viewing-userid" class="detail-value">-</span>
+                        </div>
+                        <div class="detail-row">
+                            <span class="detail-label">Viewer Email</span>
+                            <span id="v-viewing-email" class="detail-value">-</span>
+                        </div>
+                        <div class="detail-row">
+                            <span class="detail-label">Archived</span>
+                            <span id="v-viewing-archived" class="detail-value">-</span>
+                        </div>
+                        <div class="detail-row">
+                            <span class="detail-label">Date Archived</span>
+                            <span id="v-viewing-datearchived" class="detail-value">-</span>
+                        </div>
+                    </div>
+                 </div>
+                <!-- Property Tab -->
+                <div id="v-tab-property" class="tab-content">
+                    <div class="tab-header">
+                        <i class="fa-solid fa-house"></i>
+                        <span>Property Details</span>
+                    </div>
+                <div class="details-grid">
+                        <div class="detail-row">
+                            <span class="detail-label">Landlord Name:</span>
+                            <span id="v-property-landlord" class="detail-value">-</span>
+                        </div>
+                        <div class="detail-row">
+                            <span class="detail-label">Property Type:</span>
+                            <span id="v-property-type" class="detail-value">-</span>
+                        </div>
+                        <div class="detail-row">
+                            <span class="detail-label">Property Status:</span>
+                            <span id="v-property-status" class="status-badge-modal status-available">-</span>
+                        </div>
+                        <div class="detail-row">
+                            <span class="detail-label">Property Price:</span>
+                            <span id="v-property-price" class="detail-value">-</span>
+                        </div>
+                        <div class="detail-row">
+                            <span class="detail-label">Tenant Name:</span>
+                            <span id="v-property-tenant" class="detail-value">-</span>
+                        </div>
+                        <div class="detail-row">
+                            <span class="detail-label">Number of Rooms:</span>
+                            <span id="v-property-rooms" class="detail-value">-</span>
+                        </div>
+                        <div class="detail-row">
+                            <span class="detail-label">Number of Bathrooms:</span>
+                            <span id="v-property-bathrooms" class="detail-value">-</span>
+                        </div>
+                        <div class="detail-row">
+                            <span class="detail-label">EPC Rating:</span>
+                            <span id="v-property-epc" class="detail-value">-</span>
+                        </div>
+                        <div class="detail-row">
+                            <span class="detail-label">Pets Allowed:</span>
+                            <span id="v-property-pets" class="detail-value">-</span>
+                        </div>
+                        <div class="detail-row">
+                            <span class="detail-label">Garden:</span>
+                            <span id="v-property-garden" class="detail-value">-</span>
+                        </div>
+                        <div class="detail-row">
+                            <span class="detail-label">Council Band:</span>
+                            <span id="v-property-council" class="detail-value">-</span>
+                        </div>
+                    </div>
+                </div>
+
+                <!-- Notes Tab -->
+                <div id="v-tab-notes" class="tab-content">
+                    <div class="tab-header">
+                        <i class="fa-solid fa-sticky-note"></i>
+                        <span>Notes</span>
+                    </div>
+                    <div class="notes-input-section">
+                        <textarea id="v-noteTextarea" class="note-textarea" placeholder="Write your note here..."></textarea>
+                        <button id="v-addNoteBtn" class="add-note-btn" onclick="window.actionbtn.addNote()">
+                            <i class="fa-solid fa-plus"></i> Add Note
+                        </button>
+                    </div>
+                    <div id="v-notesList" class="notes-list">
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
 
     <script>
         
