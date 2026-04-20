@@ -109,9 +109,11 @@ function formatDateValue($value) {
 
                 <div class="controls-spacer"></div>
 
+                <?php if (in_array($_SESSION['role'], ['admin', 'agent'])): ?>
                 <button class="btn-add blue" onclick="openAddPaymentModal()">
                     <i class="fa-solid fa-plus"></i> Payment
                 </button>
+                <?php endif; ?>
             </div>
 
             <div class="table-container">

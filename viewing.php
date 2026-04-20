@@ -102,9 +102,11 @@ $viewings = $stmt->fetchAll(PDO::FETCH_ASSOC);
 
                 <div class="controls-spacer"></div>
 
+                <?php if (in_array($_SESSION['role'], ['admin', 'agent'])): ?>
                 <button class="btn-add blue" onclick="openBookViewingModal()">
                     <i class="fa-solid fa-plus"></i> Viewing
                 </button>
+                <?php endif; ?>
             </div>
 
             <div class="table-container">

@@ -11,43 +11,43 @@ window.actionbtn = (() => {
   const SCHEMAS = {
 
     property: [
-      { id: 'p-property-landlord',   key: 'landlord',        type: 'text',     tab: 'property',  editable: true  },
-      { id: 'p-property-status',     key: 'status',          type: 'badge',    tab: 'property',  editable: false },
-      { id: 'p-property-price',      key: 'price',           type: 'number',   tab: 'property',  editable: true,  prefix: '£', format: 'currency' },
-      { id: 'p-property-type',       key: 'type',            type: 'select',   tab: 'property',  editable: true,  options: ['Flat','House','Apartment','Bungalow'] },
-      { id: 'p-property-tenant',     key: 'tenant',          type: 'text',     tab: 'property',  editable: true  },
-      { id: 'p-property-rooms',      key: 'rooms',           type: 'number',   tab: 'property',  editable: true,  fallback: 'N/A' },
-      { id: 'p-property-bathrooms',  key: 'bathrooms',       type: 'number',   tab: 'property',  editable: true,  fallback: 'N/A' },
-      { id: 'p-property-epc',        key: 'epc',             type: 'text',     tab: 'property',  editable: true,  fallback: 'N/A' },
+      { id: 'p-property-landlord',   key: 'landlord',        type: 'text',     tab: 'property',  editable: true,  fallback: 'No Record'   },
+      { id: 'p-property-status',     key: 'status',          type: 'badge',    tab: 'property',  editable: false,  fallback: 'No Record'  },
+      { id: 'p-property-price',      key: 'price',           type: 'number',   tab: 'property',  editable: true,  prefix: '£', format: 'currency',  fallback: 'No Record'  },
+      { id: 'p-property-type',       key: 'type',            type: 'select',   tab: 'property',  editable: true,  options: ['Flat','House','Apartment','Bungalow'],  fallback: 'No Record'  },
+      { id: 'p-property-tenant',     key: 'tenant',          type: 'text',     tab: 'property',  editable: false, fallback: 'No Tenant' },
+      { id: 'p-property-rooms',      key: 'rooms',           type: 'number',   tab: 'property',  editable: true,  fallback: 'No Record' },
+      { id: 'p-property-bathrooms',  key: 'bathrooms',       type: 'number',   tab: 'property',  editable: true,  fallback: 'No Record' },
+      { id: 'p-property-epc',        key: 'epc',             type: 'text',     tab: 'property',  editable: true,  fallback: 'No Record' },
       { id: 'p-property-pets',       key: 'pets',            type: 'select',   tab: 'property',  editable: true,  options: ['Yes','No'] },
       { id: 'p-property-garden',     key: 'garden',          type: 'select',   tab: 'property',  editable: true,  options: ['Yes','No'] },
-      { id: 'p-property-council',    key: 'council',         type: 'text',     tab: 'property',  editable: true,  fallback: 'N/A' },
+      { id: 'p-property-council',    key: 'council',         type: 'text',     tab: 'property',  editable: true,  fallback: 'No Record' },
 
-      { id: 'p-contract-landlord',   key: 'landlord',        type: 'text',     tab: 'contract',  editable: false },
-      { id: 'p-contract-tenant',     key: 'tenant',          type: 'text',     tab: 'contract',  editable: false },
-      { id: 'p-contract-rent',       key: 'rent',            type: 'number',   tab: 'contract',  editable: true,  prefix: '£', format: 'currency', fallback: 'N/A' },
-      { id: 'p-contract-frequency',  key: 'frequency',       type: 'select',   tab: 'contract',  editable: true,  options: ['Monthly','Weekly','Biweekly','Quarterly'], fallback: 'N/A' },
-      { id: 'p-contract-start',      key: 'startDate',       type: 'date',     tab: 'contract',  editable: true,  fallback: 'N/A' },
-      { id: 'p-contract-end',        key: 'endDate',         type: 'date',     tab: 'contract',  editable: true,  fallback: 'N/A' },
-      { id: 'p-contract-duedate',    key: '_dueDate',        type: 'computed', tab: 'contract',  editable: false },
+      { id: 'p-contract-landlord',   key: 'landlord',        type: 'text',     tab: 'contract',  editable: false,  fallback: 'No Record' },
+      { id: 'p-contract-tenant',     key: 'tenant',          type: 'text',     tab: 'contract',  editable: true, fallback: 'No Tenant' },
+      { id: 'p-contract-rent',       key: 'rent',            type: 'number',   tab: 'contract',  editable: true,  prefix: '£', format: 'currency', fallback: 'No Rent' },
+      { id: 'p-contract-frequency',  key: 'frequency',       type: 'select',   tab: 'contract',  editable: true,  options: ['Monthly','Weekly','Biweekly','Quarterly'], fallback: 'Not Set' },
+      { id: 'p-contract-start',      key: 'startDate',       type: 'date',     tab: 'contract',  editable: true,  fallback: 'No Contract' },
+      { id: 'p-contract-end',        key: 'endDate',         type: 'date',     tab: 'contract',  editable: true,  fallback: 'No Contract' },
+      { id: 'p-contract-duedate',    key: '_dueDate',        type: 'computed', tab: 'contract',  editable: false, fallback: 'Not Set' },
 
-      { id: 'p-date-landlord-id',    key: 'landlordIdExpiry', type: 'date',    tab: 'dates',     editable: true,  fallback: 'N/A' },
-      { id: 'p-date-tenant-id',      key: 'tenantIdExpiry',   type: 'date',    tab: 'dates',     editable: true,  fallback: 'N/A' },
-      { id: 'p-date-contract-end',   key: 'endDate',          type: 'date',    tab: 'dates',     editable: false, fallback: 'N/A' },
-      { id: 'p-date-gas',            key: 'gasDate',          type: 'date',    tab: 'dates',     editable: true,  fallback: 'N/A' },
-      { id: 'p-date-electric',       key: 'electricDate',     type: 'date',    tab: 'dates',     editable: true,  fallback: 'N/A' },
-      { id: 'p-date-epc',            key: 'epcDate',          type: 'date',    tab: 'dates',     editable: true,  fallback: 'N/A' },
+      { id: 'p-date-landlord-id',    key: 'landlordIdExpiry', type: 'date',    tab: 'dates',     editable: true,  fallback: 'No Record' },
+      { id: 'p-date-tenant-id',      key: 'tenantIdExpiry',   type: 'date',    tab: 'dates',     editable: true,  fallback: 'No Record' },
+      { id: 'p-date-contract-end',   key: 'endDate',          type: 'date',    tab: 'dates',     editable: false, fallback: 'No Record' },
+      { id: 'p-date-gas',            key: 'gasDate',          type: 'date',    tab: 'dates',     editable: true,  fallback: 'No Record' },
+      { id: 'p-date-electric',       key: 'electricDate',     type: 'date',    tab: 'dates',     editable: true,  fallback: 'No Record' },
+      { id: 'p-date-epc',            key: 'epcDate',          type: 'date',    tab: 'dates',     editable: true,  fallback: 'No Record' },
     ],
 
     landlord: [
-      { id: 'l-landlord-name',     key: 'name',     type: 'text', tab: 'landlord', editable: true },
-      { id: 'l-landlord-phone',    key: 'phone',    type: 'text', tab: 'landlord', editable: true },
-      { id: 'l-landlord-email',    key: 'email',    type: 'text', tab: 'landlord', editable: true },
-      { id: 'l-landlord-idtype',   key: 'idtype',   type: 'text', tab: 'landlord', editable: true },
-      { id: 'l-landlord-idnumber', key: 'idnumber', type: 'text', tab: 'landlord', editable: true },
-      { id: 'l-landlord-idexpiry', key: 'idexpiry', type: 'date', tab: 'landlord', editable: true },
-      { id: 'l-landlord-address',  key: 'address',  type: 'text', tab: 'landlord', editable: true },
-      { id: 'l-landlord-contact',  key: 'contact',  type: 'text', tab: 'landlord', editable: true },
+      { id: 'l-landlord-name',           key: 'name',           type: 'text',   tab: 'landlord', editable: true },
+      { id: 'l-landlord-phone',          key: 'phone',          type: 'text',   tab: 'landlord', editable: true },
+      { id: 'l-landlord-email',          key: 'email',          type: 'text',   tab: 'landlord', editable: true },
+      { id: 'l-landlord-idtype',         key: 'id_type',        type: 'text',   tab: 'landlord', editable: true },
+      { id: 'l-landlord-idnumber',       key: 'id_number',      type: 'text',   tab: 'landlord', editable: true },
+      { id: 'l-landlord-idexpiry',       key: 'id_expiry_date', type: 'date',   tab: 'landlord', editable: true },
+      { id: 'l-landlord-address',        key: 'address',        type: 'text',   tab: 'landlord', editable: true },
+      { id: 'l-landlord-contact-method', key: 'contact_method', type: 'select', tab: 'landlord', editable: true, options: ['email', 'phone', 'sms'] }
     ],
 
     tenant: [
@@ -57,14 +57,14 @@ window.actionbtn = (() => {
       { id: 't-tenant-idtype',                key: 'idtype',        type: 'text',   tab: 'tenant',  editable: true  },
       { id: 't-tenant-idnumber',              key: 'idnumber',      type: 'text',   tab: 'tenant',  editable: true  },
       { id: 'l-tenant-idexpiry',              key: 'idexpiry',      type: 'date',   tab: 'tenant',  editable: true  },
-      { id: 'l-tenant-address',               key: 'address',       type: 'text',   tab: 'tenant',  editable: true  },
-      { id: 't-tenant-contact',               key: 'contact',       type: 'text',   tab: 'tenant',  editable: true  },
-      { id: 't-currentTenancy-address',       key: 'address',       type: 'text',   tab: 'tenancy', editable: false },
-      { id: 't-currentTenancy-landlord',      key: 'landlord',      type: 'text',   tab: 'tenancy', editable: false },
-      { id: 't-currentTenancy-contractStart', key: 'contractStart', type: 'date',   tab: 'tenancy', editable: false },
-      { id: 't-currentTenancy-contractEnd',   key: 'contractEnd',   type: 'date',   tab: 'tenancy', editable: false },
-      { id: 't-currentTenancy-rent',          key: 'rent',          type: 'number', tab: 'tenancy', editable: false, prefix: '£', format: 'currency' },
-      { id: 't-currentTenancy-status',        key: 'status',        type: 'text',   tab: 'tenancy', editable: false },
+      { id: 'l-tenant-address',               key: 'address',       type: 'text',   tab: 'tenant',  editable: false  },
+      { id: 't-tenant-contact',               key: 'contact',       type: 'select', editable: true, options: ['email','phone','sms'] },
+      { id: 't-currentTenancy-address',       key: 'address',       type: 'text',   tab: 'currentTenancy', editable: false },
+      { id: 't-currentTenancy-landlord',      key: 'landlord',      type: 'text',   tab: 'currentTenancy', editable: false },
+      { id: 't-currentTenancy-contractStart', key: 'contractStart', type: 'date',   tab: 'currentTenancy', editable: false },
+      { id: 't-currentTenancy-contractEnd',   key: 'contractEnd',   type: 'date',   tab: 'currentTenancy', editable: false },
+      { id: 't-currentTenancy-rent',          key: 'rent',          type: 'number', tab: 'currentTenancy', editable: false, prefix: '£', format: 'currency' },
+      { id: 't-currentTenancy-status',        key: 'status',        type: 'text',   tab: 'currentTenancy', editable: false },
     ],
   };
 
@@ -91,7 +91,21 @@ window.actionbtn = (() => {
       electric:   'p-date-electric',
       epcDate:    'p-date-epc',
     },
+
+    landlord: {
+      id:             'landlord_id',
+      name:           'l-landlord-name',
+      phone:          'l-landlord-phone',
+      email:          'l-landlord-email',
+      address:        'l-landlord-address',
+      id_type:        'l-landlord-idtype',
+      id_number:      'l-landlord-idnumber',
+      id_expiry_date: 'l-landlord-idexpiry',
+      contact_method: 'l-landlord-contact-method'
+    },
   };
+
+  // Extract Data
 
   function extractPropertyData(btn) {
     const row = btn.closest('tr') || btn.closest('.card');
@@ -122,40 +136,44 @@ window.actionbtn = (() => {
   }
 
   function extractLandlordData(btn) {
-    const c = btn.closest('.card') || btn.closest('tr');
+    const c = btn.closest('.card');
     return {
-      name:       c.querySelector('.card-name')?.textContent.trim() || c.dataset.name || 'N/A',
-      phone:      c.dataset.phone      || 'N/A',
-      email:      c.dataset.email      || 'N/A',
-      idtype:     c.dataset.idtype     || 'N/A',
-      idnumber:   c.dataset.idnumber   || 'N/A',
-      idexpiry:   c.dataset.idexpiry   || 'N/A',
-      address:    c.dataset.address    || 'N/A',
-      contact:    c.dataset.contact    || 'N/A',
-      properties: c.dataset.properties || 0,
+      _id:            c.dataset.id || c.dataset.landlordId,
+      name:           c.querySelector('.card-name')?.textContent.trim() || '',
+      phone:          c.dataset.phone          || '',
+      email:          c.dataset.email          || '',
+      address:        c.dataset.address        || '',
+      id_type:        c.dataset.idtype         || '',
+      id_number:      c.dataset.idnumber       || '',
+      id_expiry_date: c.dataset.idexpiry       || '',
+      contact_method: c.dataset.contactMethod  || '',
+      properties:     c.dataset.properties     || 0,
     };
   }
-
+  
   function extractTenantData(btn) {
     const row = btn.closest('tr') || btn.closest('.card');
     return {
-      id:            row.dataset.tenantId      || 'N/A',
-      name:          row.dataset.name          || 'N/A',
-      phone:         row.dataset.phone         || 'N/A',
-      email:         row.dataset.email         || 'N/A',
-      address:       row.dataset.address       || 'N/A',
-      idtype:        row.dataset.idtype        || 'N/A',
-      idnumber:      row.dataset.idnumber      || 'N/A',
-      idexpiry:      row.dataset.idexpiry      || 'N/A',
-      contact:       row.dataset.contact       || 'N/A',
-      contractStart: row.dataset.contractStart || 'N/A',
-      contractEnd:   row.dataset.contractEnd   || 'N/A',
-      frequency:     row.dataset.frequency     || 'N/A',
-      landlord:      row.dataset.landlord      || 'N/A',
-      rent:          row.dataset.rent          || 'N/A',
-      status:        row.dataset.status        || 'N/A',
+      _id:           row.dataset.tenantId      || '',
+      id:            row.dataset.tenantId      || '',
+      name:          row.dataset.name          || '',
+      phone:         row.dataset.phone         || '',
+      email:         row.dataset.email         || '',
+      address:       row.dataset.address       || '',
+      idtype:        row.dataset.idtype        || '',
+      idnumber:      row.dataset.idnumber      || '',
+      idexpiry:      row.dataset.idexpiry      || '',
+      contact:       row.dataset.contact       || '',
+      contractStart: row.dataset.contractStart || '',
+      contractEnd:   row.dataset.contractEnd   || '',
+      frequency:     row.dataset.frequency     || '',
+      landlord:      row.dataset.landlord      || '',
+      rent:          row.dataset.rent          || '',
+      status:        row.dataset.status        || '',
     };
   }
+
+  // Render
 
   function formatViewValue(field, rawValue) {
     const val = rawValue ?? field.fallback ?? 'N/A';
@@ -178,39 +196,38 @@ window.actionbtn = (() => {
       return;
     }
     if (field.type === 'computed') return;
-    el.textContent = formatViewValue(field, raw);
+
+    const isEmpty = raw === null || raw === undefined || raw === '';
+    const value   = formatViewValue(field, raw);
+    el.innerHTML  = `<span class="${isEmpty ? 'tenant-vacant' : ''}">${value}</span>`;
   }
 
   function renderFieldEdit(field, data) {
     if (!field.editable) return;
     const el = document.getElementById(field.id);
     if (!el) return;
-    const raw = data[field.key] ?? '';
+
+    const raw         = data[field.key] ?? '';
+    const isEmpty     = raw === null || raw === undefined || raw === '';
+    const placeholder = field.fallback || '';
 
     switch (field.type) {
       case 'select': {
         const opts = (field.options || [])
           .map(o => `<option value="${o}" ${o == raw ? 'selected' : ''}>${o}</option>`)
           .join('');
-        el.innerHTML = `<select data-field-id="${field.id}">${opts}</select>`;
+        const emptyOption = isEmpty ? `<option value="" disabled selected>${placeholder}</option>` : '';
+        el.innerHTML = `<select data-field-id="${field.id}">${emptyOption}${opts}</select>`;
         break;
       }
       case 'date':
         el.innerHTML = `<input class="date-input" type="date" value="${raw}" data-field-id="${field.id}">`;
         break;
       case 'number':
-        el.innerHTML = `<input type="number" value="${raw}" data-field-id="${field.id}">`;
+        el.innerHTML = `<input type="number" value="${raw}" placeholder="${isEmpty ? placeholder : ''}" data-field-id="${field.id}">`;
         break;
       default:
-        el.innerHTML = `<input type="text" value="${raw}" data-field-id="${field.id}">`;
-    }
-
-    const input = el.querySelector('input, select');
-    if (input) {
-      input.addEventListener('change', () => {
-        state.formState[field.id] = input.value;
-      });
-      state.formState[field.id] = input.value;
+        el.innerHTML = `<input type="text" value="${raw}" placeholder="${isEmpty ? placeholder : ''}" data-field-id="${field.id}">`;
     }
   }
 
@@ -227,14 +244,101 @@ window.actionbtn = (() => {
     });
   }
 
+  // Landlord Properties Tab
+function fetchLandlordProperties(landlordId) {
+  const container = document.querySelector('.contant-row-p');
+  const count     = document.getElementById('l-properties-count');
+  if (!container) return;
+
+  const header = container.querySelector('.data-row.header');
+  container.innerHTML = '';
+  if (header) container.appendChild(header);
+
+  // Loading indicator
+  const loading = document.createElement('div');
+  loading.className = 'data-row';
+  loading.innerHTML = `<div class="cell" style="grid-column:1/-1; color:var(--text-muted);">
+    <i class="fa-solid fa-spinner fa-spin"></i> Loading...
+  </div>`;
+  container.appendChild(loading);
+
+  fetch(`get_landlord_properties.php?landlord_id=${landlordId}`)
+    .then(r => r.json())
+    .then(properties => {
+      const header = container.querySelector('.data-row.header');
+      container.innerHTML = '';
+      if (header) container.appendChild(header);
+
+      if (count) count.textContent = properties.length;
+
+      if (!properties.length) {
+        const empty = document.createElement('div');
+        empty.className = 'data-row';
+        empty.innerHTML = `<div class="cell" style="grid-column:1/-1; text-align:center; color:var(--text-muted);">No properties found</div>`;
+        container.appendChild(empty);
+        return;
+      }
+
+      properties.forEach(p => {
+        const row = document.createElement('div');
+        row.className = 'data-row';
+
+        const status      = p.status === 'occupied' ? 'occupied' : 'available';
+        const statusLabel = status === 'occupied' ? 'Occupied' : 'Vacant';
+        const statusClass = status === 'occupied' ? 'status-occupied' : 'status-available';
+        const tenant      = p.tenant_name
+          ? escapeHtml(p.tenant_name)
+          : `<span class="tenant-vacant">No Tenant</span>`;
+        const rent        = p.status === 'occupied' && p.contract_rent
+          ? `£${Number(p.contract_rent).toLocaleString()}`
+          : `£${Number(p.monthly_rent).toLocaleString()}`;
+
+        row.innerHTML = `
+          <div class="cell">${escapeHtml(p.property_address)}</div>
+          <div class="cell">${escapeHtml(p.property_type)}</div>
+          <div class="cell"><span class="status-badge ${statusClass}">${statusLabel}</span></div>
+          <div class="cell">${tenant}</div>
+          <div class="cell"><span class="rent">${rent}</span></div>`;
+
+        container.appendChild(row);
+      });
+    })
+    .catch(err => {
+      console.error('fetchLandlordProperties error:', err);
+      const header = container.querySelector('.data-row.header');
+      container.innerHTML = '';
+      if (header) container.appendChild(header);
+      const errRow = document.createElement('div');
+      errRow.className = 'data-row';
+      errRow.innerHTML = `<div class="cell" style="color:red;">Failed to load properties</div>`;
+      container.appendChild(errRow);
+    });
+}
+
+  // Compute Payment Due
+
   function computePaymentDue(data) {
     const el = document.getElementById('p-contract-duedate');
     if (!el) return;
-    if (!data.startDate || !data.frequency) { el.textContent = ''; return; }
 
-    const freq  = (data.frequency || '').toLowerCase();
+    if (!data.startDate || !data.frequency) {
+      el.innerHTML = `<span class="tenant-vacant">Not Set</span>`;
+      return;
+    }
+
+    const freq      = (data.frequency || '').toLowerCase().trim();
+    const validFreqs = ['monthly', 'weekly', 'biweekly', 'quarterly'];
+    if (!validFreqs.includes(freq)) {
+      el.innerHTML = `<span class="tenant-vacant">Not Set</span>`;
+      return;
+    }
+
     const today = new Date();
     let due     = new Date(data.startDate);
+    if (isNaN(due.getTime())) {
+      el.innerHTML = `<span class="tenant-vacant">Not Set</span>`;
+      return;
+    }
 
     const advance = () => {
       if      (freq === 'monthly')   due.setMonth(due.getMonth() + 1);
@@ -243,9 +347,18 @@ window.actionbtn = (() => {
       else if (freq === 'quarterly') due.setMonth(due.getMonth() + 3);
     };
 
-    while (due < today) advance();
+    let max = 1000;
+    while (due < today && max-- > 0) advance();
+
+    if (max <= 0) {
+      el.innerHTML = `<span class="tenant-vacant">Not Set</span>`;
+      return;
+    }
+
     el.textContent = due.toISOString().split('T')[0];
   }
+
+  // Modal
 
   const TITLE_MAP = {
     property: { titleId: 'propertyTitle', titleKey: 'address' },
@@ -284,9 +397,9 @@ window.actionbtn = (() => {
     if (!state.modal) return;
     state.modal.classList.add('active');
     document.body.style.overflow = 'hidden';
-    state.modal.onclick = (e) => {
+    state.modal.addEventListener('click', (e) => {
       if (e.target === state.modal) closeModal();
-    };
+    }, { once: true });
   }
 
   function closeModal() {
@@ -308,8 +421,7 @@ window.actionbtn = (() => {
     footer.innerHTML = `
       <button class="modal-btn-save-changes modal-btn-save" data-action="save">
         <i class="fa-solid fa-check"></i> Save Changes
-      </button>
-    `;
+      </button>`;
     state.modal?.querySelector('.action-modal-container')?.appendChild(footer);
   }
 
@@ -317,45 +429,42 @@ window.actionbtn = (() => {
     state.modal?.querySelector('.action-modal-footer')?.remove();
   }
 
-  function fetchNotes(propertyId) {
-    fetch(`notes.php?property_id=${propertyId}`)
+  // Notes
+
+  function fetchNotes(id, type) {
+    if (!id || id === 'undefined' || id === '0') {
+      const list = state.modal?.querySelector('[data-notes-list]');
+      if (list) list.innerHTML = '';
+      return;
+    }
+
+    fetch(`notes.php?entity_id=${id}&entity_type=${type}`)
       .then(r => r.json())
       .then(notes => {
-        const list = document.getElementById('p-notesList');
+        const list = state.modal?.querySelector('[data-notes-list]');
         if (!list) return;
         list.innerHTML = '';
         notes.forEach(n => {
-          list.insertAdjacentHTML('afterbegin', `
+          list.insertAdjacentHTML('beforeend', `
             <div class="note-item">
-              <div class="note-text">${n.note_text}</div>
-              <div class="note-timestamp">
-                <i class="fa-solid fa-clock"></i>
-                ${n.created_at} - ${n.created_by ?? 'Unknown'}
+              <div style="display:flex; justify-content:space-between; align-items:center;">
+                <div class="note-timestamp">
+                  <i class="fa-solid fa-clock"></i>
+                  ${n.created_at} - ${n.created_by ?? 'Unknown'}
+                </div>
+                ${state.mode === 'edit' ? `
+                  <button class="delete-btn" data-id="${n.note_id}">
+                    <i class="fa-solid fa-trash"></i>
+                  </button>` : ''}
               </div>
-            </div>
-          `);
+              <div class="note-text">${escapeHtml(n.note_text)}</div>
+            </div>`);
         });
-      });
+      })
+      .catch(err => console.error('fetchNotes error:', err));
   }
 
-  function fetchFiles(propertyId) {
-    fetch(`get_files.php?property_id=${propertyId}`)
-      .then(r => r.json())
-      .then(files => {
-        const list = document.querySelector('#p-tab-files .files-list');
-        if (!list) return;
-        list.innerHTML = '';
-        files.forEach(f => {
-          list.insertAdjacentHTML('beforeend', `
-            <div class="file-item">
-              <i class="fa-solid fa-file-pdf file-icon"></i>
-              <span class="file-name">${f.file_name}</span>
-              <button class="file-open-btn" onclick="window.open('${f.file_path}', '_blank')">Open</button>
-            </div>
-          `);
-        });
-      });
-  }
+  // Open Modal
 
   function openEntityModal(entityType, data, mode) {
     state.entity     = data;
@@ -364,13 +473,20 @@ window.actionbtn = (() => {
     state.formState  = {};
 
     openModal(entityType);
+    if (!state.modal) return;
+
     renderTitle(entityType, data);
     renderFields(entityType, data, mode);
 
-    if (entityType === 'property') {
-      computePaymentDue(data);
-      fetchNotes(data._id);
-      fetchFiles(data._id);
+    if (entityType === 'property') { computePaymentDue(data);}
+    if (entityType === 'landlord') fetchLandlordProperties(data._id);
+    if (entityType === 'tenant')   fetchTenantHistory(data._id || data.id);
+
+    fetchNotes(data._id || data.id, entityType);
+
+    const notesInput = state.modal.querySelector('.notes-input-section');
+    if (notesInput) {
+      notesInput.style.display = (mode === 'edit') ? 'none' : 'flex';
     }
 
     if (mode === 'edit') showSaveButton();
@@ -381,12 +497,16 @@ window.actionbtn = (() => {
 
   function switchTab(tabId, event) {
     if (!state.modal) return;
+    if (!tabId) return;
     state.modal.querySelectorAll('.tab-content').forEach(t => t.classList.remove('active'));
     state.modal.querySelectorAll('.tab-btn').forEach(b => b.classList.remove('active'));
-    const prefix = TAB_PREFIXES[state.entityType] || 'l-tab-';
-    state.modal.querySelector(`#${prefix}${tabId}`)?.classList.add('active');
-    if (event) event.currentTarget.classList.add('active');
+    const prefix = TAB_PREFIXES[state.entityType] || 't-tab-';
+    const tabEl = state.modal.querySelector(`#${prefix}${tabId}`);
+    if (tabEl) tabEl.classList.add('active');
+    if (event && event.currentTarget) event.currentTarget.classList.add('active');
   }
+
+  // Save 
 
   function saveProperty() {
     const map     = SAVE_MAP.property;
@@ -406,34 +526,100 @@ window.actionbtn = (() => {
       .then(() => location.reload());
   }
 
+  function saveLandlord() {
+    const payload = {
+      id:             state.entity._id,
+      type:           'landlord',
+      name:           document.querySelector('#l-landlord-name input')?.value      || '',
+      phone:          document.querySelector('#l-landlord-phone input')?.value     || '',
+      email:          document.querySelector('#l-landlord-email input')?.value     || '',
+      address:        document.querySelector('#l-landlord-address input')?.value   || '',
+      id_type:        document.querySelector('#l-landlord-idtype input')?.value    || '',
+      id_number:      document.querySelector('#l-landlord-idnumber input')?.value  || '',
+      id_expiry_date: document.querySelector('#l-landlord-idexpiry input')?.value  || '',
+      contact_method: document.querySelector('#l-landlord-contact-method select')?.value || ''
+    };
+
+    fetch('update_property.php', {
+      method:  'POST',
+      headers: { 'Content-Type': 'application/json' },
+      body:    JSON.stringify(payload)
+    })
+      .then(r => r.json())
+      .then(() => location.reload())
+      .catch(err => console.error(err));
+  }
+
+  function saveTenant() {
+  const payload = {
+    id:             state.entity._id || state.entity.id,
+    name:           document.querySelector('#t-tenant-name input')?.value     || '',
+    phone:          document.querySelector('#t-tenant-phone input')?.value    || '',
+    email:          document.querySelector('#t-tenant-email input')?.value    || '',
+    id_type:        document.querySelector('#t-tenant-idtype input')?.value   || '',
+    id_number:      document.querySelector('#t-tenant-idnumber input')?.value || '',
+    id_expiry_date: document.querySelector('#l-tenant-idexpiry input')?.value || '',
+    contact_method: document.querySelector('#t-tenant-contact select')?.value || '',
+  };
+
+  fetch('update_tenant.php', {
+    method:  'POST',
+    headers: { 'Content-Type': 'application/json' },
+    body:    JSON.stringify(payload)
+  })
+  .then(r => r.json())
+  .then(() => location.reload())
+  .catch(err => console.error(err));
+}
+
+  // Add Note
+
   function addNote() {
     if (!state.modal) return;
-    const textarea = document.getElementById('p-noteTextarea');
+    const textarea = state.modal.querySelector('textarea');
     const text     = textarea?.value.trim();
     if (!text) return;
+
+    const payload = new URLSearchParams({
+      note_text:   text,
+      entity_type: state.entityType,
+      entity_id:   state.entity._id
+    });
+
     fetch('notes.php', {
       method:  'POST',
       headers: { 'Content-Type': 'application/x-www-form-urlencoded' },
-      body:    `property_id=${state.entity._id}&note_text=${encodeURIComponent(text)}`,
+      body:    payload.toString(),
     })
-      .then(r => r.json())
-      .then(data => {
-        const list = document.getElementById('p-notesList');
-        list?.insertAdjacentHTML('afterbegin', `
+      .then(async r => {
+        const data = await r.json();
+        if (!r.ok || data.success === false) throw new Error(data.message || 'Failed');
+
+        const list = state.modal.querySelector('[data-notes-list]');
+        if (!list) return;
+
+        list.insertAdjacentHTML('afterbegin', `
           <div class="note-item">
             <div class="note-text">${escapeHtml(text)}</div>
             <div class="note-timestamp">
               <i class="fa-solid fa-clock"></i>
               ${data.created_at} - ${data.created_by ?? 'Unknown'}
             </div>
-          </div>
-        `);
-        if (textarea) textarea.value = '';
+          </div>`);
+
+        textarea.value = '';
+      })
+      .catch(err => {
+        console.error('Add note error:', err);
+        alert('Failed to add note');
       });
   }
 
+  // Helpers 
+
   function escapeHtml(str) {
-    return str
+    if (!str) return '';
+    return String(str)
       .replace(/&/g, '&amp;')
       .replace(/</g, '&lt;')
       .replace(/>/g, '&gt;')
@@ -441,32 +627,122 @@ window.actionbtn = (() => {
       .replace(/'/g, '&#39;');
   }
 
+  function formatDate(dateStr) {
+  if (!dateStr) return '-';
+  const d = new Date(dateStr);
+  return isNaN(d) ? dateStr : d.toLocaleDateString('en-GB');
+}
+
+  // Global Click Handler 
+
   document.addEventListener('click', (e) => {
     const tabBtn = e.target.closest('.tab-btn');
-    if (tabBtn) {
-      switchTab(tabBtn.dataset.tab, e);
-      return;
-    }
+    if (tabBtn && state.modal) { switchTab(tabBtn.dataset.tab, e); return; }
+
     const saveBtn = e.target.closest('[data-action="save"]');
     if (saveBtn) {
       if (state.entityType === 'property') saveProperty();
+      if (state.entityType === 'landlord') saveLandlord();
+      if (state.entityType === 'tenant')   saveTenant();
+      return;
+    }
+
+    const deleteBtn = e.target.closest('.delete-btn');
+    if (deleteBtn) {
+      const noteId = deleteBtn.dataset.id;
+      if (!confirm('Are you sure you want to delete this note?')) return;
+      fetch('notes.php', {
+        method:  'POST',
+        headers: { 'Content-Type': 'application/x-www-form-urlencoded' },
+        body:    new URLSearchParams({ delete_note: 1, note_id: noteId })
+      })
+        .then(r => r.json())
+        .then(res => {
+          if (res.success) deleteBtn.closest('.note-item').remove();
+          else alert('Failed to delete note');
+        });
       return;
     }
   });
+
+  // Public API
 
   return {
     viewProperty(btn)  { openEntityModal('property', extractPropertyData(btn), 'view'); },
     editProperty(btn)  { openEntityModal('property', extractPropertyData(btn), 'edit'); },
     viewLandlord(btn)  { openEntityModal('landlord', extractLandlordData(btn), 'view'); },
+    editLandlord(btn)  { openEntityModal('landlord', extractLandlordData(btn), 'edit'); },
     viewTenant(btn)    { openEntityModal('tenant',   extractTenantData(btn),   'view'); },
+    editTenant(btn) { openEntityModal('tenant', extractTenantData(btn), 'edit'); },
     closeModal,
     switchTab,
     addNote,
     saveProperty,
+    saveLandlord,
+    saveTenant
   };
 
 })();
 
 function openFile(fileType) {
-  alert(`Opening ${fileType.toUpperCase()} file... (Implement PDF viewer)`);
+  alert(`Opening ${fileType.toUpperCase()} file... (Implement PDF later)`);
+}
+
+function fetchTenantHistory(tenantId) {
+  const container = document.querySelector('.contant-row-t');
+  if (!container) return;
+
+  const header = container.querySelector('.data-row.header');
+  container.innerHTML = '';
+  if (header) container.appendChild(header);
+
+  const loading = document.createElement('div');
+  loading.className = 'data-row';
+  loading.innerHTML = `<div class="cell" style="grid-column:1/-1;">
+    <i class="fa-solid fa-spinner fa-spin"></i> Loading...
+  </div>`;
+  container.appendChild(loading);
+
+  fetch(`get_tenant_history.php?tenant_id=${tenantId}`)
+    .then(r => r.json())
+    .then(history => {
+      const header = container.querySelector('.data-row.header');
+      container.innerHTML = '';
+      if (header) container.appendChild(header);
+
+      if (!history.length) {
+        container.innerHTML += `<div class="data-row">
+          <div class="cell" style="grid-column:1/-1;">No tenancy history found</div>
+        </div>`;
+        return;
+      }
+
+      history.forEach(h => {
+        const row = document.createElement('div');
+        row.className = 'data-row';
+
+        const statusClass =
+          h.status === 'current'  ? 'status-active' :
+          h.status === 'upcoming' ? 'status-new' :
+                                    'status-previous';
+
+        const statusLabel =
+          h.status === 'current'  ? 'Current' :
+          h.status === 'upcoming' ? 'Upcoming' :
+                                    'Previous';
+
+        const safe = (s) => String(s||'').replace(/&/g,'&amp;').replace(/</g,'&lt;').replace(/>/g,'&gt;');
+        const fmtD = (d) => { if(!d) return '-'; const dt=new Date(d); return isNaN(dt)?d:dt.toLocaleDateString('en-GB'); };
+
+        row.innerHTML = `
+          <div class="cell">${safe(h.property_address)}</div>
+          <div class="cell">${safe(h.landlord_name || '-')}</div>
+          <div class="cell">${fmtD(h.contract_start)}</div>
+          <div class="cell">${fmtD(h.contract_end)}</div>
+          <div class="cell">
+            <span class="status-badge ${statusClass}">${statusLabel}</span>
+          </div>`;
+        container.appendChild(row);
+      });
+    });
 }

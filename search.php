@@ -69,4 +69,5 @@ foreach ($stmt->fetchAll(PDO::FETCH_ASSOC) as $r) {
     $results[] = ['type' => 'viewing', 'id' => $r['id'], 'label' => $r['label'], 'sub' => $r['sub'], 'url' => 'viewing.php'];
 }
 
+
 echo json_encode($results);

@@ -28,7 +28,8 @@ $query  = "SELECT
         c.contract_end,
         c.rent,
         c.frequency,
-        p.property_address
+        p.property_address,
+        l.name AS landlord_name
         FROM tenants t
         LEFT JOIN contracts c ON c.tenant_id = t.tenant_id AND c.contract_id = ( 
         SELECT contract_id FROM contracts 
@@ -36,6 +37,7 @@ $query  = "SELECT
         ORDER BY contract_end DESC LIMIT 1
          )
         LEFT JOIN properties p ON c.property_id = p.property_id
+        LEFT JOIN landlords l ON l.landlord_id = p.landlord_id
         WHERE t.archived = 0";
 
 $tenants = $pdo -> query($query)->fetchAll(PDO::FETCH_ASSOC);
@@ -110,10 +112,12 @@ $tenants = $pdo -> query($query)->fetchAll(PDO::FETCH_ASSOC);
                 <!-- Spacer to push button to right -->
                 <div class="controls-spacer"></div>
 
+                <?php if (in_array($_SESSION['role'], ['admin', 'agent'])): ?>
                 <!-- Action Button -->
                 <button class="btn-add blue" onclick="openAddTenantModal()">
                     <i class="fa-solid fa-plus"></i> Tenant
                 </button>
+                <?php endif; ?>
             </div>
 
             <!-- Table Container -->
@@ -143,6 +147,7 @@ $tenants = $pdo -> query($query)->fetchAll(PDO::FETCH_ASSOC);
                                 data-idtype="<?= htmlspecialchars($t['id_type']) ?>"
                                 data-idnumber="<?= htmlspecialchars($t['id_number']) ?>"
                                 data-idexpiry="<?= htmlspecialchars($t['id_expiry_date']) ?>"
+                                data-contact="<?= htmlspecialchars($t['contact_method'] ?? '') ?>"
 
                                 data-contract-start="<?= htmlspecialchars($t['contract_start']) ?>"
                                 data-contract-end="<?= htmlspecialchars($t['contract_end']) ?>" 
@@ -173,7 +178,7 @@ $tenants = $pdo -> query($query)->fetchAll(PDO::FETCH_ASSOC);
                                         </button>
                                         
                                         <?php if (in_array($_SESSION['role'], ['admin', 'agent'])): ?>
-                                            <button class="action-btn action-btn-edit" onclick="editTenant(this)">
+                                            <button class="action-btn action-btn-edit" onclick="actionbtn.editTenant(this)">
                                                 <i class="fa-solid fa-pen"></i>
                                             </button>
                                         <?php endif; ?>
@@ -214,7 +219,7 @@ $tenants = $pdo -> query($query)->fetchAll(PDO::FETCH_ASSOC);
                 </div>
                 <h2 id="tenantName">Tenant Name</h2>
             </div>
-            <button class="action-modal-close" onclick="actionbtn.closeModal()">
+            <button class="modal-close-btn" onclick="actionbtn.closeModal()">
                 <i class="fa-solid fa-xmark"></i>
             </button>
         </div>
@@ -395,7 +400,7 @@ $tenants = $pdo -> query($query)->fetchAll(PDO::FETCH_ASSOC);
                         <i class="fa-solid fa-plus"></i> Add Note
                     </button>
                 </div>
-                <div id="t-note-notesList" class="notes-list">
+                <div data-notes-list class="notes-list">
                 </div>
             </div>
         </div>
@@ -498,24 +503,35 @@ $tenants = $pdo -> query($query)->fetchAll(PDO::FETCH_ASSOC);
                         show = false;
                     }
                 }
-                
                 // Contract date filters
                 if (startFilter || endFilter) {
-                    const contractCell = row.querySelector('.contract-info');
-                    if (contractCell && contractCell.textContent !== '-') {
-                        const [startDate, endDate] = contractCell.textContent.split(' to ');
-                        if (startFilter && new Date(startDate) < new Date(startFilter)) {
-                            show = false;
-                        }
-                        if (endFilter && new Date(endDate) > new Date(endFilter)) {
-                            show = false;
-                        }
-                    }
-                }
-                
+                    const contractStart = row.dataset.contractStart;
+                    const contractEnd = row.dataset.contractEnd;
+
+                    if (contractStart && contractEnd) {
+                        const cStart = new Date(contractStart);
+                        const cEnd = new Date(contractEnd);
+
+                        const fStart = startFilter ? new Date(startFilter) : null;
+                        const fEnd = endFilter ? new Date(endFilter) : null;
+
+                      if (fStart && !fEnd) {              
+                          show = (cStart <= fStart && cEnd >= fStart);
+                      }
+              
+                      else if (!fStart && fEnd) {              
+                          show = (cStart <= fEnd && cEnd >= fEnd);
+                      }
+              
+                      else if (fStart && fEnd) {
+                          show = (cStart <= fEnd && cEnd >= fStart);
+                      }
+                   }
+                } 
                 row.style.display = show ? '' : 'none';
             });
         }
+
 
         // Reset filters
         function resetFilters() {
