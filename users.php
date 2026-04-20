@@ -166,6 +166,89 @@ $users = $stmt->fetchAll(PDO::FETCH_ASSOC);
 
     <div id="modals-container"></div>
 
+<!-- ============================================ -->
+<!-- Action Buttons: View User -->
+<!-- ============================================ -->
+<div id="viewUserModal" class="action-modal-overlay">
+    <div class="action-modal-container">
+        <!-- Header -->
+        <div class="action-modal-header">
+            <div class="action-header-left">
+                <div class="action-modal-header-icon">
+                    <i class="fa-solid fa-house"></i>
+                </div>
+                <h2 id="username">-</h2>
+            </div>
+            <button class="modal-close-btn" onclick="actionbtn.closeModal()">
+                <i class="fa-solid fa-xmark"></i>
+            </button>
+        </div>
+
+        <!-- Tabs Navigation -->
+        <div class="action-tabs-nav">
+            <button class="tab-btn active" data-tab="user">
+                <i class="fa-solid fa-house"></i> User Details
+            </button>
+        </div>
+
+        <!-- Tab Content -->
+        <div class="action-tabs-content">
+            <!-- User Tab -->
+            <div id="u-tab-user" class="tab-content active">
+                <div class="tab-header">
+                    <i class="fa-solid fa-house"></i>
+                    <span>User Details</span>
+                </div>
+              <div class="details-grid">
+                    <div class="detail-row">
+                        <span class="detail-label">Username:</span>
+                        <span id="u-users-username" class="detail-value">-</span>
+                    </div>
+                    <div class="detail-row">
+                        <span class="detail-label">Name:</span>
+                        <span id="u-users-name" class="detail-value">-</span>
+                    </div>
+                    <div class="detail-row">
+                        <span class="detail-label">Phone Number:</span>
+                        <span id="u-users-phone" class="status-badge-modal status-available">-</span>
+                    </div>
+                    <div class="detail-row">
+                        <span class="detail-label">Email:</span>
+                        <span id="u-users-email" class="status-badge-modal status-available">-</span>
+                    </div>
+                    <div class="detail-row">
+                        <span class="detail-label">Password:</span>
+                        <span id="u-users-password" class="status-badge-modal status-available">-</span>
+                    </div>
+                    <div class="detail-row">
+                        <span class="detail-label">Phone Reset Date:</span>
+                        <span id="u-users-passwordresetdate" class="status-badge-modal status-available">-</span>
+                    </div>
+                    <div class="detail-row">
+                        <span class="detail-label">Id Number:</span>
+                        <span id="u-users-IdNumber" class="status-badge-modal status-available">-</span>
+                    </div>
+                    <div class="detail-row">
+                        <span class="detail-label">Id Expiry Date:</span>
+                        <span id="u-users-Idexpirydate" class="status-badge-modal status-available">-</span>
+                    </div>
+                    <div class="detail-row">
+                        <span class="detail-label">Role:</span>
+                        <span id="u-users-role" class="status-badge-modal status-available">-</span>
+                    </div>
+                    <div class="detail-row">
+                        <span class="detail-label">Archived:</span>
+                        <span id="u-users-archived" class="status-badge-modal status-available">-</span>
+                    </div>
+                    <div class="detail-row">
+                        <span class="detail-label">Date Archived:</span>
+                        <span id="u-users-datearchived" class="status-badge-modal status-available">-</span>
+                    </div>
+                </div>
+        </div>
+    </div>
+</div>    
+
     <script>
         function toggleFilter() {
             const filterToggle = document.getElementById('filterToggle');
@@ -223,16 +306,19 @@ $users = $stmt->fetchAll(PDO::FETCH_ASSOC);
             sortUsers();
         }
 
-        function viewUser(btn) {
-            const card = btn.closest('.card');
-            const name = card.querySelector('.card-name').textContent.trim();
-            alert('View User: ' + name);
-        }
 
         function editUser(btn) {
             const card = btn.closest('.card');
             const name = card.querySelector('.card-name').textContent.trim();
             alert('Edit User: ' + name);
+        }
+
+        function deleteProperty(btn) {
+            const row = btn.closest('tr');
+            const id = row.querySelector('.card-name').textContent;
+            if (confirm('Are you sure you want to delete ' + name + '?')) {
+                row.remove();
+            }
         }
     </script>
 </body>

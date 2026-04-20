@@ -154,7 +154,7 @@ function formatDateValue($date) {
                                 <td class="contract-enddate"><?= htmlspecialchars(formatDateValue($row['contract_end'] ?? null)) ?></td>
                                 <td>
                                     <div class="action-buttons">
-                                        <button class="action-btn action-btn-view" title="View" onclick="viewImportantDate(this)">
+                                        <button class="action-btn action-btn-view" title="View" onclick="actionbtn.viewImportantDate(this)">
                                             <i class="fa-solid fa-eye"></i>
                                         </button>
                                         
@@ -181,6 +181,147 @@ function formatDateValue($date) {
     </main>
 
     <div id="modals-container"></div>
+
+
+    <!-- ============================================ -->
+    <!-- Action Buttons: View Property Important Dates -->
+    <!-- ============================================ -->
+    <div id="viewImportantDatesModal" class="action-modal-overlay">
+        <div class="action-modal-container">
+            <!-- Header -->
+            <div class="action-modal-header">
+                <div class="action-header-left">
+                    <div class="action-modal-header-icon">
+                        <i class="fa-solid fa-house"></i>
+                    </div>
+                    <h2 id="propertyTitle">-</h2>
+                </div>
+                <button class="modal-close-btn" onclick="actionbtn.closeModal()">
+                    <i class="fa-solid fa-xmark"></i>
+                </button>
+            </div>
+
+            <!-- Tabs Navigation -->
+            <div class="action-tabs-nav">
+                <button class="tab-btn active" data-tab="dates">
+                    <i class="fa-solid fa-calendar"></i> Important Dates
+                </button>
+                <button class="tab-btn" data-tab="property">
+                    <i class="fa-solid fa-house"></i> Property Details
+                </button>
+                <button class="tab-btn" data-tab="notes">
+                    <i class="fa-solid fa-sticky-note"></i> Notes
+                </button>
+            </div>
+
+            <!-- Tab Content -->
+            <div class="action-tabs-content">
+                <!-- Important Dates Tab -->
+                <div id="p-tab-dates" class="tab-content active">
+                    <div class="tab-header">
+                        <i class="fa-solid fa-calendar"></i>
+                        <span>Important Dates</span>
+                    </div>
+                    <div class="dates-list">
+                        <div class="date-item">
+                            <span class="date-label">Landlord's ID Expiry:</span>
+                            <span  id="p-date-landlord-id" class="date-value">-</span>
+                        </div>
+                        <div class="date-item">
+                            <span class="date-label">Tenant's ID Expiry:</span>
+                            <span  id="p-date-tenant-id" class="date-value">-</span>
+                        </div>
+                        <div class="date-item">
+                            <span class="date-label ">Contract End:</span>
+                            <span id="p-date-contract-end" class="date-value">-</span>
+                        </div>
+                        <div class="date-item">
+                            <span class="date-label">Gas Certificate Due Date:</span>
+                            <span id="p-date-gas" class="date-value">-</span>
+                        </div>
+                        <div class="date-item">
+                            <span class="date-label">Electric Certificate Due Date:</span>
+                            <span id="p-date-electric" class="date-value">-</span>
+                        </div>
+                        <div class="date-item">
+                            <span class="date-label">EPC Due Date:</span>
+                            <span id="p-date-epc" class="date-value">-</span>
+                        </div>
+                    </div>
+                </div>
+                <!-- Property Tab -->
+                <div id="p-tab-property" class="tab-content">
+                    <div class="tab-header">
+                        <i class="fa-solid fa-house"></i>
+                        <span>Property Details</span>
+                    </div>
+                <div class="details-grid">
+                        <div class="detail-row">
+                            <span class="detail-label">Landlord Name:</span>
+                            <span id="p-property-landlord" class="detail-value">-</span>
+                        </div>
+                        <div class="detail-row">
+                            <span class="detail-label">Property Type:</span>
+                            <span id="p-property-type" class="detail-value">-</span>
+                        </div>
+                        <div class="detail-row">
+                            <span class="detail-label">Property Status:</span>
+                            <span id="p-property-status" class="status-badge-modal status-available">-</span>
+                        </div>
+                        <div class="detail-row">
+                            <span class="detail-label">Property Price:</span>
+                            <span id="p-property-price" class="detail-value">-</span>
+                        </div>
+                        <div class="detail-row">
+                            <span class="detail-label">Tenant Name:</span>
+                            <span id="p-property-tenant" class="detail-value">-</span>
+                        </div>
+                        <div class="detail-row">
+                            <span class="detail-label">Number of Rooms:</span>
+                            <span id="p-property-rooms" class="detail-value">-</span>
+                        </div>
+                        <div class="detail-row">
+                            <span class="detail-label">Number of Bathrooms:</span>
+                            <span id="p-property-bathrooms" class="detail-value">-</span>
+                        </div>
+                        <div class="detail-row">
+                            <span class="detail-label">EPC Rating:</span>
+                            <span id="p-property-epc" class="detail-value">-</span>
+                        </div>
+                        <div class="detail-row">
+                            <span class="detail-label">Pets Allowed:</span>
+                            <span id="p-property-pets" class="detail-value">-</span>
+                        </div>
+                        <div class="detail-row">
+                            <span class="detail-label">Garden:</span>
+                            <span id="p-property-garden" class="detail-value">-</span>
+                        </div>
+                        <div class="detail-row">
+                            <span class="detail-label">Council Band:</span>
+                            <span id="p-property-council" class="detail-value">-</span>
+                        </div>
+                    </div>
+                </div>
+
+
+                <!-- Notes Tab -->
+                <div id="p-tab-notes" class="tab-content">
+                    <div class="tab-header">
+                        <i class="fa-solid fa-sticky-note"></i>
+                        <span>Notes</span>
+                    </div>
+                    <div class="notes-input-section">
+                        <textarea id="p-noteTextarea" class="note-textarea" placeholder="Write your note here..."></textarea>
+                        <button id="p-addNoteBtn" class="add-note-btn" onclick="window.actionbtn.addNote()">
+                            <i class="fa-solid fa-plus"></i> Add Note
+                        </button>
+                    </div>
+                    <div id="p-notesList" class="notes-list">
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
 
     <script>
 
