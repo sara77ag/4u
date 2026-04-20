@@ -64,7 +64,7 @@ function formatDateValue($value) {
     <script src="navbar.js" defer></script>
     <script src="modals.js" defer></script>
     <style>
-        .col-id { width: 8%; }
+       
         .col-tenant { width: 15%; }
         .col-property { width: 21%; }
         .col-amount { width: 8%; }
@@ -119,9 +119,7 @@ function formatDateValue($value) {
                     <table id="paymentsTable">
                         <thead>
                             <tr>
-                                <th class="sortable col-id" onclick="sortTable('id', this)">
-                                    Id <i class="fa-solid fa-sort sort-icon"></i>
-                                </th>
+                                
                                 <th class="sortable col-tenant" onclick="sortTable('tenant', this)">
                                     Tenant <i class="fa-solid fa-sort sort-icon"></i>
                                 </th>
@@ -174,7 +172,7 @@ function formatDateValue($value) {
         data-nextdue="<?= htmlspecialchars($p['next_due'] ?? '') ?>"
         data-status="<?= htmlspecialchars($status) ?>"
     >
-        <td class="payment-id"><?= (int)$p['transaction_id'] ?></td>
+
         <td class="tenant-name"><?= htmlspecialchars($p['tenant_name'] ?? '-') ?></td>
         <td class="property-address"><?= htmlspecialchars($p['property_address'] ?? '-') ?></td>
         <td class="rent-amount">£<?= number_format((float)$p['transaction_amount'], 0) ?></td>
@@ -262,10 +260,7 @@ function formatDateValue($value) {
                 let aVal, bVal;
 
                 switch (column) {
-                    case 'id':
-                        aVal = parseInt(a.dataset.id) || 0;
-                        bVal = parseInt(b.dataset.id) || 0;
-                        break;
+                    
                     case 'tenant':
                         aVal = (a.dataset.tenant || '').toLowerCase();
                         bVal = (b.dataset.tenant || '').toLowerCase();
@@ -389,13 +384,13 @@ function formatDateValue($value) {
 
         function viewPayment(btn) {
             const row = btn.closest('tr');
-            const id = row.querySelector('.payment-id').textContent;
+            const id = row.dateset.id;
             alert('View Payment: ' + id);
         }
 
         function editPayment(btn) {
             const row = btn.closest('tr');
-            const id = row.querySelector('.payment-id').textContent;
+            const id = row.dateset.id;
             alert('Edit Payment: ' + id);
         }
 
