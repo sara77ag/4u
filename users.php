@@ -1,4 +1,9 @@
 <?php
+session_start();
+if(!isset($_SESSION['user_id'])) {
+    header("Location: index.php");
+    exit();
+}
 $dbPath = __DIR__ . '/database.db';
 
 try {
@@ -132,9 +137,17 @@ $users = $stmt->fetchAll(PDO::FETCH_ASSOC);
                             </form>
                         </div>
                         <div class="action-buttons">
-                            <button class="action-btn action-btn-edit" title="Edit" onclick="actionbtn.editUser(this)">
+                            <button class="action-btn action-btn-view" title="View" onclick="viewUser(this)">
+                                <i class="fa-solid fa-eye"></i>
+                            </button>
+                            
+                            <?php if (in_array($_SESSION['role'], ['admin', 'agent'])): ?>
+                            <button class="action-btn action-btn-edit" title="Edit" onclick="editUser(this)">
                                 <i class="fa-solid fa-pen"></i>
                             </button>
+                            <?php endif; ?>
+                            
+                            <?php if ($_SESSION['role'] === 'admin'): ?>
                             <form method="POST" style="display:inline;">
                                 <input type="hidden" name="archive_id" value="<?= $user['user_id'] ?>">
                                 <button type="submit" class="action-btn action-btn-delete" title="Archive"
@@ -142,6 +155,7 @@ $users = $stmt->fetchAll(PDO::FETCH_ASSOC);
                                     <i class="fa-solid fa-trash"></i>
                                 </button>
                             </form>
+                            <?php endif; ?>
                         </div>
                     </div>
 <?php endforeach; ?>

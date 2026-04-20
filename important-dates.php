@@ -1,4 +1,9 @@
 <?php
+session_start();
+if(!isset($_SESSION['user_id'])) {
+    header("Location: index.php");
+    exit();
+}
 $dbPath = __DIR__ . '/database.db';
 
 try {
@@ -86,7 +91,7 @@ function formatDateValue($date) {
                 <div class="filter-dropdowns" id="filterDropdowns" style="display: none;">
                     <div class="filter-group">
                         <label>Property</label>
-                        <input type="text" id="filterProperty" onchange="filterImportantDates()">
+                        <input type="text" id="filterProperty" onchange="filterImportantDates()" placeholder = "Enter Property Name">
                     </div>
                     <button class="filter-btn-reset" onclick="resetFilters()">
                         <i class="fa-solid fa-rotate-left"></i>
@@ -152,16 +157,18 @@ function formatDateValue($date) {
                                         <button class="action-btn action-btn-view" title="View" onclick="actionbtn.viewImportantDate(this)">
                                             <i class="fa-solid fa-eye"></i>
                                         </button>
-                                        <button class="action-btn action-btn-edit" title="Edit" onclick="actionbtn.editImportantDate(this)">
+                                        
+                                        <?php if (in_array($_SESSION['role'], ['admin', 'agent'])): ?>
+                                        <button class="action-btn action-btn-edit" title="Edit" onclick="editImportantDate(this)">
                                             <i class="fa-solid fa-pen"></i>
                                         </button>
-                                            <form method="POST" style="display:inline;">
-                                                <input type="hidden" name="archive_id" value="<?= $p['property_id'] ?>">
-                                                <button type="submit" class="action-btn action-btn-delete" title="Archive"
-                                                    onclick="return confirm('Archive this property?\n<?= htmlspecialchars($p['property_address']) ?>')">
-                                                    <i class="fa-solid fa-trash"></i>
-                                                </button>
-                                            </form>
+                                        <?php endif; ?>
+                                        
+                                        <?php if ($_SESSION['role'] === 'admin'): ?>
+                                        <button class="action-btn action-btn-delete" title="Delete" onclick="deleteImportantDate(this)">
+                                            <i class="fa-solid fa-trash"></i>
+                                        </button>
+                                        <?php endif; ?>
                                     </div>
                                 </td>
                             </tr>
