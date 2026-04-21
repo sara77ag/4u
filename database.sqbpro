@@ -1,149 +1,246 @@
-<?xml version="1.0" encoding="UTF-8"?><sqlb_project><db path="database.db" readonly="0" foreign_keys="1" case_sensitive_like="0" temp_store="0" wal_autocheckpoint="1000" synchronous="2"/><attached/><window><main_tabs open="structure browser pragmas query" current="1"/></window><tab_structure><column_width id="0" width="300"/><column_width id="1" width="0"/><column_width id="2" width="100"/><column_width id="3" width="3532"/><column_width id="4" width="0"/><expanded_item id="0" parent="1"/><expanded_item id="1" parent="1"/><expanded_item id="2" parent="1"/><expanded_item id="3" parent="1"/></tab_structure><tab_browse><table title="users" custom_title="0" dock_id="1" table="4,5:mainusers"/><dock_state state="000000ff00000000fd0000000100000002000009f4000004eefc0100000001fb000000160064006f0063006b00420072006f00770073006500310100000000000009f40000011800ffffff000002580000000000000004000000040000000800000008fc00000000"/><default_encoding codec=""/><browse_table_settings><table schema="main" name="files" show_row_id="0" encoding="" plot_x_axis="" unlock_view_pk="_rowid_" freeze_columns="0"><sort/><column_widths><column index="1" value="43"/><column index="2" value="63"/><column index="3" value="57"/><column index="4" value="58"/><column index="5" value="78"/><column index="6" value="81"/><column index="7" value="73"/><column index="8" value="62"/><column index="9" value="71"/><column index="10" value="56"/><column index="11" value="87"/></column_widths><filter_values/><conditional_formats/><row_id_formats/><display_formats/><hidden_columns/><plot_y_axes/><global_filter/></table><table schema="main" name="properties" show_row_id="0" encoding="" plot_x_axis="" unlock_view_pk="_rowid_" freeze_columns="0"><sort/><column_widths><column index="1" value="73"/><column index="2" value="106"/><column index="3" value="87"/><column index="4" value="84"/><column index="5" value="71"/><column index="6" value="84"/><column index="7" value="105"/><column index="8" value="87"/><column index="9" value="144"/><column index="10" value="76"/><column index="11" value="101"/><column index="12" value="68"/><column index="13" value="74"/><column index="14" value="82"/><column index="15" value="82"/><column index="16" value="56"/><column index="17" value="87"/></column_widths><filter_values/><conditional_formats/><row_id_formats/><display_formats/><hidden_columns/><plot_y_axes/><global_filter/></table><table schema="main" name="users" show_row_id="0" encoding="" plot_x_axis="" unlock_view_pk="_rowid_" freeze_columns="0"><sort/><column_widths><column index="1" value="50"/><column index="2" value="63"/><column index="3" value="109"/><column index="4" value="93"/><column index="5" value="148"/><column index="6" value="93"/><column index="7" value="128"/><column index="8" value="70"/><column index="9" value="92"/><column index="10" value="78"/><column index="11" value="56"/><column index="12" value="87"/></column_widths><filter_values/><conditional_formats/><row_id_formats/><display_formats/><hidden_columns/><plot_y_axes/><global_filter/></table></browse_table_settings></tab_browse><tab_sql><sql name="SQL 1*">INSERT INTO landlords VALUES 
-
-(1, 'James Carter', '07911123456', '14 Birchwood Lane, Manchester, M14 5AB', 'james.carter@email.com', 'Passport', 'P123456789', '2028-06-15', 3, 0, NULL), 
-
-(2, 'Sarah Patel', '07922234567', '8 Elm Grove, Birmingham, B15 2TF', 'sarah.patel@email.com', 'Driving Licence', 'DL987654321', '2027-03-20', 2, 0, NULL), 
-
-(3, 'Mohammed Ali', '07933345678', '22 Cedar Street, Leeds, LS1 4CD', 'mohammed.ali@email.com', 'Passport', 'P456789123', '2029-01-10', 2, 0, NULL), 
-
-(4, 'Emma Thompson', '07944456789', '5 Rosewood Close, Liverpool, L1 8EF', 'emma.thompson@email.com', 'Passport', 'P789123456', '2027-09-30', 2, 0, NULL), 
-
-(5, 'David Okafor', '07955567890', '31 Willow Drive, Sheffield, S1 2GH', 'david.okafor@email.com', 'Driving Licence', 'DL321654987', '2026-11-15', 1, 0, NULL); 
-
- 
-
-INSERT INTO users VALUES 
-
-(1, 'ammers', 'Ammer Hassan', '07911111111', 'ammer@ilet4you.com', 'hashed_pw_1', '2025-01-01', 'ID111111', '2029-01-01', 'admin', 0, NULL), 
-
-(2, 'ericg', 'Eric Gonzales', '07922222222', 'eric@ilet4you.com', 'hashed_pw_2', '2025-06-01', 'ID222222', '2028-05-10', 'agent', 0, NULL), 
-
-(3, 'sarahm', 'Sarah Mills', '07933333333', 'sarah@ilet4you.com', 'hashed_pw_3', '2025-03-01', 'ID333333', '2027-11-20', 'agent', 0, NULL), 
-
-(4, 'tomread', 'Tom Reader', '07944444444', 'tom@ilet4you.com', 'hashed_pw_4', '2025-09-01', 'ID444444', '2028-08-15', 'read_only', 0, NULL), 
-
-(5, 'lucyw', 'Lucy Ward', '07955555555', 'lucy@ilet4you.com', 'hashed_pw_5', '2025-12-01', 'ID555555', '2029-03-22', 'agent', 0, NULL); 
-
- 
-
-INSERT INTO properties VALUES 
-
-(1, '123 High St, London, SW1 1AA', 'Flat', 1200.00, 1, '2026-06-01', '2026-06-01', '2026-06-01', '2028-06-15', 2, 1, 'C', 0, 0, 'C', 0, NULL), 
-
-(2, '45 Oak Road, Manchester, M2 3BC', 'House', 1500.00, 1, '2026-09-01', '2026-09-01', '2026-09-01', '2028-06-15', 3, 2, 'B', 1, 1, 'D', 0, NULL), 
-
-(3, '9 Maple Avenue, Birmingham, B3 4DE', 'Flat', 950.00, 1, '2026-03-10', '2026-03-10', '2026-03-10', '2028-06-15', 1, 1, 'D', 0, 0, 'B', 0, NULL), 
-
-(4, '67 Pine Lane, Leeds, LS2 5FG', 'House', 1300.00, 2, '2026-07-15', '2026-07-15', '2026-07-15', '2027-03-20', 3, 1, 'C', 1, 0, 'C', 0, NULL), 
-
-(5, '14 Birch Close, Leeds, LS3 6HI', 'Flat', 800.00, 2, '2026-05-20', '2026-05-20', '2026-05-20', '2027-03-20', 1, 1, 'E', 0, 0, 'A', 0, NULL), 
-
-(6, '3 Elm Court, Liverpool, L2 7JK', 'Flat', 1100.00, 3, '2026-08-01', '2026-08-01', '2026-08-01', '2029-01-10', 2, 1, 'C', 0, 1, 'C', 0, NULL), 
-
-(7, '88 Ash Boulevard, Liverpool, L3 8LM', 'House', 1600.00, 3, '2026-04-15', '2026-04-15', '2026-04-15', '2029-01-10', 4, 2, 'B', 1, 1, 'E', 0, NULL), 
-
-(8, '21 Cedar Way, Sheffield, S2 9NO', 'Flat', 750.00, 4, '2026-10-01', '2026-10-01', '2026-10-01', '2027-09-30', 1, 1, 'F', 0, 0, 'A', 0, NULL), 
-
-(9, '56 Willow Street, Sheffield, S3 1PQ', 'House', 1400.00, 4, '2026-06-30', '2026-06-30', '2026-06-30', '2027-09-30', 3, 2, 'C', 1, 0, 'D', 0, NULL), 
-
-(10, '7 Poplar Road, Sheffield, S4 2RS', 'Flat', 900.00, 5, '2026-11-15', '2026-11-15', '2026-11-15', '2026-11-15', 2, 1, 'D', 0, 0, 'B', 0, NULL); 
-
- 
-
-INSERT INTO tenants VALUES 
-
-(1, 1, 'Ali Ahmed', '07911112222', '2025-01-01', 'ali.ahmed@hotmail.com', 'ID778899', '2027-08-01', '2026-01-01', 'monthly', 0, NULL), 
-
-(2, 2, 'Priya Sharma', '07922223333', '2025-03-01', 'priya.sharma@hotmail.com', 'ID334455', '2028-02-14', '2026-03-01', 'monthly', 0, NULL), 
-
-(3, 4, 'Tom Bradley', '07933334444', '2025-06-01', 'tom.bradley@gmail.com', 'ID556677', '2027-11-30', '2026-06-01', 'monthly', 0, NULL), 
-
-(4, 6, 'Fatima Malik', '07944445555', '2025-09-01', 'fatima.malik@gmail.com', 'ID998877', '2028-04-20', '2026-09-01', 'monthly', 0, NULL), 
-
-(5, 7, 'Liam Johnson', '07955556666', '2025-11-01', 'liam.j@gmail.com', 'ID112244', '2027-06-15', '2026-11-01', 'monthly', 0, NULL); 
-
- 
-
-INSERT INTO transactions VALUES 
-
-(1, 1, 1, 1200.00, '2025-01-01 09:00:00', 'Jan 2025', '2025-02-01', 'completed', 0, NULL), 
-
-(2, 1, 1, 1200.00, '2025-02-01 09:00:00', 'Feb 2025', '2025-03-01', 'completed', 0, NULL), 
-
-(3, 1, 1, 1200.00, '2025-03-01 09:00:00', 'Mar 2025', '2025-04-01', 'completed', 0, NULL), 
-
-(4, 1, 1, 1200.00, '2025-04-01 09:00:00', 'Apr 2025', '2025-05-01', 'completed', 0, NULL), 
-
-(5, 1, 1, 1200.00, '2025-05-01 09:00:00', 'May 2025', '2025-06-01', 'pending', 0, NULL), 
-
-(6, 2, 2, 1500.00, '2025-03-01 10:00:00', 'Mar 2025', '2025-04-01', 'completed', 0, NULL), 
-
-(7, 2, 2, 1500.00, '2025-04-01 10:00:00', 'Apr 2025', '2025-05-01', 'completed', 0, NULL), 
-
-(8, 2, 2, 1500.00, '2025-05-01 10:00:00', 'May 2025', '2025-06-01', 'completed', 0, NULL), 
-
-(9, 2, 2, 1500.00, '2025-06-01 10:00:00', 'Jun 2025', '2025-07-01', 'not complete', 0, NULL), 
-
-(10, 3, 4, 1300.00, '2025-06-01 11:00:00', 'Jun 2025', '2025-07-01', 'completed', 0, NULL), 
-
-(11, 3, 4, 1300.00, '2025-07-01 11:00:00', 'Jul 2025', '2025-08-01', 'completed', 0, NULL), 
-
-(12, 3, 4, 1300.00, '2025-08-01 11:00:00', 'Aug 2025', '2025-09-01', 'completed', 0, NULL), 
-
-(13, 3, 4, 1300.00, '2025-09-01 11:00:00', 'Sep 2025', '2025-10-01', 'pending', 0, NULL), 
-
-(14, 4, 6, 1100.00, '2025-09-01 12:00:00', 'Sep 2025', '2025-10-01', 'completed', 0, NULL), 
-
-(15, 4, 6, 1100.00, '2025-10-01 12:00:00', 'Oct 2025', '2025-11-01', 'completed', 0, NULL), 
-
-(16, 4, 6, 1100.00, '2025-11-01 12:00:00', 'Nov 2025', '2025-12-01', 'not complete', 0, NULL), 
-
-(17, 5, 7, 1600.00, '2025-11-01 13:00:00', 'Nov 2025', '2025-12-01', 'completed', 0, NULL), 
-
-(18, 5, 7, 1600.00, '2025-12-01 13:00:00', 'Dec 2025', '2026-01-01', 'completed', 0, NULL), 
-
-(19, 5, 7, 1600.00, '2026-01-01 13:00:00', 'Jan 2026', '2026-02-01', 'completed', 0, NULL), 
-
-(20, 5, 7, 1600.00, '2026-02-01 13:00:00', 'Feb 2026', '2026-03-01', 'pending', 0, NULL); 
-
- 
-
-INSERT INTO notes VALUES 
-
-(1, 'Landlord prefers contact via email only.', '2025-01-10 09:00:00', NULL, 1, NULL, 0, NULL), 
-
-(2, 'Tenant reported a leaking tap in the bathroom.', '2025-02-05 14:00:00', 1, NULL, 1, 0, NULL), 
-
-(3, 'Property requires boiler service before next tenancy.', '2025-03-18 11:00:00', 2, NULL, NULL, 0, NULL), 
-
-(4, 'Tenant has requested permission to keep a cat.', '2025-07-22 10:00:00', NULL, NULL, 4, 0, NULL), 
-
-(5, 'Landlord confirmed rent increase from January 2026.', '2025-09-01 09:00:00', NULL, 2, NULL, 0, NULL); 
-
- 
-
-INSERT INTO files VALUES 
-
-(1, 'gas_cert_property1.pdf', 'PDF', '/files/properties/1/gas_cert.pdf', '2025-01-01 09:00:00', 'gas_cert', 1, NULL, NULL, 0, NULL), 
-
-(2, 'ali_ahmed_passport.pdf', 'PDF', '/files/tenants/1/passport.pdf', '2025-01-01 09:00:00', 'id_document', NULL, 1, NULL, 0, NULL), 
-
-(3, 'james_carter_licence.pdf', 'PDF', '/files/landlords/1/driving_licence.pdf', '2025-01-01 09:00:00', 'id_document', NULL, NULL, 1, 0, NULL), 
-
-(4, 'tenancy_agreement_1.pdf', 'PDF', '/files/properties/1/contract.pdf', '2025-01-01 09:00:00', 'contract', 1, 1, NULL, 0, NULL), 
-
-(5, 'epc_property2.pdf', 'PDF', '/files/properties/2/epc.pdf', '2025-03-01 09:00:00', 'epc', 2, NULL, NULL, 0, NULL); 
-
- 
-
-INSERT INTO viewing_bookings VALUES 
-
-(1, 3, 'Daniel Foster', '07988890123', 'completed', '2025-05-10 14:00:00', 2, 'daniel.foster@gmail.com', 0, NULL), 
-
-(2, 5, 'Lucy Chen', '07999901234', 'cancelled', '2025-06-15 11:00:00', 3, 'lucy.chen@gmail.com', 0, NULL), 
-
-(3, 8, 'Mark Thompson', '07911112233', 'no_show', '2025-07-20 15:30:00', 2, 'mark.t@gmail.com', 0, NULL), 
-
-(4, 9, 'Zara Khan', '07922223344', 'scheduled', '2026-03-20 10:00:00', 5, 'zara.khan@gmail.com', 0, NULL), 
-
-(5, 10, 'Ben Clarke', '07933334455', 'completed', '2025-12-05 13:00:00', 1, 'ben.clarke@gmail.com', 0, NULL); </sql><current_tab id="0"/></tab_sql></sqlb_project>
+<?xml version="1.0" encoding="UTF-8"?><sqlb_project><db path="database.db" readonly="0" foreign_keys="1" case_sensitive_like="0" temp_store="0" wal_autocheckpoint="1000" synchronous="2"/><attached/><window><main_tabs open="structure browser pragmas query" current="3"/></window><tab_structure><column_width id="0" width="300"/><column_width id="1" width="0"/><column_width id="2" width="100"/><column_width id="3" width="4934"/><column_width id="4" width="0"/><expanded_item id="0" parent="1"/><expanded_item id="1" parent="1"/><expanded_item id="2" parent="1"/><expanded_item id="3" parent="1"/></tab_structure><tab_browse><table title="contracts" custom_title="0" dock_id="1" table="4,9:maincontracts"/><dock_state state="000000ff00000000fd00000001000000020000000000000000fc0100000001fb000000160064006f0063006b00420072006f00770073006500310100000000ffffffff0000011e00ffffff000000000000000000000004000000040000000800000008fc00000000"/><default_encoding codec=""/><browse_table_settings/></tab_browse><tab_sql><sql name="SQL 1*">PRAGMA foreign_keys = OFF;
+
+DROP TABLE IF EXISTS files;
+DROP TABLE IF EXISTS notes;
+DROP TABLE IF EXISTS viewing_bookings;
+DROP TABLE IF EXISTS transactions;
+DROP TABLE IF EXISTS contracts;
+DROP TABLE IF EXISTS tenants;
+DROP TABLE IF EXISTS properties;
+DROP TABLE IF EXISTS users;
+DROP TABLE IF EXISTS landlords;
+
+PRAGMA foreign_keys = ON;
+
+CREATE TABLE landlords (
+    landlord_id INTEGER PRIMARY KEY AUTOINCREMENT,
+    name TEXT NOT NULL,
+    phone TEXT NOT NULL,
+    address TEXT NOT NULL,
+    email TEXT NOT NULL,
+    id_type TEXT NOT NULL,
+    id_number TEXT NOT NULL,
+    id_expiry_date TEXT NOT NULL,
+    number_of_properties INTEGER NOT NULL,
+    contact_method TEXT NOT NULL DEFAULT 'email',
+    archived INTEGER NOT NULL CHECK (archived IN (0,1)),
+    date_archived TEXT
+);
+
+CREATE TABLE users (
+    user_id INTEGER PRIMARY KEY AUTOINCREMENT,
+    username TEXT NOT NULL,
+    name TEXT NOT NULL,
+    phone TEXT NOT NULL,
+    email TEXT NOT NULL,
+    password TEXT NOT NULL,
+    password_reset_date TEXT NOT NULL,
+    id_number TEXT NOT NULL,
+    id_expiry_date TEXT NOT NULL,
+    role TEXT NOT NULL CHECK (role IN ('admin','agent','read_only')),
+    archived INTEGER NOT NULL CHECK (archived IN (0,1)),
+    date_archived TEXT
+);
+
+CREATE TABLE properties (
+    property_id INTEGER PRIMARY KEY AUTOINCREMENT,
+    property_address TEXT NOT NULL,
+    property_type TEXT NOT NULL,
+    monthly_rent REAL NOT NULL,
+    landlord_id INTEGER NOT NULL,
+    gas_cert_due TEXT NOT NULL,
+    electric_cert_due TEXT NOT NULL,
+    epc_due_date TEXT NOT NULL,
+    landlord_id_expiry_date TEXT NOT NULL,
+    room_count INTEGER NOT NULL,
+    bathroom_count INTEGER NOT NULL,
+    epc_rating TEXT NOT NULL CHECK (epc_rating IN ('A','B','C','D','E','F','G')),
+    has_garden INTEGER NOT NULL CHECK (has_garden IN (0,1)),
+    allowed_pets INTEGER NOT NULL CHECK (allowed_pets IN (0,1)),
+    council_band TEXT NOT NULL CHECK (council_band IN ('A','B','C','D','E','F','G','H')),
+    archived INTEGER NOT NULL CHECK (archived IN (0,1)),
+    date_archived TEXT,
+    FOREIGN KEY (landlord_id) REFERENCES landlords(landlord_id)
+);
+
+CREATE TABLE tenants (
+    tenant_id INTEGER PRIMARY KEY AUTOINCREMENT,
+    name TEXT NOT NULL,
+    phone TEXT NOT NULL,
+    email TEXT NOT NULL,
+    id_type TEXT NOT NULL,
+    id_number TEXT NOT NULL,
+    id_expiry_date TEXT NOT NULL,
+    contact_method TEXT NOT NULL DEFAULT 'email',
+    archived INTEGER NOT NULL CHECK (archived IN (0,1)),
+    date_archived TEXT
+);
+
+CREATE TABLE contracts (
+    contract_id INTEGER PRIMARY KEY AUTOINCREMENT,
+    tenant_id INTEGER,
+    property_id INTEGER,
+    landlord_id INTEGER,
+    contract_start DATE NOT NULL,
+    contract_end DATE NOT NULL,
+    rent REAL NOT NULL,
+    frequency TEXT NOT NULL,
+    archived INTEGER NOT NULL DEFAULT 0 CHECK (archived IN (0,1)),
+    date_archived TEXT,
+    FOREIGN KEY (property_id) REFERENCES properties(property_id),
+    FOREIGN KEY (tenant_id) REFERENCES tenants(tenant_id),
+    FOREIGN KEY (landlord_id) REFERENCES landlords(landlord_id)
+);
+
+CREATE TABLE transactions (
+    transaction_id INTEGER PRIMARY KEY AUTOINCREMENT,
+    tenant_id INTEGER NOT NULL,
+    property_id INTEGER NOT NULL,
+    transaction_amount REAL NOT NULL,
+    date_of_transaction TEXT NOT NULL,
+    payment_period TEXT NOT NULL,
+    next_due TEXT NOT NULL,
+    status TEXT NOT NULL CHECK (status IN ('completed','pending','not complete')),
+    archived INTEGER NOT NULL CHECK (archived IN (0,1)),
+    date_archived TEXT,
+    FOREIGN KEY (tenant_id) REFERENCES tenants(tenant_id),
+    FOREIGN KEY (property_id) REFERENCES properties(property_id)
+);
+
+CREATE TABLE notes (
+    note_id INTEGER PRIMARY KEY AUTOINCREMENT,
+    note_text TEXT NOT NULL,
+    created_at TEXT NOT NULL,
+    created_by TEXT,
+    type TEXT,
+    property_id INTEGER,
+    landlord_id INTEGER,
+    tenant_id INTEGER,
+    payment_id INTEGER,
+    viewing_id INTEGER,
+    date_id INTEGER,
+    user_id INTEGER,
+    archived INTEGER NOT NULL CHECK (archived IN (0,1)),
+    date_archived TEXT,
+    FOREIGN KEY (property_id) REFERENCES properties(property_id),
+    FOREIGN KEY (landlord_id) REFERENCES landlords(landlord_id),
+    FOREIGN KEY (tenant_id) REFERENCES tenants(tenant_id)
+);
+
+CREATE TABLE viewing_bookings (
+    booking_id INTEGER PRIMARY KEY AUTOINCREMENT,
+    property_id INTEGER NOT NULL,
+    viewer_name TEXT NOT NULL,
+    viewer_phone TEXT NOT NULL,
+    status TEXT NOT NULL CHECK (status IN ('scheduled','completed','cancelled','no_show')),
+    date_time TEXT NOT NULL,
+    user_id INTEGER NOT NULL,
+    email VARCHAR(50) NOT NULL,
+    archived INTEGER NOT NULL CHECK (archived IN (0,1)),
+    date_archived TEXT,
+    FOREIGN KEY (property_id) REFERENCES properties(property_id),
+    FOREIGN KEY (user_id) REFERENCES users(user_id)
+);
+
+
+INSERT INTO landlords VALUES
+(1, 'James Carter',      '07911123456', '14 Birchwood Lane, Manchester, M14 5AB', 'james.carter@email.com',      'Passport',        'P123456789',    '2028-06-15', 3, 'email', 0, NULL),
+(2, 'Sarah Patel',       '07922234567', '8 Elm Grove, Birmingham, B15 2TF',        'sarah.patel@email.com',       'Driving Licence', 'DL987654321',   '2027-03-20', 2, 'phone', 0, NULL),
+(3, 'Mohammed Ali',      '07933345678', '22 Cedar Street, Leeds, LS1 4CD',         'mohammed.ali@email.com',      'Passport',        'P456789123',    '2029-01-10', 2, 'email', 0, NULL),
+(4, 'Emma Thompson',     '07944456789', '5 Rosewood Close, Liverpool, L1 8EF',     'emma.thompson@email.com',     'Passport',        'P789123456',    '2027-09-30', 2, 'phone', 0, NULL),
+(5, 'David Okafor',      '07955567890', '31 Willow Drive, Sheffield, S1 2GH',      'david.okafor@email.com',      'Driving Licence', 'DL321654987',   '2026-11-15', 1, 'email', 0, NULL),
+(6, 'Robert Hargreaves', '07911223344', '22 Oak Lane, Manchester, M2 4HL',         'robert.hargreaves@email.com', 'Passport',        'GBP123456',     '2027-05-10', 2, 'phone', 1, '2024-06-01'),
+(7, 'Susan Patel',       '07722556677', '9 Maple Road, Birmingham, B5 7TJ',        'susan.patel@protonmail.com',  'Driving Licence', 'PATEL801234SP', '2029-11-20', 1, 'email', 1, '2024-07-15');
+
+INSERT INTO users VALUES
+(1, 'ammers',  'Ammer Hassan',  '07911111111', 'ammer@ilet4you.com',       'hashed_pw_1',       '2025-01-01', 'ID111111', '2029-01-01', 'admin',     0, NULL),
+(2, 'ericg',   'Eric Gonzales', '07922222222', 'eric@ilet4you.com',        'hashed_pw_2',       '2025-06-01', 'ID222222', '2028-05-10', 'agent',     0, NULL),
+(3, 'sarahm',  'Sarah Mills',   '07933333333', 'sarah@ilet4you.com',       'hashed_pw_3',       '2025-03-01', 'ID333333', '2027-11-20', 'agent',     0, NULL),
+(4, 'tomread', 'Tom Reader',    '07944444444', 'tom@ilet4you.com',         'hashed_pw_4',       '2025-09-01', 'ID444444', '2028-08-15', 'read_only', 0, NULL),
+(5, 'lucyw',   'Lucy Ward',     '07955555555', 'lucy@ilet4you.com',        'hashed_pw_5',       '2025-12-01', 'ID555555', '2029-03-22', 'agent',     0, NULL),
+(6, 'jdoe',    'John Doe',      '07100111222', 'john.doe@ilet4you.com',    'hashed_password_1', '2024-01-01', 'EMP001',   '2026-01-01', 'admin',     1, '2024-06-01'),
+(7, 'asmith',  'Alice Smith',   '07200333444', 'alice.smith@ilet4you.com', 'hashed_password_2', '2024-01-01', 'EMP002',   '2026-06-01', 'read_only', 1, '2024-07-15');
+
+INSERT INTO properties VALUES
+(1,  '123 High St, London, SW1 1AA',           'Flat',          1200.00, 1, '2026-06-01', '2026-06-01', '2026-06-01', '2028-06-15', 2, 1, 'C', 0, 0, 'C', 0, NULL),
+(2,  '45 Oak Road, Manchester, M2 3BC',         'House',         1500.00, 1, '2026-09-01', '2026-09-01', '2026-09-01', '2028-06-15', 3, 2, 'B', 1, 1, 'D', 0, NULL),
+(3,  '9 Maple Avenue, Birmingham, B3 4DE',      'Flat',           950.00, 1, '2026-03-10', '2026-03-10', '2026-03-10', '2028-06-15', 1, 1, 'D', 0, 0, 'B', 0, NULL),
+(4,  '67 Pine Lane, Leeds, LS2 5FG',            'House',         1300.00, 2, '2026-07-15', '2026-07-15', '2026-07-15', '2027-03-20', 3, 1, 'C', 1, 0, 'C', 0, NULL),
+(5,  '14 Birch Close, Leeds, LS3 6HI',          'Flat',           800.00, 2, '2026-05-20', '2026-05-20', '2026-05-20', '2027-03-20', 1, 1, 'E', 0, 0, 'A', 0, NULL),
+(6,  '3 Elm Court, Liverpool, L2 7JK',          'Flat',          1100.00, 3, '2026-08-01', '2026-08-01', '2026-08-01', '2029-01-10', 2, 1, 'C', 0, 1, 'C', 0, NULL),
+(7,  '88 Ash Boulevard, Liverpool, L3 8LM',     'House',         1600.00, 3, '2026-04-15', '2026-04-15', '2026-04-15', '2029-01-10', 4, 2, 'B', 1, 1, 'E', 0, NULL),
+(8,  '21 Cedar Way, Sheffield, S2 9NO',         'Flat',           750.00, 4, '2026-10-01', '2026-10-01', '2026-10-01', '2027-09-30', 1, 1, 'F', 0, 0, 'A', 0, NULL),
+(9,  '56 Willow Street, Sheffield, S3 1PQ',     'House',         1400.00, 4, '2026-06-30', '2026-06-30', '2026-06-30', '2027-09-30', 3, 2, 'C', 1, 0, 'D', 0, NULL),
+(10, '7 Poplar Road, Sheffield, S4 2RS',        'Flat',           900.00, 5, '2026-11-15', '2026-11-15', '2026-11-15', '2026-11-15', 2, 1, 'D', 0, 0, 'B', 0, NULL),
+(11, '14 Birchwood Close, Manchester, M14 5GH', 'Semi-Detached', 1200.00, 6, '2025-01-01', '2025-06-01', '2026-01-01', '2027-05-10', 3, 1, 'C', 1, 0, 'C', 1, '2024-06-01'),
+(12, '7 Elm Street, Birmingham, B12 0TH',       'Flat',           850.00, 7, '2024-08-01', '2025-01-01', '2025-09-01', '2029-11-20', 2, 1, 'D', 0, 1, 'B', 1, '2024-07-15');
+
+INSERT INTO tenants VALUES
+(1,  'Ali Ahmed',       '07911112222', 'ali.ahmed@hotmail.com',     'Passport',        'ID778899',      '2027-08-01', 'email', 0, NULL),
+(2,  'Priya Sharma',    '07922223333', 'priya.sharma@hotmail.com',  'Passport',        'ID334455',      '2028-02-14', 'phone', 0, NULL),
+(3,  'Tom Bradley',     '07933334444', 'tom.bradley@gmail.com',     'Driving Licence', 'ID556677',      '2027-11-30', 'email', 0, NULL),
+(4,  'Fatima Malik',    '07944445555', 'fatima.malik@gmail.com',    'Passport',        'ID998877',      '2028-04-20', 'phone', 0, NULL),
+(5,  'Liam Johnson',    '07955556666', 'liam.j@gmail.com',          'Driving Licence', 'ID112244',      '2027-06-15', 'email', 0, NULL),
+(6,  'James Whitfield', '07833112233', 'james.whitfield@gmail.com', 'Passport',        'GBP654321',     '2027-03-10', 'email', 1, '2024-06-01'),
+(7,  'Aisha Okonkwo',   '07955443322', 'aisha.okonkwo@outlook.com', 'Driving Licence', 'OKONK901234AJ', '2029-08-22', 'phone', 1, '2024-07-15'),
+(8,  'Chloe Bennett',   '07811223344', 'chloe.bennett@gmail.com',   'Passport',        'ID445566',      '2028-07-12', 'email', 0, NULL),
+(9,  'Rajan Mehta',     '07833445566', 'rajan.mehta@hotmail.com',   'Passport',        'ID667788',      '2027-05-20', 'phone', 0, NULL),
+(10, 'Grace O''Brien',  '07855667788', 'grace.obrien@gmail.com',    'Driving Licence', 'ID889900',      '2029-02-28', 'email', 0, NULL),
+(11, 'Marcus Reid',     '07877889900', 'marcus.reid@outlook.com',   'Driving Licence', 'ID223344',      '2028-11-05', 'phone', 0, NULL);
+
+INSERT INTO contracts VALUES
+(1,  1,  1,  1, '2025-01-01', '2026-01-01',  1200.00, 'monthly', 0, NULL),
+(2,  2,  2,  1, '2025-03-01', '2026-03-01',  1500.00, 'monthly', 0, NULL),
+(3,  3,  4,  2, '2025-06-01', '2026-06-01',  1300.00, 'monthly', 0, NULL),
+(4,  4,  6,  3, '2025-09-01', '2026-09-01',  1100.00, 'monthly', 0, NULL),
+(5,  5,  7,  3, '2025-11-01', '2026-11-01',  1600.00, 'monthly', 0, NULL),
+(6,  6,  11, 6, '2023-01-01', '2024-01-01',  1200.00, 'monthly', 1, '2024-06-01'),
+(7,  7,  12, 7, '2023-03-01', '2024-03-01',   850.00, 'monthly', 1, '2024-07-15'),
+(8,  8,  3,  1, '2025-02-01', '2026-02-01',   950.00, 'monthly', 0, NULL),
+(9,  9,  5,  2, '2025-04-01', '2026-04-01',   800.00, 'monthly', 0, NULL),
+(10, 10, 8,  4, '2025-07-01', '2026-07-01',   750.00, 'monthly', 0, NULL),
+(11, 11, 10, 5, '2025-10-01', '2026-10-01',   900.00, 'monthly', 0, NULL);
+
+INSERT INTO transactions VALUES
+(1,  1, 1,  1200.00, '2025-01-01 09:00:00', 'Jan 2025', '2025-02-01', 'completed',    0, NULL),
+(2,  1, 1,  1200.00, '2025-02-01 09:00:00', 'Feb 2025', '2025-03-01', 'completed',    0, NULL),
+(3,  1, 1,  1200.00, '2025-03-01 09:00:00', 'Mar 2025', '2025-04-01', 'completed',    0, NULL),
+(4,  1, 1,  1200.00, '2025-04-01 09:00:00', 'Apr 2025', '2025-05-01', 'completed',    0, NULL),
+(5,  1, 1,  1200.00, '2025-05-01 09:00:00', 'May 2025', '2025-06-01', 'pending',      0, NULL),
+(6,  2, 2,  1500.00, '2025-03-01 10:00:00', 'Mar 2025', '2025-04-01', 'completed',    0, NULL),
+(7,  2, 2,  1500.00, '2025-04-01 10:00:00', 'Apr 2025', '2025-05-01', 'completed',    0, NULL),
+(8,  2, 2,  1500.00, '2025-05-01 10:00:00', 'May 2025', '2025-06-01', 'completed',    0, NULL),
+(9,  2, 2,  1500.00, '2025-06-01 10:00:00', 'Jun 2025', '2025-07-01', 'not complete', 0, NULL),
+(10, 3, 4,  1300.00, '2025-06-01 11:00:00', 'Jun 2025', '2025-07-01', 'completed',    0, NULL),
+(11, 3, 4,  1300.00, '2025-07-01 11:00:00', 'Jul 2025', '2025-08-01', 'completed',    0, NULL),
+(12, 3, 4,  1300.00, '2025-08-01 11:00:00', 'Aug 2025', '2025-09-01', 'completed',    0, NULL),
+(13, 3, 4,  1300.00, '2025-09-01 11:00:00', 'Sep 2025', '2025-10-01', 'pending',      0, NULL),
+(14, 4, 6,  1100.00, '2025-09-01 12:00:00', 'Sep 2025', '2025-10-01', 'completed',    0, NULL),
+(15, 4, 6,  1100.00, '2025-10-01 12:00:00', 'Oct 2025', '2025-11-01', 'completed',    0, NULL),
+(16, 4, 6,  1100.00, '2025-11-01 12:00:00', 'Nov 2025', '2025-12-01', 'not complete', 0, NULL),
+(17, 5, 7,  1600.00, '2025-11-01 13:00:00', 'Nov 2025', '2025-12-01', 'completed',    0, NULL),
+(18, 5, 7,  1600.00, '2025-12-01 13:00:00', 'Dec 2025', '2026-01-01', 'completed',    0, NULL),
+(19, 5, 7,  1600.00, '2026-01-01 13:00:00', 'Jan 2026', '2026-02-01', 'completed',    0, NULL),
+(20, 5, 7,  1600.00, '2026-02-01 13:00:00', 'Feb 2026', '2026-03-01', 'pending',      0, NULL),
+(21, 6, 11, 1200.00, '2024-01-03 09:00:00', 'January 2024',  '2024-02-01', 'completed', 1, '2024-06-01'),
+(22, 7, 12,  850.00, '2024-02-01 09:00:00', 'February 2024', '2024-03-01', 'completed', 1, '2024-07-15');
+
+INSERT INTO notes VALUES
+(1, 'Landlord prefers contact via email only.',              '2025-01-10 09:00:00', 'system', NULL,   NULL, 1,    NULL, NULL, NULL, NULL, NULL, 0, NULL),
+(2, 'Tenant reported a leaking tap in the bathroom.',        '2025-02-05 14:00:00', 'system', NULL,   1,    NULL, 1,    NULL, NULL, NULL, NULL, 0, NULL),
+(3, 'Property requires boiler service before next tenancy.', '2025-03-18 11:00:00', 'system', NULL,   2,    NULL, NULL, NULL, NULL, NULL, NULL, 0, NULL),
+(4, 'Tenant has requested permission to keep a cat.',        '2025-07-22 10:00:00', 'system', NULL,   NULL, NULL, 4,    NULL, NULL, NULL, NULL, 0, NULL),
+(5, 'Landlord confirmed rent increase from January 2026.',   '2025-09-01 09:00:00', 'system', NULL,   NULL, 2,    NULL, NULL, NULL, NULL, NULL, 0, NULL),
+(6, 'Tenant requested early termination in Dec 2023. Settlement reached.', '2023-12-20 10:00:00', 'system', NULL, 11, 6, 6, NULL, NULL, NULL, NULL, 1, '2024-06-01'),
+(7, 'Boiler replaced Feb 2024. Warranty valid 5 years.',     '2024-02-10 14:30:00', 'system', NULL,   12,   7,    7,    NULL, NULL, NULL, NULL, 1, '2024-07-15');
+
+INSERT INTO viewing_bookings VALUES
+(1, 3,  'Daniel Foster', '07988890123', 'completed', '2025-05-10 14:00:00', 2, 'daniel.foster@gmail.com', 0, NULL),
+(2, 5,  'Lucy Chen',     '07999901234', 'cancelled',  '2025-06-15 11:00:00', 3, 'lucy.chen@gmail.com',     0, NULL),
+(3, 8,  'Mark Thompson', '07911112233', 'no_show',    '2025-07-20 15:30:00', 2, 'mark.t@gmail.com',        0, NULL),
+(4, 9,  'Zara Khan',     '07922223344', 'scheduled',  '2026-03-20 10:00:00', 5, 'zara.khan@gmail.com',     0, NULL),
+(5, 10, 'Ben Clarke',    '07933334455', 'completed',  '2025-12-05 13:00:00', 1, 'ben.clarke@gmail.com',    0, NULL),
+(6, 11, 'Tom Bellamy',   '07601334455', 'completed',  '2023-11-14 10:30:00', 1, 'tom.bellamy@gmail.com',   1, '2024-06-01'),
+(7, 12, 'Nina Forsythe', '07712998877', 'no_show',    '2023-12-05 14:00:00', 2, 'nina.forsythe@yahoo.com', 1, '2024-07-15'),
+(8,  2, 'Jake Morrison', '07911000001', 'scheduled', '2026-04-25 10:00:00', 1, 'jake.morrison@gmail.com', 0, NULL),
+(9,  4, 'Priya Nair',    '07922000002', 'scheduled', '2026-05-02 14:00:00', 2, 'priya.nair@gmail.com',    0, NULL);</sql><current_tab id="0"/></tab_sql></sqlb_project>
