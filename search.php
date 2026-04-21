@@ -61,10 +61,10 @@ foreach ($stmt->fetchAll(PDO::FETCH_ASSOC) as $r) {
 $stmt = $pdo->prepare("
     SELECT booking_id AS id, viewer_name AS label, email AS sub
     FROM viewing_bookings
-    WHERE archived = 0 AND (viewer_name LIKE ? OR email LIKE ?)
+    WHERE archived = 0 AND (viewer_name LIKE ? OR email LIKE ? OR viewer_phone LIKE ?)
     LIMIT 5
 ");
-$stmt->execute([$like, $like]);
+$stmt->execute([$like, $like, $like]);
 foreach ($stmt->fetchAll(PDO::FETCH_ASSOC) as $r) {
     $results[] = ['type' => 'viewing', 'id' => $r['id'], 'label' => $r['label'], 'sub' => $r['sub'], 'url' => 'viewing.php'];
 }

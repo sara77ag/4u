@@ -33,9 +33,9 @@ $role = $_SESSION['role'] ?? '';
         <h1 class="company-name">iLet4You</h1>
     </div>
     <div class="header-center">
-        <div class="search-bar">
-            <input type="text" placeholder="Search by name, address, or postcode" class="search-input">
-            <button class="search-btn">
+        <div class="search-bar" id="searchBarWrapper">
+            <input type="text" placeholder="Search by name, address, or postcode" class="search-input" id="globalSearch">
+            <button class="search-btn" id="searchBtn">
                 <i class="fa-solid fa-magnifying-glass"></i>
             </button>
         </div>
