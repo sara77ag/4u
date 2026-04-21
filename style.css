@@ -930,7 +930,7 @@ body.login-page {
     width: 40px;
     height: 40px;
     border-radius: 10px;
-    background: #ebf8ff;
+    background: #dbf3ff;
     display: flex;
     align-items: center;
     justify-content: center;
@@ -938,7 +938,7 @@ body.login-page {
 
 .modal-header-title-icon i {
     font-size: 18px;
-    color: #3182ce;
+    color: #054c72;
 }
 
 .modal-header-title h3 {
@@ -1174,6 +1174,15 @@ input.form-control[type="time"] {
 .modal-btn-reset:hover {
     background: #4a5568;
 }
+
+.modal-btn-send {
+   background: #ccd1d6;   /* رمادي أزرق هادي */
+    color: #334155;
+}
+
+.modal-btn-send:hover {
+background: #b9bcc0;
+    color: #1e293b;}
 
 .modal-btn-save {
     background: #266c49;
@@ -1811,3 +1820,19 @@ Action Button Style
     cursor: pointer;
 }
 
+.issue-field {
+    background:#f7fafc; 
+    cursor: default; 
+    border:1px solid #e2e8f0; 
+    padding:10px; 
+    border-radius:8px;
+    margin-bottom: 15px;
+}
+
+.issue-textarea {
+    width:100%; 
+    min-height:120px; 
+    padding:10px; 
+    border-radius:8px; 
+    border:1px solid #e2e8f0;
+}
