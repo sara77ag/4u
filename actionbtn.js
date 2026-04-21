@@ -68,16 +68,16 @@ window.actionbtn = (() => {
     ],
   
    
-   payment: [
-      { id: 'pay-payment-id',       key: 'id',       type: 'text',     tab: 'payment', editable: false, fallback: 'No Record' },
-      { id: 'pay-payment-tenant',   key: 'tenant',   type: 'text',     tab: 'payment', editable: false, fallback: 'No Record' },
-      { id: 'pay-payment-property', key: 'property', type: 'text',     tab: 'payment', editable: false, fallback: 'No Record' },
-      { id: 'pay-payment-amount',   key: 'amount',   type: 'number',   tab: 'payment', editable: true,  prefix: '£', format: 'currency', fallback: 'No Record' },
-      { id: 'pay-payment-datetime', key: 'datetime', type: 'datetime', tab: 'payment', editable: true,  fallback: 'No Record' },
-      { id: 'pay-payment-period',   key: 'period',   type: 'text',     tab: 'payment', editable: true,  fallback: 'No Record' },
-      { id: 'pay-payment-nextdue',  key: 'nextdue',  type: 'date',     tab: 'payment', editable: true,  fallback: 'No Record' },
-      { id: 'pay-payment-status',   key: 'dbStatus', type: 'select',   tab: 'payment', editable: true,  options: ['completed', 'pending', 'not complete'], fallback: 'No Record' },
-    ],
+    payment: [
+  { id: 'pay-payment-id',       key: 'id',       type: 'text',     tab: 'payment', editable: false, fallback: 'No Record' },
+  { id: 'pay-payment-tenant',   key: 'tenant',   type: 'text',     tab: 'payment', editable: false, fallback: 'No Record' },
+  { id: 'pay-payment-property', key: 'property', type: 'text',     tab: 'payment', editable: false, fallback: 'No Record' },
+  { id: 'pay-payment-amount',   key: 'amount',   type: 'number',   tab: 'payment', editable: true,  prefix: '£', format: 'currency', fallback: 'No Record' },
+  { id: 'pay-payment-datetime', key: 'datetime', type: 'datetime', tab: 'payment', editable: true,  fallback: 'No Record' },
+  { id: 'pay-payment-period',   key: 'period',   type: 'text',     tab: 'payment', editable: true,  fallback: 'No Record' },
+  { id: 'pay-payment-nextdue',  key: 'nextdue',  type: 'date',     tab: 'payment', editable: true,  fallback: 'No Record' },
+  { id: 'pay-payment-status',   key: 'dbStatus', type: 'select',   tab: 'payment', editable: true,  options: ['completed', 'pending', 'not complete'], fallback: 'No Record' },
+],
 
   };
   const SAVE_MAP = {
@@ -185,25 +185,27 @@ window.actionbtn = (() => {
     };
   }
 
-  // Render
+
 
   function extractPaymentData(btn) {
-  const row = btn.closest('tr');
-  const id  = row.dataset.id || '';
+    const row = btn.closest('tr');
+    const id  = row.dataset.id || '';
 
-  return {
-    _id:      id,
-    id:       id,
-    title:    `Payment #${id}`,
-    tenant:   row.dataset.tenant   || '',
-    property: row.dataset.property || '',
-    amount:   row.dataset.amount   || '',
-    datetime: row.dataset.datetime || '',
-    period:   row.dataset.period   || '',
-    nextdue:  row.dataset.nextdue  || '',
-    dbStatus: row.dataset.dbStatus || ''
-  };
-}
+   return {
+    _id:       id,
+    id:        id,
+    title:     `Payment #${id}`,
+    tenantId:  row.dataset.tenantId || '',
+    propertyId: row.dataset.propertyId || '',
+    tenant:    row.dataset.tenant || '',
+    property:  row.dataset.property || '',
+    amount:    row.dataset.amount || '',
+    datetime:  row.dataset.datetime || '',
+    period:    row.dataset.period || '',
+    nextdue:   row.dataset.nextdue || '',
+    dbStatus:  row.dataset.dbStatus || ''
+   };
+ }
 
   function formatViewValue(field, rawValue) {
     const val = rawValue ?? field.fallback ?? 'N/A';
@@ -532,9 +534,10 @@ function fetchLandlordProperties(landlordId) {
     renderTitle(entityType, data);
     renderFields(entityType, data, mode);
 
-    if (entityType === 'property') { computePaymentDue(data);}
+    if (entityType === 'property') { computePaymentDue(data); }
     if (entityType === 'landlord') fetchLandlordProperties(data._id);
     if (entityType === 'tenant')   fetchTenantHistory(data._id || data.id);
+    if (entityType === 'payment')  fetchPaymentRecords(data.tenantId, data.propertyId);
 
     fetchNotes(data._id || data.id, entityType);
 
@@ -786,6 +789,7 @@ function openFile(fileType) {
   alert(`Opening ${fileType.toUpperCase()} file... (Implement PDF later)`);
 }
 
+
 function fetchTenantHistory(tenantId) {
   const container = document.querySelector('.contant-row-t');
   if (!container) return;
@@ -840,7 +844,103 @@ function fetchTenantHistory(tenantId) {
           <div class="cell">
             <span class="status-badge ${statusClass}">${statusLabel}</span>
           </div>`;
-        container.appendChild(row);
-      });
+          container.appendChild(row);
+      } );
+  
+
+    })
+    .catch(() => {
+      const header = container.querySelector('.data-row.header');
+      container.innerHTML = '';
+      if (header) container.appendChild(header);
+
+      container.innerHTML += `<div class="data-row">
+        <div class="cell" style="grid-column:1/-1; color:red;">Failed to load tenancy history</div>
+      </div>`;
     });
 }
+  
+ function fetchPaymentRecords(tenantId, propertyId) {
+   const container = document.querySelector('.contant-row-pay');
+   if (!container) return;
+
+   const header = container.querySelector('.data-row.header');
+  container.innerHTML = '';
+  if (header) container.appendChild(header);
+
+   const loading = document.createElement('div');
+  loading.className = 'data-row';
+  loading.innerHTML = `<div class="cell" style="grid-column:1/-1;">
+    <i class="fa-solid fa-spinner fa-spin"></i> Loading...
+  </div>`;
+  container.appendChild(loading);
+
+   const safe = (s) => String(s || '')
+    .replace(/&/g, '&amp;')
+    .replace(/</g, '&lt;')
+    .replace(/>/g, '&gt;');
+
+  const fmtDT = (d) => {
+    if (!d) return '-';
+    const dt = new Date(String(d).replace(' ', 'T'));
+    return isNaN(dt) ? d : dt.toLocaleString('en-GB', { hour12: false });
+  };
+
+
+  fetch(`get_payment_records.php?tenant_id=${tenantId}&property_id=${propertyId}`)
+    .then(r => r.json())
+    .then(records => {
+      const header = container.querySelector('.data-row.header');
+      container.innerHTML = '';
+      if (header) container.appendChild(header);
+
+      if (!records.length) {
+        container.innerHTML += `
+          <div class="data-row">
+            <div class="cell" style="grid-column:1/-1;">No payment records found</div>
+          </div>`;
+        return;
+      }
+
+      records.forEach(rec => {
+        const row = document.createElement('div');
+        row.className = 'data-row';
+
+        let statusClass = 'status-due';
+        let statusLabel = rec.status || 'Pending';
+
+        if (rec.status === 'completed') {
+          statusClass = 'status-paid';
+          statusLabel = 'Completed';
+        } else if (rec.status === 'not complete') {
+          statusClass = 'status-overdue';
+          statusLabel = 'Not Complete';
+        } else {
+          statusClass = 'status-due';
+          statusLabel = 'Pending';
+        }
+
+       row.innerHTML = `
+       <div class="cell">£${Number(rec.transaction_amount).toLocaleString()}</div>
+       <div class="cell">${safe(rec.payment_period || '-')}</div>
+       <div class="cell">${fmtDT(rec.date_of_transaction)}</div>
+       <div class="cell"><span class="status-badge ${statusClass}">${statusLabel}</span></div>
+     `;
+
+        container.appendChild(row);
+      });
+    })
+    .catch(() => {
+      const header = container.querySelector('.data-row.header');
+      container.innerHTML = '';
+      if (header) container.appendChild(header);
+
+      container.innerHTML += `
+        <div class="data-row">
+          <div class="cell" style="grid-column:1/-1; color:red;">Failed to load payment records</div>
+        </div>`;
+    });
+  }
+    
+  
+  

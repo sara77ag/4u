@@ -21,10 +21,11 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST' && isset($_POST['archive_id'])) {
     exit();
 }
 
-// Fetch all transactions with tenant name and property address
-$stmt = $pdo->query("
+   $stmt = $pdo->query("
     SELECT
         tr.transaction_id,
+        tr.tenant_id,
+        tr.property_id,
         tr.transaction_amount,
         tr.date_of_transaction,
         tr.payment_period,
@@ -36,7 +37,7 @@ $stmt = $pdo->query("
     LEFT JOIN tenants t ON tr.tenant_id = t.tenant_id
     LEFT JOIN properties p ON tr.property_id = p.property_id
     WHERE tr.archived = 0
-");
+  ");
 
 $payments = $stmt->fetchAll(PDO::FETCH_ASSOC);
 
@@ -172,16 +173,18 @@ function formatDateValue($value) {
     $nextDueDisplay = formatDateValue($p['next_due']);
 ?>
     <tr
-        data-id="<?= (int)$p['transaction_id'] ?>"
-        data-tenant="<?= htmlspecialchars($p['tenant_name'] ?? '') ?>"
-        data-property="<?= htmlspecialchars($p['property_address'] ?? '') ?>"
-        data-amount="<?= (float)$p['transaction_amount'] ?>"
-        data-datetime="<?= htmlspecialchars($p['date_of_transaction'] ?? '') ?>"
-        data-period="<?= htmlspecialchars($p['payment_period'] ?? '') ?>"
-        data-nextdue="<?= htmlspecialchars($p['next_due'] ?? '') ?>"
-        data-status="<?= htmlspecialchars($status) ?>"
-        data-db-status="<?= htmlspecialchars($dbStatus) ?>"
-    >
+    data-id="<?= (int)$p['transaction_id'] ?>"
+    data-tenant-id="<?= (int)$p['tenant_id'] ?>"
+    data-property-id="<?= (int)$p['property_id'] ?>"
+    data-tenant="<?= htmlspecialchars($p['tenant_name'] ?? '') ?>"
+    data-property="<?= htmlspecialchars($p['property_address'] ?? '') ?>"
+    data-amount="<?= (float)$p['transaction_amount'] ?>"
+    data-datetime="<?= htmlspecialchars($p['date_of_transaction'] ?? '') ?>"
+    data-period="<?= htmlspecialchars($p['payment_period'] ?? '') ?>"
+    data-nextdue="<?= htmlspecialchars($p['next_due'] ?? '') ?>"
+    data-status="<?= htmlspecialchars($status) ?>"
+    data-db-status="<?= htmlspecialchars($dbStatus) ?>"
+   >
 
         <td class="tenant-name"><?= htmlspecialchars($p['tenant_name'] ?? '-') ?></td>
         <td class="property-address"><?= htmlspecialchars($p['property_address'] ?? '-') ?></td>
@@ -251,12 +254,19 @@ function formatDateValue($value) {
             <button class="tab-btn active" data-tab="payment">
                 <i class="fa-solid fa-credit-card"></i> Payment Information
             </button>
+            <button class="tab-btn" data-tab="records">
+                <i class="fa-solid fa-receipt"></i> Payment Records
+            </button>
+            <button class="tab-btn" data-tab="files">
+                <i class="fa-solid fa-folder"></i> Files
+            </button>
             <button class="tab-btn" data-tab="notes">
                 <i class="fa-solid fa-sticky-note"></i> Notes
             </button>
         </div>
 
         <div class="action-tabs-content">
+            <!-- Payment Information -->
             <div id="pay-tab-payment" class="tab-content active">
                 <div class="tab-header">
                     <i class="fa-solid fa-credit-card"></i>
@@ -266,39 +276,78 @@ function formatDateValue($value) {
                 <div class="details-grid">
                     <div class="detail-row">
                         <span class="detail-label">Payment ID:</span>
-                        <span id="pay-payment-id" class="detail-value"></span>
+                        <span id="pay-payment-id" class="detail-value">-</span>
                     </div>
                     <div class="detail-row">
-                        <span class="detail-label">Tenant:</span>
-                        <span id="pay-payment-tenant" class="detail-value"></span>
+                        <span class="detail-label">Tenant Name:</span>
+                        <span id="pay-payment-tenant" class="detail-value">-</span>
                     </div>
                     <div class="detail-row">
                         <span class="detail-label">Property:</span>
-                        <span id="pay-payment-property" class="detail-value"></span>
+                        <span id="pay-payment-property" class="detail-value">-</span>
                     </div>
                     <div class="detail-row">
                         <span class="detail-label">Amount:</span>
-                        <span id="pay-payment-amount" class="detail-value"></span>
+                        <span id="pay-payment-amount" class="detail-value">-</span>
                     </div>
                     <div class="detail-row">
                         <span class="detail-label">Date/Time:</span>
-                        <span id="pay-payment-datetime" class="detail-value"></span>
+                        <span id="pay-payment-datetime" class="detail-value">-</span>
                     </div>
                     <div class="detail-row">
                         <span class="detail-label">Period:</span>
-                        <span id="pay-payment-period" class="detail-value"></span>
+                        <span id="pay-payment-period" class="detail-value">-</span>
                     </div>
                     <div class="detail-row">
                         <span class="detail-label">Next Due:</span>
-                        <span id="pay-payment-nextdue" class="detail-value"></span>
+                        <span id="pay-payment-nextdue" class="detail-value">-</span>
                     </div>
                     <div class="detail-row">
                         <span class="detail-label">Status:</span>
-                        <span id="pay-payment-status" class="detail-value"></span>
+                        <span id="pay-payment-status" class="detail-value">-</span>
                     </div>
                 </div>
             </div>
 
+            <!-- Payment Records -->
+            <div id="pay-tab-records" class="tab-content">
+                <div class="tab-header">
+                    <i class="fa-solid fa-receipt"></i>
+                    <span>Payment Records</span>
+                </div>
+
+                <div class="contant-row-pay">
+                    <div class="data-row header">
+                        <div class="cell">Amount</div>
+                        <div class="cell">Period</div>
+                        <div class="cell">Date/Time</div>
+                        <div class="cell">Status</div>
+                    </div>
+                </div>
+            </div>
+
+            <!-- Files -->
+            <div id="pay-tab-files" class="tab-content">
+                <div class="tab-header">
+                    <i class="fa-solid fa-folder"></i>
+                    <span>Files</span>
+                </div>
+
+                <div class="files-list">
+                    <div class="file-item">
+                        <i class="fa-solid fa-file-pdf file-icon"></i>
+                        <span class="file-name">Payment Receipt</span>
+                        <button class="file-open-btn" onclick="openFile('payment receipt')">Open</button>
+                    </div>
+                    <div class="file-item">
+                        <i class="fa-solid fa-file-pdf file-icon"></i>
+                        <span class="file-name">Invoice</span>
+                        <button class="file-open-btn" onclick="openFile('invoice')">Open</button>
+                    </div>
+                </div>
+            </div>
+
+            <!-- Notes -->
             <div id="pay-tab-notes" class="tab-content">
                 <div class="tab-header">
                     <i class="fa-solid fa-sticky-note"></i>
@@ -319,9 +368,7 @@ function formatDateValue($value) {
         </div>
     </div>
 </div>
-
-
-
+        
 
     <script>
         const months = ["Jan","Feb","Mar","Apr","May","Jun","Jul","Aug","Sep","Oct","Nov","Dec"];

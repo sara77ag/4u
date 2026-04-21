@@ -621,6 +621,14 @@
     font-size: 14px;
 }
 
+.contant-row-pay {
+    display: grid;
+    grid-template-columns: 1fr 1fr 1.5fr 1fr;
+    gap: 0 16px;
+    font-size: 14px;
+}
+
+
 .data-row {
     display: contents;
 }
@@ -641,7 +649,7 @@
 }
 
 @media (max-width: 768px) {
-    .contant-row-p, .contant-row-t {
+    .contant-row-p, .contant-row-t, .contant-row-pay {
         grid-template-columns: 1fr;
         gap: 10px;
     }
