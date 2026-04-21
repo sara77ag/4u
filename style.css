@@ -171,11 +171,29 @@ body.login-page {
     transition: background 0.2s ease;
 }
 
+.user-dropdown-btn {
+    width: 100%;
+    border: none;
+    background: transparent;
+    font: inherit;
+    text-align: left;
+    cursor: pointer;
+}
+
 .user-dropdown a:hover {
     background: #f7fafc;
 }
 
+.user-dropdown-btn:hover {
+    background: #f7fafc;
+}
+
 .user-dropdown a i {
+    color: #3182ce;
+    font-size: 14px;
+}
+
+.user-dropdown-btn i {
     color: #3182ce;
     font-size: 14px;
 }
