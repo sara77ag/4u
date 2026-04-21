@@ -439,13 +439,13 @@ function formatDateValue($value) {
 
         function viewPayment(btn) {
             const row = btn.closest('tr');
-            const id = row.dateset.id;
+            const id = row.dataset.id;
             alert('View Payment: ' + id);
         }
 
         function editPayment(btn) {
             const row = btn.closest('tr');
-            const id = row.dateset.id;
+            const id = row.dataset.id;
             alert('Edit Payment: ' + id);
         }
 
