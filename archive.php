@@ -253,7 +253,7 @@ $typeConfig = [
                             <option value="transactions">Transaction</option>
                             <option value="viewing_bookings">Viewing</option>
                             <option value="users">User</option>
-                            <option value="notes">Note</option>
+                            <option value="notes">Note</option>                            
                         </select>
                     </div>
                     <div class="filter-group">

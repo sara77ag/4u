@@ -35,7 +35,7 @@ $deadlines = $pdo->query("
     (SELECT COUNT(*) FROM tenants    WHERE id_expiry_date    BETWEEN date('now') AND date('now', '+30 days') AND archived = 0) +
     (SELECT COUNT(*) FROM contracts  WHERE contract_end      BETWEEN date('now') AND date('now', '+30 days') AND archived = 0)
 ")->fetchColumn();
-$todos = $pdo->query("SELECT note_id, note_text FROM notes WHERE archived = 0 AND type = 'todo' ORDER BY created_at ASC")->fetchAll(PDO::FETCH_ASSOC);
+$todos = $pdo->query("SELECT note_id, note_text, completed FROM notes WHERE archived = 0 AND type = 'todo' ORDER BY created_at ASC")->fetchAll(PDO::FETCH_ASSOC);
 ?>
 
 <!DOCTYPE html>
@@ -186,24 +186,24 @@ $todos = $pdo->query("SELECT note_id, note_text FROM notes WHERE archived = 0 AN
         if (todos.length > 0) {
             todoList.innerHTML = '';
             todos.forEach(function(todo) {
-                todoList.appendChild(makeTodoItem(todo.note_id, todo.note_text));
+            todoList.appendChild(makeTodoItem(todo.note_id, todo.note_text, todo.completed));
             });
         }
     }
 
-    function makeTodoItem(id, text) {
-        const li = document.createElement('li');
-        li.className = 'todo-item';
-        li.dataset.id = id;
-        li.innerHTML = `
-            <input type="checkbox" class="todo-checkbox" onchange="toggleTodo(this)">
-            <span class="todo-text">${text}</span>
-            <button class="delete-btn" onclick="deleteTodo(this)">
-                <i class="fa-solid fa-trash"></i>
-            </button>
-        `;
-        return li;
-    }
+    function makeTodoItem(id, text, completed) {
+    const li = document.createElement('li');
+    li.className = 'todo-item' + (completed ? ' completed' : '');
+    li.dataset.id = id;
+    li.innerHTML = `
+        <input type="checkbox" class="todo-checkbox" ${completed ? 'checked' : ''} onchange="toggleTodo(this)">
+        <span class="todo-text">${text}</span>
+        <button class="delete-btn" onclick="deleteTodo(this)">
+            <i class="fa-solid fa-trash"></i>
+        </button>
+    `;
+    return li;
+}
 
     function addTodo() {
         const input = document.getElementById('todo-input');
@@ -231,12 +231,21 @@ $todos = $pdo->query("SELECT note_id, note_text FROM notes WHERE archived = 0 AN
     }
 
     function toggleTodo(checkbox) {
-        checkbox.parentElement.classList.toggle('completed');
-    }
+    const li = checkbox.closest('.todo-item');
+    const id = li.dataset.id;
+    const completed = checkbox.checked ? 1 : 0;
+    li.classList.toggle('completed', checkbox.checked);
 
-    document.getElementById('todo-input').addEventListener('keypress', function(e) {
-        if (e.key === 'Enter') addTodo();
-    });
+    const form = document.createElement('form');
+    form.method = 'POST';
+    form.action = 'modals.php';
+    form.innerHTML = `
+        <input type="hidden" name="toggle_todo_id" value="${id}">
+        <input type="hidden" name="toggle_todo_completed" value="${completed}">
+    `;
+    document.body.appendChild(form);
+    form.submit();
+    };
 </script>
 </body>
 </html>
