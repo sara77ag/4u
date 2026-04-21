@@ -203,7 +203,6 @@ $typeConfig = [
         .type-viewing     { background: #fde8e8; color: #c0392b; }
         .type-user        { background: #fdf8e8; color: #d4a017; }
         .type-note        { background: #f0f0f0; color: #555; }
-        .type-file        { background: #e8eafd; color: #3949ab; }
 
         /* ── Archive-specific empty state ───────────────────── */
         .archive-empty {
