@@ -28,8 +28,44 @@ function CallNavbar() {
         });
 
         initSearch();
+        initProfileModal();
     })
     .catch(error => console.error('Error loading navbar:', error));
+}
+
+function initProfileModal() {
+    const openBtn = document.getElementById('viewProfileBtn');
+    const modal = document.getElementById('profileModal');
+    const closeBtn = document.getElementById('closeProfileModal');
+    const footerCloseBtn = document.getElementById('profileFooterClose');
+
+    if (!openBtn || !modal || !closeBtn || !footerCloseBtn) return;
+
+    function closeModal() {
+        modal.classList.remove('is-open');
+        modal.setAttribute('aria-hidden', 'true');
+    }
+
+    openBtn.addEventListener('click', function (e) {
+        e.preventDefault();
+        modal.classList.add('is-open');
+        modal.setAttribute('aria-hidden', 'false');
+    });
+
+    closeBtn.addEventListener('click', closeModal);
+    footerCloseBtn.addEventListener('click', closeModal);
+
+    modal.addEventListener('click', function (e) {
+        if (e.target === modal) {
+            closeModal();
+        }
+    });
+
+    document.addEventListener('keydown', function (e) {
+        if (e.key === 'Escape' && modal.classList.contains('is-open')) {
+            closeModal();
+        }
+    });
 }
 
 function initSearch() {
