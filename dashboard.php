@@ -6,6 +6,7 @@ if(!isset($_SESSION['user_id'])) {
     exit();
 }
 
+
 $dbPath = __DIR__ . '/database.db';
 
 try {
@@ -129,12 +130,12 @@ $todos = $pdo->query("SELECT note_id, note_text, completed FROM notes WHERE arch
                         <h4 class="quick-card-title">Export Report</h4>
                         <p class="quick-card-desc">Export monthly summary</p>
                     </div>
-                    <div class="quick-card" onclick="alert('WhatsApp integration coming soon.')">
+                    <div class="quick-card" onclick="window.open('https://web.whatsapp.com', '_blank')">
                         <div class="quick-card-icon"><i class="fa-brands fa-whatsapp"></i></div>
                         <h4 class="quick-card-title">Open WhatsApp</h4>
                         <p class="quick-card-desc">Send a quick message via WhatsApp</p>
                     </div>
-                    <div class="quick-card" onclick="alert('Issue reporting coming soon.')">
+                    <div class="quick-card" onclick="openComplaintModal()">
                         <div class="quick-card-icon"><i class="fa-solid fa-wrench"></i></div>
                         <h4 class="quick-card-title">Report an Issue</h4>
                         <p class="quick-card-desc">Log a maintenance request</p>
@@ -176,6 +177,24 @@ $todos = $pdo->query("SELECT note_id, note_text, completed FROM notes WHERE arch
     <div id="modals-container"></div>
 
     <script>
+
+    const SESSION_USER = {
+    name: "<?= $_SESSION['name'] ?? '' ?>",
+    email: "<?= $_SESSION['email'] ?? '' ?>"
+    };
+
+    function openComplaintModal() {
+    const modal = document.getElementById('complaintModal');
+    modal.style.display = 'flex';
+
+    document.getElementById('userName').value = SESSION_USER.name || '';
+    document.getElementById('userEmail').value = SESSION_USER.email || '';
+}
+    function closeComplaintModal() {
+        const modal = document.getElementById('complaintModal');
+        if (modal) modal.style.display = 'none';
+    }
+
     function afterModalsLoaded() {
         console.log('afterModalsLoaded fired');
         const todoList = document.getElementById('todo-list');
@@ -247,5 +266,57 @@ $todos = $pdo->query("SELECT note_id, note_text, completed FROM notes WHERE arch
     form.submit();
     };
 </script>
+
+<div id="complaintModal" class="modal-overlay"
+     onclick="if(event.target===this) closeComplaintModal()">
+
+    <div class="modal-container" style="max-width: 520px;">
+
+        <!-- HEADER -->
+        <div class="modal-header">
+            <div class="modal-header-title">
+                <div class="modal-header-title-icon">
+                    <i class="fa-solid fa-wrench"></i>
+                </div>
+                <h3>Report an Issue</h3>
+            </div>
+
+            <button class="modal-close-btn" onclick="closeComplaintModal()">
+                <i class="fa-solid fa-xmark"></i>
+            </button>
+        </div>
+
+        <div class="modal-body">
+            <form action="https://formspree.io/f/mjgjenwo" method="POST">
+
+                <div class="form-group"> 
+                    <label>Name</label>
+                    <input type="text" name="name" id="userName" class="issue-field" readonly>
+                </div>
+
+                <div class="form-group">
+                    <label>Email</label>
+                    <input type="text" name="_replyto" id="userEmail" class="issue-field" readonly >
+                </div>
+
+                <div class="form-group">
+                    <label>Complaint</label>
+                    <textarea name="message" placeholder="Write your issue..." class="issue-textarea" required></textarea>
+                </div>
+
+                <div class="modal-footer">
+                    <button type="submit" class="modal-btn modal-btn-send">
+                        <i class="fa-solid fa-paper-plane"></i> Send
+                    </button>
+
+                    <button type="button" class="modal-btn modal-btn-reset" onclick="closeComplaintModal()"> 
+                        <i class="fa-solid fa-xmark"></i> Cancel 
+                    </button>
+                </div>
+            </form>
+        </div>
+    </div>
+</div>
+
 </body>
 </html>

@@ -23,6 +23,7 @@ if ($_SERVER["REQUEST_METHOD"] == "POST") {
     if ($user && $password === $user['password']) {
         $_SESSION['user_id'] = $user['user_id'];
         $_SESSION['name'] = $user['name'];
+        $_SESSION['email'] = $user['email'];
         $_SESSION['role'] = $user['role']; 
         
         header("Location: dashboard.php");
