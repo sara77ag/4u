@@ -63,6 +63,7 @@ function formatDateValue($value) {
     <link rel="stylesheet" href="tables.css">
     <script src="navbar.js" defer></script>
     <script src="modals.js" defer></script>
+    <script src="actionbtn.js" defer></script>
     <style>
        
         .col-tenant { width: 15%; }
@@ -179,6 +180,7 @@ function formatDateValue($value) {
         data-period="<?= htmlspecialchars($p['payment_period'] ?? '') ?>"
         data-nextdue="<?= htmlspecialchars($p['next_due'] ?? '') ?>"
         data-status="<?= htmlspecialchars($status) ?>"
+        data-db-status="<?= htmlspecialchars($dbStatus) ?>"
     >
 
         <td class="tenant-name"><?= htmlspecialchars($p['tenant_name'] ?? '-') ?></td>
@@ -194,12 +196,12 @@ function formatDateValue($value) {
         </td>
         <td>
             <div class="action-buttons">
-                <button class="action-btn action-btn-view" title="View" onclick="viewPayment(this)">
+                <button class="action-btn action-btn-view" title="View" onclick="actionbtn.viewPayment(this)">
                     <i class="fa-solid fa-eye"></i>
                 </button>
                 
                 <?php if (in_array($_SESSION['role'], ['admin', 'agent'])): ?>
-                    <button class="action-btn action-btn-edit" title="Edit" onclick="editPayment(this)">
+                    <button class="action-btn action-btn-edit" title="Edit" onclick="actionbtn.editPayment(this)">
                         <i class="fa-solid fa-pen"></i>
                     </button>
                 <?php endif; ?>
@@ -229,6 +231,97 @@ function formatDateValue($value) {
     </main>
 
     <div id="modals-container"></div>
+
+
+    <div id="viewPaymentModal" class="action-modal-overlay">
+    <div class="action-modal-container">
+        <div class="action-modal-header">
+            <div class="action-header-left">
+                <div class="action-modal-header-icon">
+                    <i class="fa-solid fa-credit-card"></i>
+                </div>
+                <h2 id="paymentTitle">Payment</h2>
+            </div>
+            <button class="modal-close-btn" onclick="actionbtn.closeModal()">
+                <i class="fa-solid fa-xmark"></i>
+            </button>
+        </div>
+
+        <div class="action-tabs-nav">
+            <button class="tab-btn active" data-tab="payment">
+                <i class="fa-solid fa-credit-card"></i> Payment Information
+            </button>
+            <button class="tab-btn" data-tab="notes">
+                <i class="fa-solid fa-sticky-note"></i> Notes
+            </button>
+        </div>
+
+        <div class="action-tabs-content">
+            <div id="pay-tab-payment" class="tab-content active">
+                <div class="tab-header">
+                    <i class="fa-solid fa-credit-card"></i>
+                    <span>Payment Information</span>
+                </div>
+
+                <div class="details-grid">
+                    <div class="detail-row">
+                        <span class="detail-label">Payment ID:</span>
+                        <span id="pay-payment-id" class="detail-value"></span>
+                    </div>
+                    <div class="detail-row">
+                        <span class="detail-label">Tenant:</span>
+                        <span id="pay-payment-tenant" class="detail-value"></span>
+                    </div>
+                    <div class="detail-row">
+                        <span class="detail-label">Property:</span>
+                        <span id="pay-payment-property" class="detail-value"></span>
+                    </div>
+                    <div class="detail-row">
+                        <span class="detail-label">Amount:</span>
+                        <span id="pay-payment-amount" class="detail-value"></span>
+                    </div>
+                    <div class="detail-row">
+                        <span class="detail-label">Date/Time:</span>
+                        <span id="pay-payment-datetime" class="detail-value"></span>
+                    </div>
+                    <div class="detail-row">
+                        <span class="detail-label">Period:</span>
+                        <span id="pay-payment-period" class="detail-value"></span>
+                    </div>
+                    <div class="detail-row">
+                        <span class="detail-label">Next Due:</span>
+                        <span id="pay-payment-nextdue" class="detail-value"></span>
+                    </div>
+                    <div class="detail-row">
+                        <span class="detail-label">Status:</span>
+                        <span id="pay-payment-status" class="detail-value"></span>
+                    </div>
+                </div>
+            </div>
+
+            <div id="pay-tab-notes" class="tab-content">
+                <div class="tab-header">
+                    <i class="fa-solid fa-sticky-note"></i>
+                    <span>Notes</span>
+                </div>
+
+                <?php if (in_array($_SESSION['role'], ['admin', 'agent'])): ?>
+                <div class="notes-input-section">
+                    <textarea id="pay-noteTextarea" class="note-textarea" placeholder="Write your note here..."></textarea>
+                    <button id="pay-addNoteBtn" class="add-note-btn" onclick="actionbtn.addNote()">
+                        <i class="fa-solid fa-plus"></i> Add Note
+                    </button>
+                </div>
+                <?php endif; ?>
+
+                <div data-notes-list class="notes-list"></div>
+            </div>
+        </div>
+    </div>
+</div>
+
+
+
 
     <script>
         const months = ["Jan","Feb","Mar","Apr","May","Jun","Jul","Aug","Sep","Oct","Nov","Dec"];
@@ -437,18 +530,7 @@ function formatDateValue($value) {
             });
         }
 
-        function viewPayment(btn) {
-            const row = btn.closest('tr');
-            const id = row.dataset.id;
-            alert('View Payment: ' + id);
-        }
-
-        function editPayment(btn) {
-            const row = btn.closest('tr');
-            const id = row.dataset.id;
-            alert('Edit Payment: ' + id);
-        }
-
+      
         window.addEventListener('load', () => {
             updateAllStatuses();
         });

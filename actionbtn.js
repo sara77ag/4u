@@ -66,8 +66,20 @@ window.actionbtn = (() => {
       { id: 't-currentTenancy-rent',          key: 'rent',          type: 'number', tab: 'currentTenancy', editable: false, prefix: '£', format: 'currency' },
       { id: 't-currentTenancy-status',        key: 'status',        type: 'text',   tab: 'currentTenancy', editable: false },
     ],
-  };
+  
+   
+   payment: [
+      { id: 'pay-payment-id',       key: 'id',       type: 'text',     tab: 'payment', editable: false, fallback: 'No Record' },
+      { id: 'pay-payment-tenant',   key: 'tenant',   type: 'text',     tab: 'payment', editable: false, fallback: 'No Record' },
+      { id: 'pay-payment-property', key: 'property', type: 'text',     tab: 'payment', editable: false, fallback: 'No Record' },
+      { id: 'pay-payment-amount',   key: 'amount',   type: 'number',   tab: 'payment', editable: true,  prefix: '£', format: 'currency', fallback: 'No Record' },
+      { id: 'pay-payment-datetime', key: 'datetime', type: 'datetime', tab: 'payment', editable: true,  fallback: 'No Record' },
+      { id: 'pay-payment-period',   key: 'period',   type: 'text',     tab: 'payment', editable: true,  fallback: 'No Record' },
+      { id: 'pay-payment-nextdue',  key: 'nextdue',  type: 'date',     tab: 'payment', editable: true,  fallback: 'No Record' },
+      { id: 'pay-payment-status',   key: 'dbStatus', type: 'select',   tab: 'payment', editable: true,  options: ['completed', 'pending', 'not complete'], fallback: 'No Record' },
+    ],
 
+  };
   const SAVE_MAP = {
     property: {
       id:         '_id',
@@ -175,6 +187,24 @@ window.actionbtn = (() => {
 
   // Render
 
+  function extractPaymentData(btn) {
+  const row = btn.closest('tr');
+  const id  = row.dataset.id || '';
+
+  return {
+    _id:      id,
+    id:       id,
+    title:    `Payment #${id}`,
+    tenant:   row.dataset.tenant   || '',
+    property: row.dataset.property || '',
+    amount:   row.dataset.amount   || '',
+    datetime: row.dataset.datetime || '',
+    period:   row.dataset.period   || '',
+    nextdue:  row.dataset.nextdue  || '',
+    dbStatus: row.dataset.dbStatus || ''
+  };
+}
+
   function formatViewValue(field, rawValue) {
     const val = rawValue ?? field.fallback ?? 'N/A';
     if (field.format === 'currency') {
@@ -189,6 +219,20 @@ window.actionbtn = (() => {
     if (!el) return;
     const raw = data[field.key];
 
+    if (field.type === 'date') {
+  const isEmpty = raw === null || raw === undefined || raw === '';
+  const value = raw ? formatDate(raw) : (field.fallback || 'N/A');
+  el.innerHTML = `<span class="${isEmpty ? 'tenant-vacant' : ''}">${value}</span>`;
+  return;
+}
+
+if (field.type === 'datetime') {
+  const isEmpty = raw === null || raw === undefined || raw === '';
+  const value = raw ? formatDateTime(raw) : (field.fallback || 'N/A');
+  el.innerHTML = `<span class="${isEmpty ? 'tenant-vacant' : ''}">${value}</span>`;
+  return;
+}
+
     if (field.type === 'badge') {
       const val = raw || '';
       el.textContent = val.charAt(0).toUpperCase() + val.slice(1);
@@ -201,6 +245,7 @@ window.actionbtn = (() => {
     const value   = formatViewValue(field, raw);
     el.innerHTML  = `<span class="${isEmpty ? 'tenant-vacant' : ''}">${value}</span>`;
   }
+
 
   function renderFieldEdit(field, data) {
     if (!field.editable) return;
@@ -221,8 +266,13 @@ window.actionbtn = (() => {
         break;
       }
       case 'date':
-        el.innerHTML = `<input class="date-input" type="date" value="${raw}" data-field-id="${field.id}">`;
+        el.innerHTML = `<input class="date-input" type="date" value="${toDateInputValue(raw)}" data-field-id="${field.id}">`;
         break;
+
+        case 'datetime':
+        el.innerHTML = `<input type="datetime-local" value="${toDateTimeInputValue(raw)}" data-field-id="${field.id}">`;
+        break;  
+
       case 'number':
         el.innerHTML = `<input type="number" value="${raw}" placeholder="${isEmpty ? placeholder : ''}" data-field-id="${field.id}">`;
         break;
@@ -364,6 +414,7 @@ function fetchLandlordProperties(landlordId) {
     property: { titleId: 'propertyTitle', titleKey: 'address' },
     landlord: { titleId: 'landlordName',  titleKey: 'name'    },
     tenant:   { titleId: 'tenantName',    titleKey: 'name'    },
+    payment:  { titleId: 'paymentTitle',  titleKey: 'title'   }
   };
 
   function renderTitle(entityType, data) {
@@ -377,18 +428,21 @@ function fetchLandlordProperties(landlordId) {
     property: 'viewPropertyModal',
     landlord: 'viewLandlordModal',
     tenant:   'viewTenantModal',
+    payment:  'viewPaymentModal',
   };
 
   const TAB_PREFIXES = {
     property: 'p-tab-',
     landlord: 'l-tab-',
     tenant:   't-tab-',
+    payment:  'pay-tab-',
   };
 
   const DEFAULT_TABS = {
     property: 'property',
     landlord: 'landlord',
     tenant:   'tenant',
+    payment:  'payment',
   };
 
   function openModal(entityType) {
@@ -572,6 +626,28 @@ function fetchLandlordProperties(landlordId) {
   .catch(err => console.error(err));
 }
 
+
+
+function savePayment() {
+  const payload = {
+    id:                  state.entity._id || state.entity.id,
+    transaction_amount:  document.querySelector('#pay-payment-amount input')?.value || '',
+    date_of_transaction: document.querySelector('#pay-payment-datetime input')?.value || '',
+    payment_period:      document.querySelector('#pay-payment-period input')?.value || '',
+    next_due:            document.querySelector('#pay-payment-nextdue input')?.value || '',
+    status:              document.querySelector('#pay-payment-status select')?.value || ''
+  };
+
+  fetch('update_payment.php', {
+    method:  'POST',
+    headers: { 'Content-Type': 'application/json' },
+    body:    JSON.stringify(payload)
+  })
+    .then(r => r.json())
+    .then(() => location.reload())
+    .catch(err => console.error(err));
+}
+
   // Add Note
 
   function addNote() {
@@ -633,6 +709,24 @@ function fetchLandlordProperties(landlordId) {
   return isNaN(d) ? dateStr : d.toLocaleDateString('en-GB');
 }
 
+
+function formatDateTime(dateStr) {
+  if (!dateStr) return '-';
+  const d = new Date(String(dateStr).replace(' ', 'T'));
+  return isNaN(d) ? dateStr : d.toLocaleString('en-GB', { hour12: false });
+}
+
+function toDateInputValue(value) {
+  if (!value) return '';
+  return String(value).split('T')[0].split(' ')[0];
+}
+
+function toDateTimeInputValue(value) {
+  if (!value) return '';
+  return String(value).replace(' ', 'T').slice(0, 16);
+}
+
+
   // Global Click Handler 
 
   document.addEventListener('click', (e) => {
@@ -644,6 +738,7 @@ function fetchLandlordProperties(landlordId) {
       if (state.entityType === 'property') saveProperty();
       if (state.entityType === 'landlord') saveLandlord();
       if (state.entityType === 'tenant')   saveTenant();
+      if (state.entityType === 'payment')  savePayment();
       return;
     }
 
@@ -674,12 +769,15 @@ function fetchLandlordProperties(landlordId) {
     editLandlord(btn)  { openEntityModal('landlord', extractLandlordData(btn), 'edit'); },
     viewTenant(btn)    { openEntityModal('tenant',   extractTenantData(btn),   'view'); },
     editTenant(btn) { openEntityModal('tenant', extractTenantData(btn), 'edit'); },
+    viewPayment(btn)  { openEntityModal('payment', extractPaymentData(btn), 'view'); },
+    editPayment(btn)  { openEntityModal('payment', extractPaymentData(btn), 'edit'); },
     closeModal,
     switchTab,
     addNote,
     saveProperty,
     saveLandlord,
-    saveTenant
+    saveTenant,
+    savePayment
   };
 
 })();
