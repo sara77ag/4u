@@ -109,6 +109,14 @@ $role = $_SESSION['role'] ?? '';
                 <span>Users</span>
             </a>
         </li>
+        <?php if ($role === 'admin'): ?>
+<li>
+    <a href="archive.php">
+        <i class="fa-solid fa-box-archive"></i>
+        <span>Archive</span>
+    </a>
+</li>
+<?php endif; ?>
         <?php endif; ?>
     </ul>
 </nav>
