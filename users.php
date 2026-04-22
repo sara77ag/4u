@@ -61,6 +61,7 @@ $users = $stmt->fetchAll(PDO::FETCH_ASSOC);
     <link rel="stylesheet" href="tables.css">
     <script src="navbar.js"></script>
     <script src="modals.js"></script>
+    <script src="actionbtn.js"></script>
 </head>
 <body onload="CallNavbar(); loadModals();">
     <div id="navbar-container"></div>
@@ -110,7 +111,8 @@ $users = $stmt->fetchAll(PDO::FETCH_ASSOC);
 <?php foreach ($users as $user): 
     $roleDisplay = ucfirst(str_replace('_', ' ', $user['role']));
 ?>
-                    <div class="card" data-name="<?= strtolower($user['name']) ?>" data-role="<?= htmlspecialchars($user['role']) ?>">
+                    <div class="card" 
+                    data-name="<?= strtolower($user['name']) ?>" data-role="<?= htmlspecialchars($user['role']) ?>">
                         <div class="card-header">
                             <div class="card-name"><?= htmlspecialchars($user['name']) ?></div>
                         </div>
@@ -137,12 +139,12 @@ $users = $stmt->fetchAll(PDO::FETCH_ASSOC);
                             </form>
                         </div>
                         <div class="action-buttons">
-                            <button class="action-btn action-btn-view" title="View" onclick="viewUser(this)">
+                            <button class="action-btn action-btn-view" title="View" onclick="actionbtn.viewUser(this)">
                                 <i class="fa-solid fa-eye"></i>
                             </button>
                             
                             <?php if (in_array($_SESSION['role'], ['admin', 'agent'])): ?>
-                            <button class="action-btn action-btn-edit" title="Edit" onclick="editUser(this)">
+                            <button class="action-btn action-btn-edit" title="Edit" onclick="actionbtn.editUser(this)">
                                 <i class="fa-solid fa-pen"></i>
                             </button>
                             <?php endif; ?>
@@ -175,9 +177,9 @@ $users = $stmt->fetchAll(PDO::FETCH_ASSOC);
         <div class="action-modal-header">
             <div class="action-header-left">
                 <div class="action-modal-header-icon">
-                    <i class="fa-solid fa-house"></i>
+                    <i class="fa-solid fa-user-tie"></i>
                 </div>
-                <h2 id="username">-</h2>
+                <h2 id="username">Landlord Name</h2>
             </div>
             <button class="modal-close-btn" onclick="actionbtn.closeModal()">
                 <i class="fa-solid fa-xmark"></i>
@@ -202,47 +204,47 @@ $users = $stmt->fetchAll(PDO::FETCH_ASSOC);
               <div class="details-grid">
                     <div class="detail-row">
                         <span class="detail-label">Username:</span>
-                        <span id="u-users-username" class="detail-value">-</span>
+                        <span id="u-user-username" class="detail-value">-</span>
                     </div>
                     <div class="detail-row">
                         <span class="detail-label">Name:</span>
-                        <span id="u-users-name" class="detail-value">-</span>
+                        <span id="u-user-name" class="detail-value">-</span>
                     </div>
                     <div class="detail-row">
                         <span class="detail-label">Phone Number:</span>
-                        <span id="u-users-phone" class="status-badge-modal status-available">-</span>
+                        <span id="u-user-phone" class="status-badge-modal status-available">-</span>
                     </div>
                     <div class="detail-row">
                         <span class="detail-label">Email:</span>
-                        <span id="u-users-email" class="status-badge-modal status-available">-</span>
+                        <span id="u-user-email" class="status-badge-modal status-available">-</span>
                     </div>
                     <div class="detail-row">
                         <span class="detail-label">Password:</span>
-                        <span id="u-users-password" class="status-badge-modal status-available">-</span>
+                        <span id="u-user-password" class="status-badge-modal status-available">-</span>
                     </div>
                     <div class="detail-row">
                         <span class="detail-label">Phone Reset Date:</span>
-                        <span id="u-users-passwordresetdate" class="status-badge-modal status-available">-</span>
+                        <span id="u-user-passwordresetdate" class="status-badge-modal status-available">-</span>
                     </div>
                     <div class="detail-row">
                         <span class="detail-label">Id Number:</span>
-                        <span id="u-users-IdNumber" class="status-badge-modal status-available">-</span>
+                        <span id="u-user-IdNumber" class="status-badge-modal status-available">-</span>
                     </div>
                     <div class="detail-row">
                         <span class="detail-label">Id Expiry Date:</span>
-                        <span id="u-users-Idexpirydate" class="status-badge-modal status-available">-</span>
+                        <span id="u-user-Idexpirydate" class="status-badge-modal status-available">-</span>
                     </div>
                     <div class="detail-row">
                         <span class="detail-label">Role:</span>
-                        <span id="u-users-role" class="status-badge-modal status-available">-</span>
+                        <span id="u-user-role" class="status-badge-modal status-available">-</span>
                     </div>
                     <div class="detail-row">
                         <span class="detail-label">Archived:</span>
-                        <span id="u-users-archived" class="status-badge-modal status-available">-</span>
+                        <span id="u-user-archived" class="status-badge-modal status-available">-</span>
                     </div>
                     <div class="detail-row">
                         <span class="detail-label">Date Archived:</span>
-                        <span id="u-users-datearchived" class="status-badge-modal status-available">-</span>
+                        <span id="u-user-datearchived" class="status-badge-modal status-available">-</span>
                     </div>
                 </div>
         </div>

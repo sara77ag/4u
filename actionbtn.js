@@ -66,6 +66,66 @@ window.actionbtn = (() => {
       { id: 't-currentTenancy-rent',          key: 'rent',          type: 'number', tab: 'currentTenancy', editable: false, prefix: '£', format: 'currency' },
       { id: 't-currentTenancy-status',        key: 'status',        type: 'text',   tab: 'currentTenancy', editable: false },
     ],
+
+    viewing: [
+      {id: 'v-viewing-id',                    key: 'id',             type: 'text', tab:'viewing', editable: false},
+      {id: 'v-viewing-propertyid',            key: 'property_id',     type: 'text', tab:'viewing', editable: false},
+      {id: 'v-viewing-viewer',                key: 'name',           type: 'text', tab:'viewing', editable: true},
+      {id: 'v-viewing-phone',                 key: 'phone',          type: 'text', tab: 'viewing', editable: true},
+      {id: 'v-viewing-status',                key: 'status',         type: 'badge', tab: 'viewing', editable: true},
+      {id: 'v-viewing-datetime',              key: 'date_time',       type: 'datetime', tab: 'viewing', editable: true},
+      {id: 'v-viewing-userid',                key: 'user_id',         type: 'text', tab: 'viewing', editable: false},
+      {id: 'v-viewing-email',                 key: 'email',          type: 'text', tab: 'viewing', editable: true},
+      {id: 'v-viewing-archived',              key: 'archived',       type: 'text', tab: 'viewing', editable: true},
+      {id: 'v-viewing-datearchived',          key: 'date_archived',   type: 'date', tab: 'viewing', editable: false},
+
+      {id: 'v-property-landlord',             key: 'landlord',       type: 'text', tab: 'property', editable: false},
+      {id: 'v-property-type',                 key: 'type',           type: 'text', tab: 'property', editable: false},
+      {id: 'v-property-status',               key: 'status',         type: 'badge', tab: 'property', editable: true},
+      {id: 'v-property-price',                key: 'price',          type: 'number', tab: 'property', editable: false},
+      {id: 'v-property-tenant',               key: 'tenant',         type: 'select', tab: 'property', editable: false},
+      {id: 'v-property-rooms',                key: 'rooms',          type: 'number', tab: 'property', editable: false},
+      {id: 'v-property-bathrooms',            key: 'bathrooms',      type: 'number', tab: 'property', editable: false},
+      {id: 'v-property-epc',                  key: 'epc',            type: 'text', tab: 'property', editable: false},
+      {id: 'v-property-pets',                 key: 'pets',           type: 'select', tab: 'property', editable: false},
+      {id: 'v-property-garden',               key: 'garden',         type: 'select', tab: 'property', editable: false},
+      {id: 'v-property-council',              key: 'council',        type: 'text', tab: 'property', editable: false},
+    ],
+
+    user: [
+      {id: 'u-user-username',                 key: 'username',       type: 'text', tab: 'user', editable: false},
+      {id: 'u-user-name',                     key: 'name',           type: 'text', tab: 'user', editable: true},
+      {id: 'u-user-phone',                    key: 'phone',          type: 'text', tab: 'user', editable: true},
+      {id: 'u-user-email',                    key: 'email',          type: 'text', tab: 'user', editable: true},
+      {id: 'u-user-password',                 key: 'password',       type: 'text', tab: 'user', editable: true},
+      {id: 'u-user-passwordresetdate',        key: 'passwordresetdate',  type: 'date', tab: 'user', editable: false},
+      {id: 'u-user-IdNumber',                 key: 'IdNumber',       type: 'text', tab: 'user', editable: true},
+      {id: 'u-user-Idexpirydate',             key: 'Idexpirydate',   type: 'date', tab: 'user', editable: true},
+      {id: 'u-user-role',                     key: 'role',           type: 'text', tab: 'user', editable: true},
+      {id: 'u-user-archived',                 key: 'archived',       type: 'text', tab: 'user', editable: true},
+      {id: 'u-user-datearchived',             key: 'datearchived',   type: 'date', tab: 'user', editable: false},
+    ],
+
+    importantdate: [
+      { id: 'i-date-landlord-id',    key: 'landlordIdExpiry', type: 'date',    tab: 'dates',     editable: true,  fallback: 'No Record' },
+      { id: 'i-date-tenant-id',      key: 'tenantIdExpiry',   type: 'date',    tab: 'dates',     editable: true,  fallback: 'No Record' },
+      { id: 'i-date-contract-end',   key: 'endDate',          type: 'date',    tab: 'dates',     editable: false, fallback: 'No Record' },
+      { id: 'i-date-gas',            key: 'gasDate',          type: 'date',    tab: 'dates',     editable: true,  fallback: 'No Record' },
+      { id: 'i-date-electric',       key: 'electricDate',     type: 'date',    tab: 'dates',     editable: true,  fallback: 'No Record' },
+      { id: 'i-date-epc',            key: 'epcDate',          type: 'date',    tab: 'dates',     editable: true,  fallback: 'No Record' },
+
+      { id: 'i-property-landlord',   key: 'landlord',        type: 'text',     tab: 'property',  editable: true,  fallback: 'No Record'   },
+      { id: 'i-property-status',     key: 'status',          type: 'badge',    tab: 'property',  editable: false,  fallback: 'No Record'  },
+      { id: 'i-property-price',      key: 'price',           type: 'number',   tab: 'property',  editable: true,  prefix: '£', format: 'currency',  fallback: 'No Record'  },
+      { id: 'i-property-type',       key: 'type',            type: 'select',   tab: 'property',  editable: true,  options: ['Flat','House','Apartment','Bungalow'],  fallback: 'No Record'  },
+      { id: 'i-property-tenant',     key: 'tenant',          type: 'text',     tab: 'property',  editable: false, fallback: 'No Tenant' },
+      { id: 'i-property-rooms',      key: 'rooms',           type: 'number',   tab: 'property',  editable: true,  fallback: 'No Record' },
+      { id: 'i-property-bathrooms',  key: 'bathrooms',       type: 'number',   tab: 'property',  editable: true,  fallback: 'No Record' },
+      { id: 'i-property-epc',        key: 'epc',             type: 'text',     tab: 'property',  editable: true,  fallback: 'No Record' },
+      { id: 'i-property-pets',       key: 'pets',            type: 'select',   tab: 'property',  editable: true,  options: ['Yes','No'] },
+      { id: 'i-property-garden',     key: 'garden',          type: 'select',   tab: 'property',  editable: true,  options: ['Yes','No'] },
+      { id: 'i-property-council',    key: 'council',         type: 'text',     tab: 'property',  editable: true,  fallback: 'No Record' },
+    ]
   };
 
   const SAVE_MAP = {
@@ -103,6 +163,35 @@ window.actionbtn = (() => {
       id_expiry_date: 'l-landlord-idexpiry',
       contact_method: 'l-landlord-contact-method'
     },
+
+    viewing: {
+      _id:              'v-viewing-id',
+      property_id:     'v-viewing-propertyid',
+      viewer_name:     'v-viewing-viewer',
+      viewer_phone:    'v-viewing-phone',
+      status:          'v-viewing-status',
+      date_time:       'v-viewing-datetime',
+      user_id:         'v-viewing-userid',
+      email:           'v-viewing-email',
+      archived:        'v-viewing-archived',
+      date_archived:    'v-viewing-datearchived',
+    },
+
+    user: {
+      _id:               'u-user-id',
+      username:         'u-user-username',
+      name:             'u-user-name',
+      phone:            'u-user-phone',
+      email:            'u-user-email',
+      password:         'u-user-password',
+      password_reset_date:'u-user-passwordresetdate',
+      id_number:         'u-user-IdNumber',
+      id_expiry_date:   'u-user-Idexpirydate',
+      role:             'u-user-role',
+      archived:         'u-user-archived',
+      date_archived:     'u-user-datearchived',
+    },
+
   };
 
   // Extract Data
@@ -171,6 +260,40 @@ window.actionbtn = (() => {
       rent:          row.dataset.rent          || '',
       status:        row.dataset.status        || '',
     };
+  }
+
+  function extractViewingData(btn) {
+    const row = btn.closest('tr') || btn.closest('.card');
+    return{
+      _id:              row.dataset.bookingid || '',
+      property_id:      row.dataset.propertyid || '',
+      viewer_name:      row.dataset.viewer || '',
+      viewer_phone:     row.dataset.phone || '',
+      status:           row.dataset.status || '',
+      date_time:        row.dataset.datetime || '',
+      user_id:          row.dataset.userid || '',
+      email:            row.dataset.email || '',
+      archived:         row.dataset.archived || '',
+      date_archived:    row.dataset.datearchived || '',
+    };
+  }
+
+  function extractUserData(btn) {
+    const row = btn.closest('tr') || btn.closest('.card');
+    return {
+      _id:                 row.dataset.userid || '',
+      username:            row.dataset.username || '',
+      name:                row.dataset.name || '',
+      phone:               row.dataset.phone || '',
+      email:               row.dataset.email || '',
+      password:            row.dataset.password || '',
+      password_reset_date: row.dataset.passwordresetdate || '',
+      id_number:           row.dataset.IdNumber || '',
+      id_expiry_date:      row.dataset.Idexpirydate || '',
+      role:                row.dataset.role || '',
+      archived:            row.dataset.archived || '',
+      date_archived:       row.dataset.datearchived || '',
+    }
   }
 
   // Render
@@ -377,18 +500,23 @@ function fetchLandlordProperties(landlordId) {
     property: 'viewPropertyModal',
     landlord: 'viewLandlordModal',
     tenant:   'viewTenantModal',
+    user: 'viewUserModal',
+    viewing: 'viewViewingModal',
+    importantdate: 'viewImportantDatesModal',
   };
 
   const TAB_PREFIXES = {
     property: 'p-tab-',
     landlord: 'l-tab-',
     tenant:   't-tab-',
+    user: 'u-tab',
   };
 
   const DEFAULT_TABS = {
     property: 'property',
     landlord: 'landlord',
     tenant:   'tenant',
+    user: 'user',
   };
 
   function openModal(entityType) {
@@ -572,6 +700,55 @@ function fetchLandlordProperties(landlordId) {
   .catch(err => console.error(err));
 }
 
+function saveViewing() {
+  const payload = {
+    id:             state.entity._id || state.entity.id,
+    viewer_name:           document.querySelector('#v-viewing-viewer input')?.value     || '',
+    viewer_phone:          document.querySelector('#v-viewing-phone input')?.value    || '',
+    status:          document.querySelector('#v-viewing-status select')?.value    || '',
+    date_time:        document.querySelector('#v-viewing-datetime input')?.value   || '',
+    user_id:      document.querySelector('#v-viewing-userid input')?.value || '',
+    email: document.querySelector('#v-viewing-email input')?.value || '',
+    archived: document.querySelector('#v-viewing-archived select')?.value || '',
+    date_archived: document.querySelector('#v-viewing-datearchived input')?.value || '',
+  };
+
+  fetch('update_viewing.php', {
+    method:  'POST',
+    headers: { 'Content-Type': 'application/json' },
+    body:    JSON.stringify(payload)
+  })
+  .then(r => r.json())
+  .then(() => location.reload())
+  .catch(err => console.error(err));
+}
+
+function saveUser() {
+  const payload = {
+    id:             state.entity._id || state.entity.id,
+    username:           document.querySelector('#u-user-username input')?.value     || '',
+    name:          document.querySelector('#u-user-name input')?.value    || '',
+    phone:          document.querySelector('#u-user-phone input')?.value    || '',
+    email:        document.querySelector('#u-user-email input')?.value   || '',
+    password:      document.querySelector('#u-user-password input')?.value || '',
+    password_reset_date: document.querySelector('#u-user-passwordresetdate input')?.value || '',
+    id_number: document.querySelector('#u-user-IdNumber input')?.value || '',
+    id_expiry_date: document.querySelector('#u-user-Idexpirydate input')?.value || '',
+    role: document.querySelector('#u-user-role select')?.value || '',
+    archived: document.querySelector('#u-user-archived select')?.value || '',
+    date_archived: document.querySelector('#u-user-datearchived input')?.value || '',
+  };
+
+  fetch('update_user.php', {
+    method:  'POST',
+    headers: { 'Content-Type': 'application/json' },
+    body:    JSON.stringify(payload)
+  })
+  .then(r => r.json())
+  .then(() => location.reload())
+  .catch(err => console.error(err));
+}
+
   // Add Note
 
   function addNote() {
@@ -674,6 +851,12 @@ function fetchLandlordProperties(landlordId) {
     editLandlord(btn)  { openEntityModal('landlord', extractLandlordData(btn), 'edit'); },
     viewTenant(btn)    { openEntityModal('tenant',   extractTenantData(btn),   'view'); },
     editTenant(btn) { openEntityModal('tenant', extractTenantData(btn), 'edit'); },
+    viewUser(btn)    { openEntityModal('user',   extractUserData(btn),   'view'); },
+    editUser(btn) { openEntityModal('user', extractUserData(btn), 'edit'); },
+    viewViewing(btn)    { openEntityModal('viewing',   extractViewingData(btn),   'view'); },
+    editViewing(btn) { openEntityModal('viewing', extractViewingData(btn), 'edit'); },
+    viewImportantDate(btn)    { openEntityModal('important-date',   extractPropertyData(btn),   'view'); },
+    editImportantDate(btn) { openEntityModal('important-date', extractPropertyData(btn), 'edit'); },
     closeModal,
     switchTab,
     addNote,
