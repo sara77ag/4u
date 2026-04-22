@@ -14,7 +14,7 @@ try {
     $pdo->setAttribute(PDO::ATTR_ERRMODE, PDO::ERRMODE_EXCEPTION);
 
     $stmt = $pdo->prepare("
-        SELECT username, name, phone, email, role
+        SELECT username, name, phone, email, role, password_reset_date
         FROM users
         WHERE user_id = ? AND archived = 0
         LIMIT 1
@@ -23,6 +23,67 @@ try {
     $currentUser = $stmt->fetch(PDO::FETCH_ASSOC) ?: null;
 } catch (PDOException $e) {
     $currentUser = null;
+}
+
+$passwordResetDate = $currentUser['password_reset_date'] ?? null;
+
+$daysRemaining = 30;
+$progressPercent = 100;
+
+if ($passwordResetDate) {
+    $lastReset = new DateTime($passwordResetDate);
+    $today = new DateTime();
+
+    $interval = $lastReset->diff($today);
+    $daysPassed = (int)$interval->format('%a');
+
+    if ($today < $lastReset) {
+        $daysPassed = 0;
+    }
+
+    $daysPassed = min($daysPassed, 30);
+
+    $daysRemaining = max(30 - $daysPassed, 0);
+    $progressPercent = ($daysRemaining / 30) * 100;
+}
+
+$barColor = "#38a169";
+$hintClass = "";
+
+if ($daysRemaining <= 0) {
+    $barColor = "#e53e3e";
+    $hintClass = "danger";
+} elseif ($daysRemaining <= 5) {
+    $barColor = "#ed8936";
+    $hintClass = "warning";
+}
+
+if ($_SERVER['REQUEST_METHOD'] === 'POST' && isset($_POST['reset_self_password'])) {
+
+    $userId = $_SESSION['user_id'];
+
+    $newPassword = substr(str_shuffle('ABCDEFGHJKLMNPQRSTUVWXYZabcdefghjkmnpqrstuvwxyz23456789'), 0, 10);
+    $hashedPassword = password_hash($newPassword, PASSWORD_DEFAULT);
+
+    $stmt = $pdo->prepare("
+        UPDATE users 
+        SET password = ?, password_reset_date = date('now') 
+        WHERE user_id = ?
+    ");
+    $stmt->execute([$hashedPassword, $userId]);
+
+    require_once 'mailer.php';
+
+    $stmt = $pdo->prepare("SELECT email, name FROM users WHERE user_id = ?");
+    $stmt->execute([$userId]);
+    $u = $stmt->fetch(PDO::FETCH_ASSOC);
+
+    if ($u) {
+        sendPasswordResetEmail($u['email'], $u['name'], $newPassword);
+    }
+
+    header("Location: " . $_SERVER['PHP_SELF']);
+    exit();
 }
 
 $role = $_SESSION['role'] ?? '';
@@ -34,7 +95,8 @@ $role = $_SESSION['role'] ?? '';
     </div>
     <div class="header-center">
         <div class="search-bar" id="searchBarWrapper">
-            <input type="text" placeholder="Search by name, address, or postcode" class="search-input" id="globalSearch">
+            <input type="text" placeholder="Search by name, address, email, or number" class="search-input"
+                id="globalSearch">
             <button class="search-btn" id="searchBtn">
                 <i class="fa-solid fa-magnifying-glass"></i>
             </button>
@@ -110,13 +172,13 @@ $role = $_SESSION['role'] ?? '';
             </a>
         </li>
         <?php if ($role === 'admin'): ?>
-<li>
-    <a href="archive.php">
-        <i class="fa-solid fa-box-archive"></i>
-        <span>Archive</span>
-    </a>
-</li>
-<?php endif; ?>
+        <li>
+            <a href="archive.php">
+                <i class="fa-solid fa-box-archive"></i>
+                <span>Archive</span>
+            </a>
+        </li>
+        <?php endif; ?>
         <?php endif; ?>
     </ul>
 </nav>
@@ -199,15 +261,43 @@ $role = $_SESSION['role'] ?? '';
                     </div>
                 </div>
             </div>
-        </div>
 
-        <div class="modal-footer">
-            <button class="modal-btn modal-btn-reset" onclick="closeProfileModal()">
-                <i class="fa-solid fa-xmark"></i> Close
-            </button>
-        </div>
 
+            <div class="password-progress-wrapper">
+                <div class="progress-label">
+                    Password Expiry
+                </div>
+            </div>
+
+            <div class="progress-bar-bg">
+                <div class="progress-bar-fill" style="width: <?= $progressPercent ?>%; background: <?= $barColor ?>;">
+                </div>
+            </div>
+
+            <div style="display:flex; justify-content:space-between; align-items:center; margin-top:8px; width:100%;">
+
+                <div class="progress-hint <?= $hintClass ?>">
+                    <?php if ($daysRemaining <= 0): ?>
+                    Your password has expired. Change it now.
+                    <?php else: ?>
+                    You have <?= $daysRemaining ?> day<?= $daysRemaining == 1 ? '' : 's' ?> remaining
+                    <?php endif; ?>
+                </div>
+
+                <form method="POST">
+                    <input type="hidden" name="reset_self_password" value="1">
+
+                    <button type="submit" class="reset-password">
+                        Reset Password
+                    </button>
+                </form>
+
+            </div>
+
+        </div>
     </div>
+
+</div>
 </div>
 
 <style>
@@ -223,10 +313,68 @@ $role = $_SESSION['role'] ?? '';
     border: 2px solid #f7fafc;
     min-height: 42px;
 }
+
 .profile-field i {
     color: #3182ce;
     font-size: 13px;
     flex-shrink: 0;
+}
+
+.password-progress-wrapper {
+    margin-top: 20px;
+}
+
+.progress-label {
+    font-size: 13px;
+    margin-bottom: 6px;
+    color: #4a5568;
+    font-weight: 600;
+}
+
+.progress-bar-bg {
+    width: 100%;
+    height: 10px;
+    background: #edf2f7;
+    border-radius: 20px;
+    overflow: hidden;
+}
+
+.progress-bar-fill {
+    height: 100%;
+    width: 100%;
+    background: #38a169;
+    border-radius: 20px;
+    transition: width 0.5s ease, background 0.3s ease;
+}
+
+.progress-hint {
+    font-size: 12px;
+    margin-top: 6px;
+    color: #718096;
+}
+
+.progress-hint.warning {
+    color: #dd6b20;
+    font-weight: 600;
+}
+
+.progress-hint.danger {
+    color: #e53e3e;
+    font-weight: bold;
+}
+
+.reset-password {
+    border: none;
+    background: none;
+    color: #007bff;
+    cursor: pointer;
+    text-decoration: underline;
+    font-size: 12px;
+}
+
+
+.reset-password:hover {
+    color: #315d93;
 }
 </style>
 
@@ -235,6 +383,7 @@ function openProfileModal() {
     document.getElementById('profileModal').classList.add('active');
     document.body.style.overflow = 'hidden';
 }
+
 function closeProfileModal() {
     document.getElementById('profileModal').classList.remove('active');
     document.body.style.overflow = 'auto';

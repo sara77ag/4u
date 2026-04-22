@@ -175,6 +175,7 @@ $typeConfig = [
 ?>
 <!DOCTYPE html>
 <html lang="en">
+
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
@@ -184,50 +185,108 @@ $typeConfig = [
     <link rel="stylesheet" href="tables.css">
     <script src="navbar.js"></script>
     <style>
-        /* ── Type badge colours ─────────────────────────────── */
-        .type-badge {
-            display: inline-flex;
-            align-items: center;
-            gap: 6px;
-            padding: 3px 10px;
-            border-radius: 20px;
-            font-size: 0.78rem;
-            font-weight: 600;
-            white-space: nowrap;
-        }
-        .type-property    { background: #e8f4fd; color: #1a73e8; }
-        .type-landlord    { background: #fdf3e8; color: #e67e22; }
-        .type-tenant      { background: #e8fdf3; color: #27ae60; }
-        .type-contract    { background: #f3e8fd; color: #8e44ad; }
-        .type-transaction { background: #e8fdf8; color: #16a085; }
-        .type-viewing     { background: #fde8e8; color: #c0392b; }
-        .type-user        { background: #fdf8e8; color: #d4a017; }
-        .type-note        { background: #f0f0f0; color: #555; }
+    /* ── Type badge colours ─────────────────────────────── */
+    .type-badge {
+        display: inline-flex;
+        align-items: center;
+        gap: 6px;
+        padding: 3px 10px;
+        border-radius: 20px;
+        font-size: 0.78rem;
+        font-weight: 600;
+        white-space: nowrap;
+    }
 
-        /* ── Archive-specific empty state ───────────────────── */
-        .archive-empty {
-            text-align: center;
-            padding: 60px 20px;
-            color: #aaa;
-        }
-        .archive-empty i {
-            font-size: 3rem;
-            margin-bottom: 12px;
-            display: block;
-        }
+    .type-property {
+        background: #e8f4fd;
+        color: #1a73e8;
+    }
 
-        /* ── Label column ───────────────────────────────────── */
-        .col-label   { width: 24%; }
-        .col-detail  { width: 18%; }
-        .col-related { width: 18%; }
-        .col-type    { width: 12%; }
-        .col-date    { width: 12%; }
-        .col-action  { width: 16%; text-align: center; }
+    .type-landlord {
+        background: #fdf3e8;
+        color: #e67e22;
+    }
 
-        .label-cell { font-weight: 500; }
-        .sub-cell   { color: #777; font-size: 0.88rem; }
+    .type-tenant {
+        background: #e8fdf3;
+        color: #27ae60;
+    }
+
+    .type-contract {
+        background: #f3e8fd;
+        color: #8e44ad;
+    }
+
+    .type-transaction {
+        background: #e8fdf8;
+        color: #16a085;
+    }
+
+    .type-viewing {
+        background: #fde8e8;
+        color: #c0392b;
+    }
+
+    .type-user {
+        background: #fdf8e8;
+        color: #d4a017;
+    }
+
+    .type-note {
+        background: #f0f0f0;
+        color: #555;
+    }
+
+    /* ── Archive-specific empty state ───────────────────── */
+    .archive-empty {
+        text-align: center;
+        padding: 60px 20px;
+        color: #aaa;
+    }
+
+    .archive-empty i {
+        font-size: 3rem;
+        margin-bottom: 12px;
+        display: block;
+    }
+
+    /* ── Label column ───────────────────────────────────── */
+    .col-label {
+        width: 24%;
+    }
+
+    .col-detail {
+        width: 18%;
+    }
+
+    .col-related {
+        width: 18%;
+    }
+
+    .col-type {
+        width: 12%;
+    }
+
+    .col-date {
+        width: 12%;
+    }
+
+    .col-action {
+        width: 16%;
+        text-align: center;
+    }
+
+    .label-cell {
+        font-weight: 500;
+    }
+
+    .sub-cell {
+        color: #777;
+        font-size: 0.88rem;
+    }
     </style>
 </head>
+
 <body onload="CallNavbar();">
     <div id="navbar-container"></div>
 
@@ -253,7 +312,7 @@ $typeConfig = [
                             <option value="transactions">Transaction</option>
                             <option value="viewing_bookings">Viewing</option>
                             <option value="users">User</option>
-                            <option value="notes">Note</option>                            
+                            <option value="notes">Note</option>
                         </select>
                     </div>
                     <div class="filter-group">
@@ -275,75 +334,77 @@ $typeConfig = [
 
                 <div class="controls-spacer"></div>
 
-                <span id="recordCount" class="record-count" style="color:#888;font-size:.9rem;align-self:center;"></span>
+                <span id="recordCount" class="record-count"
+                    style="color:#888;font-size:.9rem;align-self:center;"></span>
             </div>
 
             <!-- Table -->
             <div class="table-container">
                 <div class="table-wrapper">
                     <?php if (empty($archived)): ?>
-                        <div class="archive-empty">
-                            <i class="fa-solid fa-box-archive"></i>
-                            <p>No archived records found.</p>
-                        </div>
+                    <div class="archive-empty">
+                        <i class="fa-solid fa-box-archive"></i>
+                        <p>No archived records found.</p>
+                    </div>
                     <?php else: ?>
                     <table id="archiveTable">
                         <thead>
                             <tr>
-                                <th class="sortable col-label"  onclick="sortTable('label', this)">
+                                <th class="sortable col-label" onclick="sortTable('label', this)">
                                     Name / Label <i class="fa-solid fa-sort sort-icon"></i>
                                 </th>
                                 <th class="col-detail">Detail</th>
                                 <th class="col-related">Related Info</th>
-                                <th class="sortable col-type"   onclick="sortTable('type', this)">
+                                <th class="sortable col-type" onclick="sortTable('type', this)">
                                     Type <i class="fa-solid fa-sort sort-icon"></i>
                                 </th>
-                                <th class="sortable col-date"   onclick="sortTable('date', this)">
+                                <th class="sortable col-date" onclick="sortTable('date', this)">
                                     Archived On <i class="fa-solid fa-sort sort-icon"></i>
                                 </th>
                                 <th class="col-action">Actions</th>
                             </tr>
                         </thead>
                         <tbody id="archiveBody">
-                        <?php foreach ($archived as $item):
+                            <?php foreach ($archived as $item):
                             $cfg   = $typeConfig[$item['type']] ?? ['label' => $item['type'], 'icon' => 'fa-box', 'class' => ''];
                             $dateF = $item['date'] ? date('d/m/Y', strtotime($item['date'])) : '-';
                         ?>
-                        <tr data-type="<?= htmlspecialchars($item['type']) ?>"
-                            data-label="<?= htmlspecialchars(strtolower($item['label'] ?? '')) ?>"
-                            data-date="<?= $item['date'] ?? '' ?>">
+                            <tr data-type="<?= htmlspecialchars($item['type']) ?>"
+                                data-label="<?= htmlspecialchars(strtolower($item['label'] ?? '')) ?>"
+                                data-date="<?= $item['date'] ?? '' ?>">
 
-                            <td class="label-cell"><?= htmlspecialchars($item['label'] ?? '-') ?></td>
-                            <td class="sub-cell"><?= htmlspecialchars($item['sub'] ?? '-') ?></td>
-                            <td class="sub-cell"><?= htmlspecialchars($item['related'] ?? '-') ?></td>
-                            <td>
-                                <span class="type-badge <?= $cfg['class'] ?>">
-                                    <i class="fa-solid <?= $cfg['icon'] ?>"></i>
-                                    <?= $cfg['label'] ?>
-                                </span>
-                            </td>
-                            <td><?= $dateF ?></td>
-                            <td>
-                                <div class="action-buttons">
-                                    <form method="POST" style="display:inline;">
-                                        <input type="hidden" name="unarchive_id"   value="<?= $item['id'] ?>">
-                                        <input type="hidden" name="unarchive_type" value="<?= $item['type'] ?>">
-                                        <button type="submit" class="action-btn action-btn-edit" title="Unarchive">
-                                            <i class="fa-solid fa-box-archive"></i>
-                                        </button>
-                                    </form>
-                                    <form method="POST" style="display:inline;">
-                                        <input type="hidden" name="delete_id"   value="<?= $item['id'] ?>">
-                                        <input type="hidden" name="delete_type" value="<?= $item['type'] ?>">
-                                        <button type="submit" class="action-btn action-btn-delete" title="Delete permanently"
-                                            onclick="return confirm('Permanently delete this <?= $cfg['label'] ?>?\nThis cannot be undone.')">
-                                            <i class="fa-solid fa-trash"></i>
-                                        </button>
-                                    </form>
-                                </div>
-                            </td>
-                        </tr>
-                        <?php endforeach; ?>
+                                <td class="label-cell"><?= htmlspecialchars($item['label'] ?? '-') ?></td>
+                                <td class="sub-cell"><?= htmlspecialchars($item['sub'] ?? '-') ?></td>
+                                <td class="sub-cell"><?= htmlspecialchars($item['related'] ?? '-') ?></td>
+                                <td>
+                                    <span class="type-badge <?= $cfg['class'] ?>">
+                                        <i class="fa-solid <?= $cfg['icon'] ?>"></i>
+                                        <?= $cfg['label'] ?>
+                                    </span>
+                                </td>
+                                <td><?= $dateF ?></td>
+                                <td>
+                                    <div class="action-buttons">
+                                        <form method="POST" style="display:inline;">
+                                            <input type="hidden" name="unarchive_id" value="<?= $item['id'] ?>">
+                                            <input type="hidden" name="unarchive_type" value="<?= $item['type'] ?>">
+                                            <button type="submit" class="action-btn action-btn-edit" title="Unarchive">
+                                                <i class="fa-solid fa-box-archive"></i>
+                                            </button>
+                                        </form>
+                                        <form method="POST" style="display:inline;">
+                                            <input type="hidden" name="delete_id" value="<?= $item['id'] ?>">
+                                            <input type="hidden" name="delete_type" value="<?= $item['type'] ?>">
+                                            <button type="submit" class="action-btn action-btn-delete"
+                                                title="Delete permanently"
+                                                onclick="return confirm('Permanently delete this <?= $cfg['label'] ?>?\nThis cannot be undone.')">
+                                                <i class="fa-solid fa-trash"></i>
+                                            </button>
+                                        </form>
+                                    </div>
+                                </td>
+                            </tr>
+                            <?php endforeach; ?>
                         </tbody>
                     </table>
                     <?php endif; ?>
@@ -353,14 +414,18 @@ $typeConfig = [
     </main>
 
     <script>
-    let currentSort = { column: null, direction: 'asc' };
+    let currentSort = {
+        column: null,
+        direction: 'asc'
+    };
 
     // Update visible row count
     function updateCount() {
         const visible = document.querySelectorAll('#archiveBody tr:not([style*="display: none"])').length;
-        const total   = document.querySelectorAll('#archiveBody tr').length;
+        const total = document.querySelectorAll('#archiveBody tr').length;
         const el = document.getElementById('recordCount');
-        if (el) el.textContent = visible === total ? `${total} record${total !== 1 ? 's' : ''}` : `${visible} of ${total} records`;
+        if (el) el.textContent = visible === total ? `${total} record${total !== 1 ? 's' : ''}` :
+            `${visible} of ${total} records`;
     }
 
     // Run on load
@@ -374,18 +439,18 @@ $typeConfig = [
 
     // Apply all filters
     function applyFilters() {
-        const typeVal   = document.getElementById('filterType').value;
+        const typeVal = document.getElementById('filterType').value;
         const searchVal = document.getElementById('filterSearch').value.toLowerCase();
-        const fromVal   = document.getElementById('filterFrom').value;
-        const toVal     = document.getElementById('filterTo').value;
+        const fromVal = document.getElementById('filterFrom').value;
+        const toVal = document.getElementById('filterTo').value;
 
         document.querySelectorAll('#archiveBody tr').forEach(row => {
             let show = true;
 
-            if (typeVal   && row.dataset.type  !== typeVal)                          show = false;
-            if (searchVal && !row.dataset.label.includes(searchVal))                 show = false;
-            if (fromVal   && row.dataset.date  && row.dataset.date < fromVal)        show = false;
-            if (toVal     && row.dataset.date  && row.dataset.date > toVal)          show = false;
+            if (typeVal && row.dataset.type !== typeVal) show = false;
+            if (searchVal && !row.dataset.label.includes(searchVal)) show = false;
+            if (fromVal && row.dataset.date && row.dataset.date < fromVal) show = false;
+            if (toVal && row.dataset.date && row.dataset.date > toVal) show = false;
 
             row.style.display = show ? '' : 'none';
         });
@@ -395,17 +460,20 @@ $typeConfig = [
 
     // Reset all filters
     function resetFilters() {
-        document.getElementById('filterType').value   = '';
+        document.getElementById('filterType').value = '';
         document.getElementById('filterSearch').value = '';
-        document.getElementById('filterFrom').value   = '';
-        document.getElementById('filterTo').value     = '';
+        document.getElementById('filterFrom').value = '';
+        document.getElementById('filterTo').value = '';
         document.querySelectorAll('#archiveBody tr').forEach(r => r.style.display = '');
         document.querySelectorAll('#archiveTable th').forEach(th => {
             th.classList.remove('sorted');
             const ic = th.querySelector('.sort-icon');
             if (ic) ic.classList.remove('asc', 'desc');
         });
-        currentSort = { column: null, direction: 'asc' };
+        currentSort = {
+            column: null,
+            direction: 'asc'
+        };
         updateCount();
     }
 
@@ -418,7 +486,7 @@ $typeConfig = [
         if (currentSort.column === column) {
             currentSort.direction = currentSort.direction === 'asc' ? 'desc' : 'asc';
         } else {
-            currentSort.column    = column;
+            currentSort.column = column;
             currentSort.direction = 'asc';
         }
 
@@ -446,10 +514,11 @@ $typeConfig = [
                     aVal = a.dataset.date || '';
                     bVal = b.dataset.date || '';
                     break;
-                default: return 0;
+                default:
+                    return 0;
             }
             if (aVal < bVal) return currentSort.direction === 'asc' ? -1 : 1;
-            if (aVal > bVal) return currentSort.direction === 'asc' ?  1 : -1;
+            if (aVal > bVal) return currentSort.direction === 'asc' ? 1 : -1;
             return 0;
         });
 
@@ -457,4 +526,5 @@ $typeConfig = [
     }
     </script>
 </body>
+
 </html>
