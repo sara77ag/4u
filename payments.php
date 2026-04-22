@@ -101,8 +101,8 @@ function formatDateValue($value) {
                         </select>
                     </div>
                     <div class="filter-group">
-                        <label>Date/Time</label>
-                        <input type="datetime-local" id="filterDateTime" onchange="filterPayments()">
+                        <label>Date</label>
+                        <input type="date" id="filterDate" onchange="filterPayments()">
                     </div>
 
                     <div class="filter-group">
@@ -274,10 +274,7 @@ function formatDateValue($value) {
                 </div>
 
                 <div class="details-grid">
-                    <div class="detail-row">
-                        <span class="detail-label">Payment ID:</span>
-                        <span id="pay-payment-id" class="detail-value">-</span>
-                    </div>
+                    
                     <div class="detail-row">
                         <span class="detail-label">Tenant Name:</span>
                         <span id="pay-payment-tenant" class="detail-value">-</span>
@@ -372,7 +369,7 @@ function formatDateValue($value) {
 
     <script>
         const months = ["Jan","Feb","Mar","Apr","May","Jun","Jul","Aug","Sep","Oct","Nov","Dec"];
-        let currentSort = { column: null, direction: 'asc' };
+        let paymentSort = { column: null, direction: 'asc' };
 
          function parseDateTimeValue(value) {
          if (!value) return 0;
@@ -420,11 +417,11 @@ function formatDateValue($value) {
             const tbody = document.getElementById('tableBody');
             const rows = Array.from(tbody.querySelectorAll('tr'));
 
-            if (currentSort.column === column) {
-                currentSort.direction = currentSort.direction === 'asc' ? 'desc' : 'asc';
+            if (paymentSort.column === column) {
+                paymentSort.direction = paymentSort.direction === 'asc' ? 'desc' : 'asc';
             } else {
-                currentSort.column = column;
-                currentSort.direction = 'asc';
+                paymentSort.column = column;
+                paymentSort.direction = 'asc';
             }
 
             document.querySelectorAll('table th').forEach(th => {
@@ -438,7 +435,7 @@ function formatDateValue($value) {
             headerElement.classList.add('sorted');
             const icon = headerElement.querySelector('.sort-icon');
             if (icon) {
-                icon.classList.add(currentSort.direction);
+                icon.classList.add(paymentSort.direction);
             }
 
             rows.sort((a, b) => {
@@ -478,8 +475,8 @@ function formatDateValue($value) {
                         return 0;
                 }
 
-                if (aVal < bVal) return currentSort.direction === 'asc' ? -1 : 1;
-                if (aVal > bVal) return currentSort.direction === 'asc' ? 1 : -1;
+                if (aVal < bVal) return paymentSort.direction === 'asc' ? -1 : 1;
+                if (aVal > bVal) return paymentSort.direction === 'asc' ? 1 : -1;
                 return 0;
             });
 
@@ -488,7 +485,7 @@ function formatDateValue($value) {
         }
         function filterPayments() {
     const statusFilter = document.getElementById('filterStatus').value;
-    const dateTimeFilter = document.getElementById('filterDateTime').value;
+    const dateFilter = document.getElementById('filterDate').value;
     const periodFilter = document.getElementById('filterPeriod').value;
     const rows = document.querySelectorAll('#tableBody tr');
 
@@ -499,15 +496,12 @@ function formatDateValue($value) {
             show = false;
         }
 
-        if (dateTimeFilter) {
-            const rowDateTime = parseDateTimeValue(row.dataset.datetime || '');
-            const selectedDateTime = new Date(dateTimeFilter).getTime();
-
-            if (!rowDateTime || rowDateTime < selectedDateTime) {
-                show = false;
-            }
-        }
-
+       if (dateFilter) {
+          const rowDate = (row.dataset.datetime || '').split(' ')[0];
+       if (rowDate !== dateFilter) {
+        show = false;
+       }
+     }
         if (periodFilter) {
             const [year, month] = periodFilter.split('-');
             const formattedFilter = months[parseInt(month, 10) - 1] + " " + year;
@@ -523,7 +517,7 @@ function formatDateValue($value) {
 
         function resetFilters() {
         document.getElementById('filterStatus').value = '';
-        document.getElementById('filterDateTime').value = '';
+        document.getElementById('filterDate').value = '';
         document.getElementById('filterPeriod').value = '';
 
         document.querySelectorAll('#tableBody tr').forEach(row => row.style.display = '');
@@ -536,7 +530,7 @@ function formatDateValue($value) {
         }
            });
 
-    currentSort = { column: null, direction: 'asc' };
+    paymentSort = { column: null, direction: 'asc' };
     updateAllStatuses();
         }
         

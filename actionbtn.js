@@ -69,7 +69,6 @@ window.actionbtn = (() => {
   
    
     payment: [
-  { id: 'pay-payment-id',       key: 'id',       type: 'text',     tab: 'payment', editable: false, fallback: 'No Record' },
   { id: 'pay-payment-tenant',   key: 'tenant',   type: 'text',     tab: 'payment', editable: false, fallback: 'No Record' },
   { id: 'pay-payment-property', key: 'property', type: 'text',     tab: 'payment', editable: false, fallback: 'No Record' },
   { id: 'pay-payment-amount',   key: 'amount',   type: 'number',   tab: 'payment', editable: true,  prefix: '£', format: 'currency', fallback: 'No Record' },
@@ -194,7 +193,7 @@ window.actionbtn = (() => {
    return {
     _id:       id,
     id:        id,
-    title:     `Payment #${id}`,
+    title:     row.dataset.tenant || 'Payment',
     tenantId:  row.dataset.tenantId || '',
     propertyId: row.dataset.propertyId || '',
     tenant:    row.dataset.tenant || '',
