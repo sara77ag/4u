@@ -42,7 +42,13 @@ $stmt = $pdo->query("
         name,
         email,
         phone,
-        role
+        role,
+        password,
+        password_reset_date,
+        id_number,
+        id_expiry_date,
+        archived,
+        date_archived
     FROM users
     WHERE archived = 0
     ORDER BY name
@@ -111,55 +117,71 @@ $users = $stmt->fetchAll(PDO::FETCH_ASSOC);
 <?php foreach ($users as $user): 
     $roleDisplay = ucfirst(str_replace('_', ' ', $user['role']));
 ?>
-                    <div class="card" 
-                    data-name="<?= strtolower($user['name']) ?>" data-role="<?= htmlspecialchars($user['role']) ?>">
-                        <div class="card-header">
-                            <div class="card-name"><?= htmlspecialchars($user['name']) ?></div>
-                        </div>
-                        <div class="card-body">
-                            <div class="card-detail">
-                                <i class="fa-solid fa-user"></i>
-                                <span><?= htmlspecialchars($user['username']) ?></span>
-                            </div>
-                            <div class="card-detail">
-                                <i class="fa-solid fa-envelope"></i>
-                                <span><?= htmlspecialchars($user['email']) ?></span>
-                            </div>
-                            <div class="card-detail">
-                                <i class="fa-solid fa-phone"></i>
-                                <span><?= htmlspecialchars($user['phone']) ?></span>
-                            </div>
-                            <span class="blue-badge"><?= htmlspecialchars($roleDisplay) ?></span>
-                            <form method="POST" style="display:inline;">
-                                <input type="hidden" name="reset_password_id" value="<?= $user['user_id'] ?>">
-                                <button type="submit" class="reset-password-link" style="border:none;background:none;color:#007bff;cursor:pointer;text-decoration:underline;"
-                                    onclick="return confirm('Reset password for <?= htmlspecialchars($user['name']) ?>?')">
-                                    Reset Password
-                                </button>
-                            </form>
-                        </div>
-                        <div class="action-buttons">
-                            <button class="action-btn action-btn-view" title="View" onclick="actionbtn.viewUser(this)">
-                                <i class="fa-solid fa-eye"></i>
-                            </button>
-                            
-                            <?php if (in_array($_SESSION['role'], ['admin', 'agent'])): ?>
-                            <button class="action-btn action-btn-edit" title="Edit" onclick="actionbtn.editUser(this)">
-                                <i class="fa-solid fa-pen"></i>
-                            </button>
-                            <?php endif; ?>
-                            
-                            <?php if ($_SESSION['role'] === 'admin'): ?>
-                            <form method="POST" style="display:inline;">
-                                <input type="hidden" name="archive_id" value="<?= $user['user_id'] ?>">
-                                <button type="submit" class="action-btn action-btn-delete" title="Archive"
-                                    onclick="return confirm('Archive this user?\n<?= htmlspecialchars($user['name']) ?>')">
-                                    <i class="fa-solid fa-trash"></i>
-                                </button>
-                            </form>
-                            <?php endif; ?>
-                        </div>
-                    </div>
+<div class="card"
+    data-userid="<?= $user['user_id'] ?>"
+    data-username="<?= htmlspecialchars($user['username']) ?>"
+    data-name="<?= htmlspecialchars($user['name']) ?>"
+    data-phone="<?= htmlspecialchars($user['phone']) ?>"
+    data-email="<?= htmlspecialchars($user['email']) ?>"
+    data-password="<?= htmlspecialchars($user['password']) ?>"
+    data-passwordresetdate="<?= htmlspecialchars($user['password_reset_date']) ?>"
+    data-idnumber="<?= htmlspecialchars($user['id_number']) ?>"
+    data-idexpirydate="<?= htmlspecialchars($user['id_expiry_date']) ?>"
+    data-role="<?= htmlspecialchars($user['role']) ?>"
+    data-archived="<?= htmlspecialchars($user['archived']) ?>"
+    data-datearchived="<?= htmlspecialchars($user['date_archived']) ?>">
+
+    <div class="card-header">
+        <div class="card-name"><?= htmlspecialchars($user['name']) ?></div>
+    </div>
+
+    <div class="card-body">
+        <div class="card-detail">
+            <i class="fa-solid fa-user"></i>
+            <span><?= htmlspecialchars($user['username']) ?></span>
+        </div>
+        <div class="card-detail">
+            <i class="fa-solid fa-envelope"></i>
+            <span><?= htmlspecialchars($user['email']) ?></span>
+        </div>
+        <div class="card-detail">
+            <i class="fa-solid fa-phone"></i>
+            <span><?= htmlspecialchars($user['phone']) ?></span>
+        </div>
+
+        <span class="blue-badge"><?= htmlspecialchars($roleDisplay) ?></span>
+
+        <form method="POST" style="display:inline;">
+            <input type="hidden" name="reset_password_id" value="<?= $user['user_id'] ?>">
+            <button type="submit" class="reset-password-link" style="border:none;background:none;color:#007bff;cursor:pointer;text-decoration:underline;"
+                onclick="return confirm('Reset password for <?= htmlspecialchars($user['name']) ?>?')">
+                Reset Password
+            </button>
+        </form>
+    </div>
+
+    <div class="action-buttons">
+        <button class="action-btn action-btn-view" title="View" onclick="actionbtn.viewUser(this)">
+            <i class="fa-solid fa-eye"></i>
+        </button>
+
+        <?php if (in_array($_SESSION['role'], ['admin', 'agent'])): ?>
+        <button class="action-btn action-btn-edit" title="Edit" onclick="actionbtn.editUser(this)">
+            <i class="fa-solid fa-pen"></i>
+        </button>
+        <?php endif; ?>
+
+        <?php if ($_SESSION['role'] === 'admin'): ?>
+        <form method="POST" style="display:inline;">
+            <input type="hidden" name="archive_id" value="<?= $user['user_id'] ?>">
+            <button type="submit" class="action-btn action-btn-delete" title="Archive"
+                onclick="return confirm('Archive this user?\n<?= htmlspecialchars($user['name']) ?>')">
+                <i class="fa-solid fa-trash"></i>
+            </button>
+        </form>
+        <?php endif; ?>
+    </div>
+</div>
 <?php endforeach; ?>
                 </div>
             </div>
@@ -191,6 +213,9 @@ $users = $stmt->fetchAll(PDO::FETCH_ASSOC);
             <button class="tab-btn active" data-tab="user">
                 <i class="fa-solid fa-house"></i> User Details
             </button>
+            <button class="tab-btn" data-tab="files">
+                <i class="fa-solid fa-folder"></i> Files
+            </button>
         </div>
 
         <!-- Tab Content -->
@@ -198,10 +223,10 @@ $users = $stmt->fetchAll(PDO::FETCH_ASSOC);
             <!-- User Tab -->
             <div id="u-tab-user" class="tab-content active">
                 <div class="tab-header">
-                    <i class="fa-solid fa-house"></i>
+                    <i class="fa-solid fa-user"></i>
                     <span>User Details</span>
                 </div>
-              <div class="details-grid">
+                <div class="details-grid">
                     <div class="detail-row">
                         <span class="detail-label">Username:</span>
                         <span id="u-user-username" class="detail-value">-</span>
@@ -212,41 +237,42 @@ $users = $stmt->fetchAll(PDO::FETCH_ASSOC);
                     </div>
                     <div class="detail-row">
                         <span class="detail-label">Phone Number:</span>
-                        <span id="u-user-phone" class="status-badge-modal status-available">-</span>
+                        <span id="u-user-phone" class="detail-value">-</span>
                     </div>
                     <div class="detail-row">
                         <span class="detail-label">Email:</span>
-                        <span id="u-user-email" class="status-badge-modal status-available">-</span>
-                    </div>
-                    <div class="detail-row">
-                        <span class="detail-label">Password:</span>
-                        <span id="u-user-password" class="status-badge-modal status-available">-</span>
-                    </div>
-                    <div class="detail-row">
-                        <span class="detail-label">Phone Reset Date:</span>
-                        <span id="u-user-passwordresetdate" class="status-badge-modal status-available">-</span>
-                    </div>
-                    <div class="detail-row">
-                        <span class="detail-label">Id Number:</span>
-                        <span id="u-user-IdNumber" class="status-badge-modal status-available">-</span>
-                    </div>
-                    <div class="detail-row">
-                        <span class="detail-label">Id Expiry Date:</span>
-                        <span id="u-user-Idexpirydate" class="status-badge-modal status-available">-</span>
+                        <span id="u-user-email" class="detail-value">-</span>
                     </div>
                     <div class="detail-row">
                         <span class="detail-label">Role:</span>
-                        <span id="u-user-role" class="status-badge-modal status-available">-</span>
+                        <span id="u-user-role" class="detail-value">-</span>
                     </div>
                     <div class="detail-row">
                         <span class="detail-label">Archived:</span>
-                        <span id="u-user-archived" class="status-badge-modal status-available">-</span>
+                        <span id="u-user-archived" class="detail-value">-</span>
                     </div>
                     <div class="detail-row">
                         <span class="detail-label">Date Archived:</span>
-                        <span id="u-user-datearchived" class="status-badge-modal status-available">-</span>
+                        <span id="u-user-datearchived" class="detail-value">-</span>
                     </div>
                 </div>
+        </div>
+
+        <div id="u-tab-files" class="tab-content">
+            <div class="tab-header">
+                <i class="fa-solid fa-folder"></i>
+                <span>Files</span>
+            </div>
+            <div class="details-grid">
+                <div class="detail-row">
+                    <span class="detail-label">ID Number:</span>
+                    <span id="u-user-IdNumber" class="detail-value">-</span>
+                </div>
+                <div class="detail-row">
+                    <span class="detail-label">ID Expiry Date:</span>
+                    <span id="u-user-Idexpirydate" class="detail-value">-</span>
+                </div>
+            </div>
         </div>
     </div>
 </div>    

@@ -24,27 +24,27 @@ if (!$input || empty($input['id'])) {
 }
 
 $stmt = $pdo->prepare("
-    UPDATE bookings SET
-        viewer_name           = ?,
-        viewer_phone          = ?,
-        status                = ?,
-        date_time:            = ?,
-        user_id:              = ?,
-        email                 = ?,
-        archived:             = ?,
-        date_archived:        = ?
+    UPDATE viewing_bookings SET
+        viewer_name = ?,
+        viewer_phone = ?,
+        status = ?,
+        date_time = ?,
+        user_id = ?,
+        email = ?,
+        archived = ?,
+        date_archived = ?
     WHERE booking_id = ?
 ");
 
 $stmt->execute([
-    $input['viewer_name']       ?? '',
-    $input['viewer_phone']      ?? '',
-    $input['status']            ?? '',
-    $input['date_time']         ?? '',
-    $input['user_id']           ?? '',
-    $input['email']             ?? '',
-    $input['archived']          ?? '',
-    $input['date_archived']     ?? '',
+    $input['viewer_name'] ?? '',
+    $input['viewer_phone'] ?? '',
+    $input['status'] ?? '',
+    $input['date_time'] ?? '',
+    $input['user_id'] ?? '',
+    $input['email'] ?? '',
+    $input['archived'] ?? '',
+    $input['date_archived'] ?? '',
     $input['id']
 ]);
 
