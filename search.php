@@ -30,7 +30,7 @@ $stmt = $pdo->prepare("
 ");
 $stmt->execute([$like]);
 foreach ($stmt->fetchAll(PDO::FETCH_ASSOC) as $r) {
-    $results[] = ['type' => 'property', 'id' => $r['id'], 'label' => $r['label'], 'sub' => $r['sub'], 'url' => 'properties.php'];
+    $results[] = ['type' => 'property', 'id' => $r['id'], 'label' => $r['label'], 'sub' => $r['sub'], 'url'=> 'properties.php?id=' . $r['id'] . '&open=1',];
 }
 
 // Landlords
@@ -42,7 +42,7 @@ $stmt = $pdo->prepare("
 ");
 $stmt->execute([$like, $like, $like]);
 foreach ($stmt->fetchAll(PDO::FETCH_ASSOC) as $r) {
-    $results[] = ['type' => 'landlord', 'id' => $r['id'], 'label' => $r['label'], 'sub' => $r['sub'], 'url' => 'landlords.php'];
+    $results[] = ['type' => 'landlord', 'id' => $r['id'], 'label' => $r['label'], 'sub' => $r['sub'], 'url'=> 'landlords.php?id=' . $r['id'] . '&open=1',];
 }
 
 // Tenants
@@ -54,19 +54,19 @@ $stmt = $pdo->prepare("
 ");
 $stmt->execute([$like, $like, $like]);
 foreach ($stmt->fetchAll(PDO::FETCH_ASSOC) as $r) {
-    $results[] = ['type' => 'tenant', 'id' => $r['id'], 'label' => $r['label'], 'sub' => $r['sub'], 'url' => 'tenants.php'];
+    $results[] = ['type' => 'tenant', 'id' => $r['id'], 'label' => $r['label'], 'sub' => $r['sub'], 'url'=> 'tenants.php?id=' . $r['id'] . '&open=1',];
 }
 
 // Viewing bookings
 $stmt = $pdo->prepare("
     SELECT booking_id AS id, viewer_name AS label, email AS sub
     FROM viewing_bookings
-    WHERE archived = 0 AND (viewer_name LIKE ? OR email LIKE ?)
+    WHERE archived = 0 AND (viewer_name LIKE ? OR email LIKE ? OR viewer_phone LIKE ?)
     LIMIT 5
 ");
-$stmt->execute([$like, $like]);
+$stmt->execute([$like, $like, $like]);
 foreach ($stmt->fetchAll(PDO::FETCH_ASSOC) as $r) {
-    $results[] = ['type' => 'viewing', 'id' => $r['id'], 'label' => $r['label'], 'sub' => $r['sub'], 'url' => 'viewing.php'];
+    $results[] = ['type' => 'viewing', 'id' => $r['id'], 'label' => $r['label'], 'sub' => $r['sub'], 'url'=> 'viewing.php?id=' . $r['id'] . '&open=1',];
 }
 
 

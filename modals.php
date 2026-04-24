@@ -30,6 +30,14 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
         header('Location: dashboard.php');
         exit();
     }
+    
+    // TODO: Toggle complete
+    if (isset($_POST['toggle_todo_id'])) {
+        $stmt = $pdo->prepare("UPDATE notes SET completed = ? WHERE note_id = ?");
+        $stmt->execute([(int)$_POST['toggle_todo_completed'], (int)$_POST['toggle_todo_id']]);
+        header('Location: dashboard.php');
+        exit();
+    }
 
     // Add Property
     if (isset($_POST['property_address'])) {
@@ -232,7 +240,8 @@ try {
             <div class="modal-form-grid">
                 <div class="form-group">
                     <label>Property Address <span class="required">*</span></label>
-                    <input type="text" name="property_address" class="form-control" placeholder="Enter Property Address" required>
+                    <input type="text" name="property_address" class="form-control" placeholder="Enter Property Address"
+                        required>
                 </div>
                 <div class="form-group">
                     <label>Property Type <span class="required">*</span></label>
@@ -246,7 +255,8 @@ try {
                 </div>
                 <div class="form-group">
                     <label>Rent Price <span class="required">*</span></label>
-                    <input type="number" name="monthly_rent" class="form-control" placeholder="Enter Rent Amount" required>
+                    <input type="number" name="monthly_rent" class="form-control" placeholder="Enter Rent Amount"
+                        required>
                 </div>
                 <div class="form-group">
                     <label>Landlord <span class="required">*</span></label>
@@ -304,19 +314,23 @@ try {
             <div class="modal-form-grid">
                 <div class="form-group">
                     <label>Full Name <span class="required">*</span></label>
-                    <input type="text" name="landlord_name" class="form-control" placeholder="Enter Landlord's Full Name" required>
+                    <input type="text" name="landlord_name" class="form-control"
+                        placeholder="Enter Landlord's Full Name" required>
                 </div>
                 <div class="form-group">
                     <label>Phone <span class="required">*</span></label>
-                    <input type="tel" name="landlord_phone" class="form-control" placeholder="Enter Landlord's Phone Number" required>
+                    <input type="tel" name="landlord_phone" class="form-control"
+                        placeholder="Enter Landlord's Phone Number" required>
                 </div>
                 <div class="form-group">
                     <label>Email <span class="required">*</span></label>
-                    <input type="email" name="landlord_email" class="form-control" placeholder="Enter Landlord's Email" required>
+                    <input type="email" name="landlord_email" class="form-control" placeholder="Enter Landlord's Email"
+                        required>
                 </div>
                 <div class="form-group">
                     <label>Address <span class="required">*</span></label>
-                    <input type="text" name="landlord_address" class="form-control" placeholder="Enter Landlord's Address" required>
+                    <input type="text" name="landlord_address" class="form-control"
+                        placeholder="Enter Landlord's Address" required>
                 </div>
                 <div class="form-group">
                     <label>ID Type <span class="required">*</span></label>
@@ -329,7 +343,8 @@ try {
                 </div>
                 <div class="form-group">
                     <label>ID Number <span class="required">*</span></label>
-                    <input type="text" name="landlord_id_number" class="form-control" placeholder="Enter Landlord's ID Number" required>
+                    <input type="text" name="landlord_id_number" class="form-control"
+                        placeholder="Enter Landlord's ID Number" required>
                 </div>
                 <div class="form-group">
                     <label>ID Expiry Date <span class="required">*</span></label>
@@ -337,7 +352,8 @@ try {
                 </div>
                 <div class="form-group">
                     <label>Number of Properties</label>
-                    <input type="number" name="landlord_number_of_properties" class="form-control" placeholder="0" min="0" value="0">
+                    <input type="number" name="landlord_number_of_properties" class="form-control" placeholder="0"
+                        min="0" value="0">
                 </div>
             </div>
             <div class="modal-footer">
@@ -382,15 +398,18 @@ try {
                 </div>
                 <div class="form-group">
                     <label>Full Name <span class="required">*</span></label>
-                    <input type="text" name="tenant_name" class="form-control" placeholder="Enter Tenant's Full Name" required>
+                    <input type="text" name="tenant_name" class="form-control" placeholder="Enter Tenant's Full Name"
+                        required>
                 </div>
                 <div class="form-group">
                     <label>Phone <span class="required">*</span></label>
-                    <input type="tel" name="tenant_phone" class="form-control" placeholder="Enter Tenant's Phone Number" required>
+                    <input type="tel" name="tenant_phone" class="form-control" placeholder="Enter Tenant's Phone Number"
+                        required>
                 </div>
                 <div class="form-group">
                     <label>Email <span class="required">*</span></label>
-                    <input type="email" name="tenant_email" class="form-control" placeholder="Enter Tenant's Email" required>
+                    <input type="email" name="tenant_email" class="form-control" placeholder="Enter Tenant's Email"
+                        required>
                 </div>
                 <div class="form-group">
                     <label>ID Type <span class="required">*</span></label>
@@ -403,7 +422,8 @@ try {
                 </div>
                 <div class="form-group">
                     <label>ID Number <span class="required">*</span></label>
-                    <input type="text" name="tenant_id_number" class="form-control" placeholder="Enter Tenant's ID Number" required>
+                    <input type="text" name="tenant_id_number" class="form-control"
+                        placeholder="Enter Tenant's ID Number" required>
                 </div>
                 <div class="form-group">
                     <label>ID Expiry Date <span class="required">*</span></label>
@@ -411,7 +431,8 @@ try {
                 </div>
                 <div class="form-group">
                     <label>Rent <span class="required">*</span></label>
-                    <input type="number" name="tenant_rent" class="form-control" placeholder="Enter Monthly Rent Amount" required>
+                    <input type="number" name="tenant_rent" class="form-control" placeholder="Enter Monthly Rent Amount"
+                        required>
                 </div>
                 <div class="form-group">
                     <label>Contract Start <span class="required">*</span></label>
@@ -472,15 +493,18 @@ try {
                 </div>
                 <div class="form-group">
                     <label>Full Name <span class="required">*</span></label>
-                    <input type="text" name="viewer_name" class="form-control" placeholder="Enter Viewer Full Name" required>
+                    <input type="text" name="viewer_name" class="form-control" placeholder="Enter Viewer Full Name"
+                        required>
                 </div>
                 <div class="form-group">
                     <label>Phone <span class="required">*</span></label>
-                    <input type="tel" name="viewer_phone" class="form-control" placeholder="Enter Viewer's Phone Number" required>
+                    <input type="tel" name="viewer_phone" class="form-control" placeholder="Enter Viewer's Phone Number"
+                        required>
                 </div>
                 <div class="form-group">
                     <label>Email <span class="required">*</span></label>
-                    <input type="email" name="viewer_email" class="form-control" placeholder="Enter Viewer's Email" required>
+                    <input type="email" name="viewer_email" class="form-control" placeholder="Enter Viewer's Email"
+                        required>
                 </div>
                 <div class="form-group">
                     <label>Viewing Date <span class="required">*</span></label>
@@ -622,11 +646,13 @@ try {
                 </div>
                 <div class="form-group">
                     <label>Amount <span class="required">*</span></label>
-                    <input type="number" name="payment_amount" class="form-control" placeholder="Enter Rent Amount Received" required>
+                    <input type="number" name="payment_amount" class="form-control"
+                        placeholder="Enter Rent Amount Received" required>
                 </div>
                 <div class="form-group">
                     <label>Period Covered <span class="required">*</span></label>
-                    <input type="text" name="payment_period" class="form-control" placeholder="e.g. Mar - Apr 2025" required>
+                    <input type="text" name="payment_period" class="form-control" placeholder="e.g. Mar - Apr 2025"
+                        required>
                 </div>
                 <div class="form-group">
                     <label>Payment Method <span class="required">*</span></label>
@@ -648,7 +674,8 @@ try {
                 </div>
                 <div class="form-group">
                     <label>Upload Files</label>
-                    <input type="file" id="paymentFileInput" name="payment_files[]" class="file-input" multiple accept=".pdf,.jpg,.jpeg,.png">
+                    <input type="file" id="paymentFileInput" name="payment_files[]" class="file-input" multiple
+                        accept=".pdf,.jpg,.jpeg,.png">
                     <div class="file-upload-group" onclick="document.getElementById('paymentFileInput').click()">
                         <i class="fa-solid fa-cloud-arrow-up"></i>
                         <p>Upload Payment Proof & other files</p>
@@ -720,7 +747,8 @@ try {
                 </div>
                 <div class="form-group">
                     <label>Rent <span class="required">*</span></label>
-                    <input type="number" name="contract_rent" class="form-control" placeholder="Enter Rent Amount" required>
+                    <input type="number" name="contract_rent" class="form-control" placeholder="Enter Rent Amount"
+                        required>
                 </div>
                 <div class="form-group">
                     <label>Payment Frequency <span class="required">*</span></label>
@@ -741,7 +769,8 @@ try {
                 </div>
                 <div class="form-group">
                     <label>Upload Files</label>
-                    <input type="file" id="contractFileInput" name="contract_files[]" class="file-input" multiple accept=".pdf,.jpg,.jpeg,.png">
+                    <input type="file" id="contractFileInput" name="contract_files[]" class="file-input" multiple
+                        accept=".pdf,.jpg,.jpeg,.png">
                     <div class="file-upload-group" onclick="document.getElementById('contractFileInput').click()">
                         <i class="fa-solid fa-cloud-arrow-up"></i>
                         <p>Upload Contract & other files</p>
@@ -784,11 +813,13 @@ try {
                 </div>
                 <div class="form-group">
                     <label>Full Name <span class="required">*</span></label>
-                    <input type="text" name="user_name" class="form-control" placeholder="Enter User's Full Name" required>
+                    <input type="text" name="user_name" class="form-control" placeholder="Enter User's Full Name"
+                        required>
                 </div>
                 <div class="form-group">
                     <label>Email <span class="required">*</span></label>
-                    <input type="email" name="user_email" class="form-control" placeholder="Enter User's Email" required>
+                    <input type="email" name="user_email" class="form-control" placeholder="Enter User's Email"
+                        required>
                 </div>
                 <div class="form-group">
                     <label>Phone <span class="required">*</span></label>
@@ -796,7 +827,8 @@ try {
                 </div>
                 <div class="form-group">
                     <label>ID Number <span class="required">*</span></label>
-                    <input type="text" name="user_id_number" class="form-control" placeholder="Enter ID Number" required>
+                    <input type="text" name="user_id_number" class="form-control" placeholder="Enter ID Number"
+                        required>
                 </div>
                 <div class="form-group">
                     <label>ID Expiry <span class="required">*</span></label>
@@ -813,7 +845,8 @@ try {
                 </div>
                 <div class="form-group">
                     <label>Password <span class="required">*</span></label>
-                    <input type="password" name="user_password" class="form-control" placeholder="Enter Password" required>
+                    <input type="password" name="user_password" class="form-control" placeholder="Enter Password"
+                        required>
                 </div>
             </div>
             <div class="modal-footer">

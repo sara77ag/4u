@@ -55,6 +55,7 @@ function formatDateValue($date) {
 
 <!DOCTYPE html>
 <html lang="en">
+
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
@@ -65,16 +66,41 @@ function formatDateValue($date) {
     <script src="navbar.js"></script>
     <script src="modals.js"></script>
     <style>
-        .col-property { width: 22%; }
-        .col-gas { width: 11%; }
-        .col-electric { width: 12%; }
-        .col-epc { width: 11%; }
-        .col-idlandlord { width: 12%; }
-        .col-idtenant { width: 11%; }
-        .col-contract { width: 11%; }
-        .col-action { width: 10%; text-align: center; }
+    .col-property {
+        width: 22%;
+    }
+
+    .col-gas {
+        width: 11%;
+    }
+
+    .col-electric {
+        width: 12%;
+    }
+
+    .col-epc {
+        width: 11%;
+    }
+
+    .col-idlandlord {
+        width: 12%;
+    }
+
+    .col-idtenant {
+        width: 11%;
+    }
+
+    .col-contract {
+        width: 11%;
+    }
+
+    .col-action {
+        width: 10%;
+        text-align: center;
+    }
     </style>
 </head>
+
 <body onload="CallNavbar(); loadModals();">
 
     <div id="navbar-container"></div>
@@ -91,7 +117,8 @@ function formatDateValue($date) {
                 <div class="filter-dropdowns" id="filterDropdowns" style="display: none;">
                     <div class="filter-group">
                         <label>Property</label>
-                        <input type="text" id="filterProperty" onchange="filterImportantDates()" placeholder = "Enter Property Name">
+                        <input type="text" id="filterProperty" onchange="filterImportantDates()"
+                            placeholder="Enter Property Name">
                     </div>
                     <button class="filter-btn-reset" onclick="resetFilters()">
                         <i class="fa-solid fa-rotate-left"></i>
@@ -99,79 +126,88 @@ function formatDateValue($date) {
                 </div>
 
 
-            <div class="table-container">
-                <div class="table-wrapper">
-                    <table id="importantDatesTable">
-                        <thead>
-                            <tr>
-                                <th class="sortable col-property" onclick="sortTable('property', this)">
-                                    Property <i class="fa-solid fa-sort sort-icon"></i>
-                                </th>
-                                <th class="sortable col-gas" onclick="sortTable('gas', this)">
-                                    Gas <i class="fa-solid fa-sort sort-icon"></i>
-                                </th>
-                                <th class="sortable col-electric" onclick="sortTable('electric', this)">
-                                    Electric <i class="fa-solid fa-sort sort-icon"></i>
-                                </th>
-                                <th class="sortable col-epc" onclick="sortTable('epc', this)">
-                                    EPC <i class="fa-solid fa-sort sort-icon"></i>
-                                </th>
-                                <th class="sortable col-idlandlord" onclick="sortTable('idlandlord', this)">
-                                    Landlord Id <br>Verification <i class="fa-solid fa-sort sort-icon"></i>
-                                </th>
-                                <th class="sortable col-idtenant" onclick="sortTable('idtenant', this)">
-                                    Tenant Id <br>Verification <i class="fa-solid fa-sort sort-icon"></i>
-                                </th>
-                                <th class="sortable col-contract" onclick="sortTable('contract', this)">
-                                    Contract <i class="fa-solid fa-sort sort-icon"></i>
-                                </th>
-                                <th class="col-action">Action</th>
-                            </tr>
-                        </thead>
-                        <tbody id="tableBody">
-<?php foreach ($importantDates as $row): ?>
-                            <tr 
-                                data-property="<?= strtolower(htmlspecialchars($row['property_address'] ?? '')) ?>"
-                                data-gas="<?= htmlspecialchars($row['gas_cert_due'] ?? '') ?>"
-                                data-electric="<?= htmlspecialchars($row['electric_cert_due'] ?? '') ?>"
-                                data-epc="<?= htmlspecialchars($row['epc_due_date'] ?? '') ?>"
-                                data-idlandlord="<?= htmlspecialchars($row['landlord_id_expiry'] ?? '') ?>"
-                                data-idtenant="<?= htmlspecialchars($row['tenant_id_expiry'] ?? '') ?>"
-                                data-contract="<?= htmlspecialchars($row['contract_end'] ?? '') ?>"
-                            >
-                                <td class="property-name"><?= htmlspecialchars($row['property_address'] ?? 'N/A') ?></td>
-                                <td class="gas-date"><?= htmlspecialchars(formatDateValue($row['gas_cert_due'] ?? null)) ?></td>
-                                <td class="electric-date"><?= htmlspecialchars(formatDateValue($row['electric_cert_due'] ?? null)) ?></td>
-                                <td class="epc-date"><?= htmlspecialchars(formatDateValue($row['epc_due_date'] ?? null)) ?></td>
-                                <td class="landlord-id-ver"><?= htmlspecialchars(formatDateValue($row['landlord_id_expiry'] ?? null)) ?></td>
-                                <td class="tenant-id-ver"><?= htmlspecialchars(formatDateValue($row['tenant_id_expiry'] ?? null)) ?></td>
-                                <td class="contract-enddate"><?= htmlspecialchars(formatDateValue($row['contract_end'] ?? null)) ?></td>
-                                <td>
-                                    <div class="action-buttons">
-                                        <button class="action-btn action-btn-view" title="View" onclick="actionbtn.viewImportantDate(this)">
-                                            <i class="fa-solid fa-eye"></i>
-                                        </button>
-                                        
-                                        <?php if (in_array($_SESSION['role'], ['admin', 'agent'])): ?>
-                                        <button class="action-btn action-btn-edit" title="Edit" onclick="editImportantDate(this)">
-                                            <i class="fa-solid fa-pen"></i>
-                                        </button>
-                                        <?php endif; ?>
-                                        
-                                        <?php if ($_SESSION['role'] === 'admin'): ?>
-                                        <button class="action-btn action-btn-delete" title="Delete" onclick="deleteImportantDate(this)">
-                                            <i class="fa-solid fa-trash"></i>
-                                        </button>
-                                        <?php endif; ?>
-                                    </div>
-                                </td>
-                            </tr>
-<?php endforeach; ?>
-                        </tbody>
-                    </table>
+                <div class="table-container">
+                    <div class="table-wrapper">
+                        <table id="importantDatesTable">
+                            <thead>
+                                <tr>
+                                    <th class="sortable col-property" onclick="sortTable('property', this)">
+                                        Property <i class="fa-solid fa-sort sort-icon"></i>
+                                    </th>
+                                    <th class="sortable col-gas" onclick="sortTable('gas', this)">
+                                        Gas <i class="fa-solid fa-sort sort-icon"></i>
+                                    </th>
+                                    <th class="sortable col-electric" onclick="sortTable('electric', this)">
+                                        Electric <i class="fa-solid fa-sort sort-icon"></i>
+                                    </th>
+                                    <th class="sortable col-epc" onclick="sortTable('epc', this)">
+                                        EPC <i class="fa-solid fa-sort sort-icon"></i>
+                                    </th>
+                                    <th class="sortable col-idlandlord" onclick="sortTable('idlandlord', this)">
+                                        Landlord Id <br>Verification <i class="fa-solid fa-sort sort-icon"></i>
+                                    </th>
+                                    <th class="sortable col-idtenant" onclick="sortTable('idtenant', this)">
+                                        Tenant Id <br>Verification <i class="fa-solid fa-sort sort-icon"></i>
+                                    </th>
+                                    <th class="sortable col-contract" onclick="sortTable('contract', this)">
+                                        Contract <i class="fa-solid fa-sort sort-icon"></i>
+                                    </th>
+                                    <th class="col-action">Action</th>
+                                </tr>
+                            </thead>
+                            <tbody id="tableBody">
+                                <?php foreach ($importantDates as $row): ?>
+                                <tr data-property="<?= strtolower(htmlspecialchars($row['property_address'] ?? '')) ?>"
+                                    data-gas="<?= htmlspecialchars($row['gas_cert_due'] ?? '') ?>"
+                                    data-electric="<?= htmlspecialchars($row['electric_cert_due'] ?? '') ?>"
+                                    data-epc="<?= htmlspecialchars($row['epc_due_date'] ?? '') ?>"
+                                    data-idlandlord="<?= htmlspecialchars($row['landlord_id_expiry'] ?? '') ?>"
+                                    data-idtenant="<?= htmlspecialchars($row['tenant_id_expiry'] ?? '') ?>"
+                                    data-contract="<?= htmlspecialchars($row['contract_end'] ?? '') ?>">
+                                    <td class="property-name"><?= htmlspecialchars($row['property_address'] ?? 'N/A') ?>
+                                    </td>
+                                    <td class="gas-date">
+                                        <?= htmlspecialchars(formatDateValue($row['gas_cert_due'] ?? null)) ?></td>
+                                    <td class="electric-date">
+                                        <?= htmlspecialchars(formatDateValue($row['electric_cert_due'] ?? null)) ?></td>
+                                    <td class="epc-date">
+                                        <?= htmlspecialchars(formatDateValue($row['epc_due_date'] ?? null)) ?></td>
+                                    <td class="landlord-id-ver">
+                                        <?= htmlspecialchars(formatDateValue($row['landlord_id_expiry'] ?? null)) ?>
+                                    </td>
+                                    <td class="tenant-id-ver">
+                                        <?= htmlspecialchars(formatDateValue($row['tenant_id_expiry'] ?? null)) ?></td>
+                                    <td class="contract-enddate">
+                                        <?= htmlspecialchars(formatDateValue($row['contract_end'] ?? null)) ?></td>
+                                    <td>
+                                        <div class="action-buttons">
+                                            <button class="action-btn action-btn-view" title="View"
+                                                onclick="actionbtn.viewImportantDate(this)">
+                                                <i class="fa-solid fa-eye"></i>
+                                            </button>
+
+                                            <?php if (in_array($_SESSION['role'], ['admin', 'agent'])): ?>
+                                            <button class="action-btn action-btn-edit" title="Edit"
+                                                onclick="editImportantDate(this)">
+                                                <i class="fa-solid fa-pen"></i>
+                                            </button>
+                                            <?php endif; ?>
+
+                                            <?php if ($_SESSION['role'] === 'admin'): ?>
+                                            <button class="action-btn action-btn-delete" title="Delete"
+                                                onclick="deleteImportantDate(this)">
+                                                <i class="fa-solid fa-trash"></i>
+                                            </button>
+                                            <?php endif; ?>
+                                        </div>
+                                    </td>
+                                </tr>
+                                <?php endforeach; ?>
+                            </tbody>
+                        </table>
+                    </div>
                 </div>
             </div>
-        </div>
     </main>
 
     <div id="modals-container"></div>
@@ -219,11 +255,11 @@ function formatDateValue($date) {
                     <div class="dates-list">
                         <div class="date-item">
                             <span class="date-label">Landlord's ID Expiry:</span>
-                            <span  id="p-date-landlord-id" class="date-value">-</span>
+                            <span id="p-date-landlord-id" class="date-value">-</span>
                         </div>
                         <div class="date-item">
                             <span class="date-label">Tenant's ID Expiry:</span>
-                            <span  id="p-date-tenant-id" class="date-value">-</span>
+                            <span id="p-date-tenant-id" class="date-value">-</span>
                         </div>
                         <div class="date-item">
                             <span class="date-label ">Contract End:</span>
@@ -249,7 +285,7 @@ function formatDateValue($date) {
                         <i class="fa-solid fa-house"></i>
                         <span>Property Details</span>
                     </div>
-                <div class="details-grid">
+                    <div class="details-grid">
                         <div class="detail-row">
                             <span class="detail-label">Landlord Name:</span>
                             <span id="p-property-landlord" class="detail-value">-</span>
@@ -305,7 +341,8 @@ function formatDateValue($date) {
                         <span>Notes</span>
                     </div>
                     <div class="notes-input-section">
-                        <textarea id="p-noteTextarea" class="note-textarea" placeholder="Write your note here..."></textarea>
+                        <textarea id="p-noteTextarea" class="note-textarea"
+                            placeholder="Write your note here..."></textarea>
                         <button id="p-addNoteBtn" class="add-note-btn" onclick="window.actionbtn.addNote()">
                             <i class="fa-solid fa-plus"></i> Add Note
                         </button>
@@ -318,131 +355,134 @@ function formatDateValue($date) {
     </div>
 
     <script>
+    function toggleFilter() {
+        const filterToggle = document.getElementById('filterToggle');
+        const filterDropdowns = document.getElementById('filterDropdowns');
+        filterDropdowns.style.display = filterDropdowns.style.display === 'none' ? 'flex' : 'none';
+        filterToggle.classList.toggle('active');
+    }
 
-        function toggleFilter() {
-            const filterToggle = document.getElementById('filterToggle');
-            const filterDropdowns = document.getElementById('filterDropdowns');
-            filterDropdowns.style.display = filterDropdowns.style.display === 'none' ? 'flex' : 'none';
-            filterToggle.classList.toggle('active');
+    function sortTable(column, headerElement) {
+        const tbody = document.getElementById('tableBody');
+        const rows = Array.from(tbody.querySelectorAll('tr'));
+
+        if (currentSort.column === column) {
+            currentSort.direction = currentSort.direction === 'asc' ? 'desc' : 'asc';
+        } else {
+            currentSort.column = column;
+            currentSort.direction = 'asc';
         }
 
-        function sortTable(column, headerElement) {
-            const tbody = document.getElementById('tableBody');
-            const rows = Array.from(tbody.querySelectorAll('tr'));
+        document.querySelectorAll('table th').forEach(th => {
+            th.classList.remove('sorted');
+            const icon = th.querySelector('.sort-icon');
+            if (icon) icon.classList.remove('asc', 'desc');
+        });
 
-            if (currentSort.column === column) {
-                currentSort.direction = currentSort.direction === 'asc' ? 'desc' : 'asc';
-            } else {
-                currentSort.column = column;
-                currentSort.direction = 'asc';
+        headerElement.classList.add('sorted');
+        const icon = headerElement.querySelector('.sort-icon');
+        if (icon) icon.classList.add(currentSort.direction);
+
+        rows.sort((a, b) => {
+            let aVal, bVal;
+
+            switch (column) {
+                case 'property':
+                    aVal = a.dataset.property || '';
+                    bVal = b.dataset.property || '';
+                    break;
+                case 'gas':
+                    aVal = a.dataset.gas || '';
+                    bVal = b.dataset.gas || '';
+                    break;
+                case 'electric':
+                    aVal = a.dataset.electric || '';
+                    bVal = b.dataset.electric || '';
+                    break;
+                case 'epc':
+                    aVal = a.dataset.epc || '';
+                    bVal = b.dataset.epc || '';
+                    break;
+                case 'idlandlord':
+                    aVal = a.dataset.idlandlord || '';
+                    bVal = b.dataset.idlandlord || '';
+                    break;
+                case 'idtenant':
+                    aVal = a.dataset.idtenant || '';
+                    bVal = b.dataset.idtenant || '';
+                    break;
+                case 'contract':
+                    aVal = a.dataset.contract || '';
+                    bVal = b.dataset.contract || '';
+                    break;
+                default:
+                    return 0;
             }
 
-            document.querySelectorAll('table th').forEach(th => {
-                th.classList.remove('sorted');
-                const icon = th.querySelector('.sort-icon');
-                if (icon) icon.classList.remove('asc', 'desc');
-            });
+            if (aVal < bVal) return currentSort.direction === 'asc' ? -1 : 1;
+            if (aVal > bVal) return currentSort.direction === 'asc' ? 1 : -1;
+            return 0;
+        });
 
-            headerElement.classList.add('sorted');
-            const icon = headerElement.querySelector('.sort-icon');
-            if (icon) icon.classList.add(currentSort.direction);
+        rows.forEach(row => tbody.appendChild(row));
+    }
 
-            rows.sort((a, b) => {
-                let aVal, bVal;
+    function filterImportantDates() {
+        const propertyFilter = document.getElementById('filterProperty').value.toLowerCase();
+        const rows = document.querySelectorAll('#tableBody tr');
 
-                switch (column) {
-                    case 'property':
-                        aVal = a.dataset.property || '';
-                        bVal = b.dataset.property || '';
-                        break;
-                    case 'gas':
-                        aVal = a.dataset.gas || '';
-                        bVal = b.dataset.gas || '';
-                        break;
-                    case 'electric':
-                        aVal = a.dataset.electric || '';
-                        bVal = b.dataset.electric || '';
-                        break;
-                    case 'epc':
-                        aVal = a.dataset.epc || '';
-                        bVal = b.dataset.epc || '';
-                        break;
-                    case 'idlandlord':
-                        aVal = a.dataset.idlandlord || '';
-                        bVal = b.dataset.idlandlord || '';
-                        break;
-                    case 'idtenant':
-                        aVal = a.dataset.idtenant || '';
-                        bVal = b.dataset.idtenant || '';
-                        break;
-                    case 'contract':
-                        aVal = a.dataset.contract || '';
-                        bVal = b.dataset.contract || '';
-                        break;
-                    default:
-                        return 0;
-                }
+        rows.forEach(row => {
+            let show = true;
 
-                if (aVal < bVal) return currentSort.direction === 'asc' ? -1 : 1;
-                if (aVal > bVal) return currentSort.direction === 'asc' ? 1 : -1;
-                return 0;
-            });
+            if (propertyFilter && !row.dataset.property.includes(propertyFilter)) {
+                show = false;
+            }
 
-            rows.forEach(row => tbody.appendChild(row));
-        }
+            row.style.display = show ? '' : 'none';
+        });
+    }
 
-        function filterImportantDates() {
-            const propertyFilter = document.getElementById('filterProperty').value.toLowerCase();
-            const rows = document.querySelectorAll('#tableBody tr');
+    function resetFilters() {
+        document.getElementById('filterProperty').value = '';
 
-            rows.forEach(row => {
-                let show = true;
+        const rows = document.querySelectorAll('#tableBody tr');
+        rows.forEach(row => row.style.display = '');
 
-                if (propertyFilter && !row.dataset.property.includes(propertyFilter)) {
-                    show = false;
-                }
+        document.querySelectorAll('table th').forEach(th => {
+            th.classList.remove('sorted');
+            const icon = th.querySelector('.sort-icon');
+            if (icon) icon.classList.remove('asc', 'desc');
+        });
 
-                row.style.display = show ? '' : 'none';
-            });
-        }
+        currentSort = {
+            column: null,
+            direction: 'asc'
+        };
+    }
 
-        function resetFilters() {
-            document.getElementById('filterProperty').value = '';
+    function showImportantDatesInfo() {
+        alert('Important dates are managed through Property, Landlord, and Tenant records.');
+    }
 
-            const rows = document.querySelectorAll('#tableBody tr');
-            rows.forEach(row => row.style.display = '');
+    function viewImportantDate(btn) {
+        const row = btn.closest('tr');
+        const property = row.querySelector('.property-name').textContent.trim();
+        alert('View Important Dates: ' + property);
+    }
 
-            document.querySelectorAll('table th').forEach(th => {
-                th.classList.remove('sorted');
-                const icon = th.querySelector('.sort-icon');
-                if (icon) icon.classList.remove('asc', 'desc');
-            });
+    function editImportantDate(btn) {
+        const row = btn.closest('tr');
+        const property = row.querySelector('.property-name').textContent.trim();
+        alert('Edit the related Property, Landlord, or Tenant record for: ' + property);
+    }
 
-            currentSort = { column: null, direction: 'asc' };
-        }
-
-        function showImportantDatesInfo() {
-            alert('Important dates are managed through Property, Landlord, and Tenant records.');
-        }
-
-        function viewImportantDate(btn) {
-            const row = btn.closest('tr');
-            const property = row.querySelector('.property-name').textContent.trim();
-            alert('View Important Dates: ' + property);
-        }
-
-        function editImportantDate(btn) {
-            const row = btn.closest('tr');
-            const property = row.querySelector('.property-name').textContent.trim();
-            alert('Edit the related Property, Landlord, or Tenant record for: ' + property);
-        }
-
-        function deleteImportantDate(btn) {
-            const row = btn.closest('tr');
-            const property = row.querySelector('.property-name').textContent.trim();
-            alert('Important dates are not deleted separately. Archive or edit the related record for: ' + property);
-        }
+    function deleteImportantDate(btn) {
+        const row = btn.closest('tr');
+        const property = row.querySelector('.property-name').textContent.trim();
+        alert('Important dates are not deleted separately. Archive or edit the related record for: ' + property);
+    }
     </script>
 
 </body>
+
 </html>
