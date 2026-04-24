@@ -724,18 +724,14 @@ if (field.type === 'datetime') {
         el.innerHTML = `<select data-field-id="${field.id}">${emptyOption}${opts}</select>`;
         break;
       }
-      case 'datetime': {
-        const dtValue = raw ? raw.replace(' ', 'T').slice(0, 16) : '';
-        el.innerHTML = `<input type="datetime-local" value="${dtValue}" data-field-id="${field.id}">`;
-        break;
-      }
+
       case 'date':
         el.innerHTML = `<input class="date-input" type="date" value="${toDateInputValue(raw)}" data-field-id="${field.id}">`;
         break;
-
+        
         case 'datetime':
         el.innerHTML = `<input type="datetime-local" value="${toDateTimeInputValue(raw)}" data-field-id="${field.id}">`;
-        break;  
+        break;
 
       case 'number':
         el.innerHTML = `<input type="number" value="${raw}" placeholder="${isEmpty ? placeholder : ''}" data-field-id="${field.id}">`;
@@ -920,6 +916,7 @@ if (field.type === 'datetime') {
     user: 'user',
     viewing: 'viewing',
     payment:  'payment',
+    importantdate: 'dates',
   };
 
   function openModal(entityType) {
@@ -1326,7 +1323,7 @@ function toDateTimeInputValue(value) {
 
   // Public API
 
-  (function () {
+ 
   return {
     viewProperty(btn)  { openEntityModal('property', extractPropertyData(btn), 'view'); },
     editProperty(btn)  { openEntityModal('property', extractPropertyData(btn), 'edit'); },
@@ -1337,7 +1334,7 @@ function toDateTimeInputValue(value) {
     viewUser(btn)    { openEntityModal('user',   extractUserData(btn),   'view'); },
     editUser(btn) { openEntityModal('user', extractUserData(btn), 'edit'); },
     viewViewing(btn) { openEntityModal('viewing', extractViewingData(btn), 'view'); },
-    viewViewingNotes(btn) { openViewingNotes(btn); },
+    //viewViewingNotes(btn) { openViewingNotes(btn); },
     editViewing(btn) { openEntityModal('viewing', extractViewingData(btn), 'edit'); },
     viewImportantDate(btn)    { openEntityModal('importantdate',   extractPropertyData(btn),   'view'); },
     editImportantDate(btn) { openEntityModal('importantdate', extractPropertyData(btn), 'edit'); },
@@ -1351,8 +1348,7 @@ function toDateTimeInputValue(value) {
     saveTenant,
     savePayment
   };
-}
-)();
+})();
 
 function openFile(fileType) {
   alert(`Opening ${fileType.toUpperCase()} file... (Implement PDF later)`);
