@@ -135,6 +135,57 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
         header('Location: viewing.php');
         exit();
     }
+   
+    // Add Payment
+    if (isset($_POST['payment_tenant_id'])) {
+        $tenantId = (int)$_POST['payment_tenant_id'];
+        $propertyId = (int)$_POST['payment_property_id'];
+        $amount = (float)$_POST['payment_amount'];
+        $paymentPeriod = trim($_POST['payment_period']);
+        $paymentMethod = trim($_POST['payment_method']); // collected from form
+        $paymentDate = $_POST['payment_date'];
+        $paymentTime = $_POST['payment_time'];
+
+        // Basic validation
+        if (!$tenantId || !$propertyId || !$amount || !$paymentPeriod || !$paymentDate || !$paymentTime) {
+            die('Missing required payment fields');
+        }
+
+        // Combine date + time
+        $dateTime = $paymentDate . ' ' . $paymentTime . ':00';
+
+        // Calculate next due date
+        $nextDue = date('Y-m-d', strtotime($paymentDate . ' +1 month'));
+
+        // Save payment
+        $stmt = $pdo->prepare("
+            INSERT INTO transactions (
+                tenant_id,
+                property_id,
+                transaction_amount,
+                date_of_transaction,
+                payment_period,
+                next_due,
+                status,
+                archived
+            )
+            VALUES (?, ?, ?, ?, ?, ?, ?, 0)
+        ");
+
+        $stmt->execute([
+            $tenantId,
+            $propertyId,
+            $amount,
+            $dateTime,
+            $paymentPeriod,
+            $nextDue,
+            'completed'
+        ]);
+
+        header('Location: payments.php');
+        exit();
+    }
+
 
     // Add User
     if (isset($_POST['user_username'])) {
