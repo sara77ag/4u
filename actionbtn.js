@@ -1097,14 +1097,6 @@ function toDateTimeInputValue(value) {
       return;
     }
 
-    const saveBtn = e.target.closest('[data-action="save"]');
-    if (saveBtn) {
-      if (state.entityType === "property") saveProperty();
-      if (state.entityType === "landlord") saveLandlord();
-      if (state.entityType === "tenant") saveTenant();
-      return;
-    }
-
     const deleteBtn = e.target.closest(".delete-btn");
     if (deleteBtn) {
       const noteId = deleteBtn.dataset.id;
