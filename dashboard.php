@@ -6,6 +6,7 @@ if(!isset($_SESSION['user_id'])) {
     exit();
 }
 
+
 $dbPath = __DIR__ . '/database.db';
 
 try {
@@ -35,23 +36,25 @@ $deadlines = $pdo->query("
     (SELECT COUNT(*) FROM tenants    WHERE id_expiry_date    BETWEEN date('now') AND date('now', '+30 days') AND archived = 0) +
     (SELECT COUNT(*) FROM contracts  WHERE contract_end      BETWEEN date('now') AND date('now', '+30 days') AND archived = 0)
 ")->fetchColumn();
-$todos = $pdo->query("SELECT note_id, note_text FROM notes WHERE archived = 0 AND type = 'todo' ORDER BY created_at ASC")->fetchAll(PDO::FETCH_ASSOC);
+$todos = $pdo->query("SELECT note_id, note_text, completed FROM notes WHERE archived = 0 AND type = 'todo' ORDER BY created_at ASC")->fetchAll(PDO::FETCH_ASSOC);
 ?>
 
 <!DOCTYPE html>
 <html lang="en">
+
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>Dashboard - iLet4You</title>
     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.1/css/all.min.css">
     <link rel="stylesheet" href="style.css">
-    <script src="navbar.js" ></script>
-    <script src="modals.js" ></script>
+    <script src="navbar.js"></script>
+    <script src="modals.js"></script>
 
 </head>
+
 <body onload="CallNavbar(); loadModals();">
-    
+
     <div id="navbar-container"></div>
 
     <main class="main-content">
@@ -73,7 +76,7 @@ $todos = $pdo->query("SELECT note_id, note_text FROM notes WHERE archived = 0 AN
 
             <div class="quick-cards-container">
                 <div class="quick-cards-row">
-                <?php if (in_array($_SESSION['role'], ['admin', 'agent'])): ?>
+                    <?php if (in_array($_SESSION['role'], ['admin', 'agent'])): ?>
                     <div class="quick-card" onclick="openAddPropertyModal()">
                         <div class="quick-card-icon"><i class="fa-solid fa-house"></i></div>
                         <h4 class="quick-card-title">Add Property</h4>
@@ -89,16 +92,16 @@ $todos = $pdo->query("SELECT note_id, note_text FROM notes WHERE archived = 0 AN
                         <h4 class="quick-card-title">Add Tenant</h4>
                         <p class="quick-card-desc">Register a <br> new tenant</p>
                     </div>
-                    
-                <?php if ($_SESSION['role'] === 'admin'): ?>
+
+                    <?php if ($_SESSION['role'] === 'admin'): ?>
                     <div class="quick-card" onclick="openAddUserModal()">
                         <div class="quick-card-icon"><i class="fa-solid fa-user-plus"></i></div>
                         <h4 class="quick-card-title">Add User</h4>
                         <p class="quick-card-desc">Create a new user account</p>
                     </div>
-                <?php endif; ?>
+                    <?php endif; ?>
 
-    
+
 
                     <div class="quick-card" onclick="openAddContractModal()">
                         <div class="quick-card-icon"><i class="fa-solid fa-file-contract"></i></div>
@@ -122,24 +125,24 @@ $todos = $pdo->query("SELECT note_id, note_text FROM notes WHERE archived = 0 AN
                         <h4 class="quick-card-title">Due Dates</h4>
                         <p class="quick-card-desc">Check upcoming deadlines</p>
                     </div>
-           
-                
+
+
                     <div class="quick-card" onclick="window.location.href='export.php'">
                         <div class="quick-card-icon"><i class="fa-solid fa-chart-line"></i></div>
                         <h4 class="quick-card-title">Export Report</h4>
                         <p class="quick-card-desc">Export monthly summary</p>
                     </div>
-                    <div class="quick-card" onclick="alert('WhatsApp integration coming soon.')">
+                    <div class="quick-card" onclick="window.open('https://web.whatsapp.com', '_blank')">
                         <div class="quick-card-icon"><i class="fa-brands fa-whatsapp"></i></div>
                         <h4 class="quick-card-title">Open WhatsApp</h4>
                         <p class="quick-card-desc">Send a quick message via WhatsApp</p>
                     </div>
-                    <div class="quick-card" onclick="alert('Issue reporting coming soon.')">
+                    <div class="quick-card" onclick="openComplaintModal()">
                         <div class="quick-card-icon"><i class="fa-solid fa-wrench"></i></div>
                         <h4 class="quick-card-title">Report an Issue</h4>
                         <p class="quick-card-desc">Log a maintenance request</p>
                     </div>
-            </div>
+                </div>
         </section>
 
         <section class="statistics-section">
@@ -176,6 +179,24 @@ $todos = $pdo->query("SELECT note_id, note_text FROM notes WHERE archived = 0 AN
     <div id="modals-container"></div>
 
     <script>
+    const SESSION_USER = {
+        name: "<?= $_SESSION['name'] ?? '' ?>",
+        email: "<?= $_SESSION['email'] ?? '' ?>"
+    };
+
+    function openComplaintModal() {
+        const modal = document.getElementById('complaintModal');
+        modal.style.display = 'flex';
+
+        document.getElementById('userName').value = SESSION_USER.name || '';
+        document.getElementById('userEmail').value = SESSION_USER.email || '';
+    }
+
+    function closeComplaintModal() {
+        const modal = document.getElementById('complaintModal');
+        if (modal) modal.style.display = 'none';
+    }
+
     function afterModalsLoaded() {
         console.log('afterModalsLoaded fired');
         const todoList = document.getElementById('todo-list');
@@ -186,22 +207,22 @@ $todos = $pdo->query("SELECT note_id, note_text FROM notes WHERE archived = 0 AN
         if (todos.length > 0) {
             todoList.innerHTML = '';
             todos.forEach(function(todo) {
-                todoList.appendChild(makeTodoItem(todo.note_id, todo.note_text));
+                todoList.appendChild(makeTodoItem(todo.note_id, todo.note_text, todo.completed));
             });
         }
     }
 
-    function makeTodoItem(id, text) {
+    function makeTodoItem(id, text, completed) {
         const li = document.createElement('li');
-        li.className = 'todo-item';
+        li.className = 'todo-item' + (completed ? ' completed' : '');
         li.dataset.id = id;
         li.innerHTML = `
-            <input type="checkbox" class="todo-checkbox" onchange="toggleTodo(this)">
-            <span class="todo-text">${text}</span>
-            <button class="delete-btn" onclick="deleteTodo(this)">
-                <i class="fa-solid fa-trash"></i>
-            </button>
-        `;
+        <input type="checkbox" class="todo-checkbox" ${completed ? 'checked' : ''} onchange="toggleTodo(this)">
+        <span class="todo-text">${text}</span>
+        <button class="delete-btn" onclick="deleteTodo(this)">
+            <i class="fa-solid fa-trash"></i>
+        </button>
+    `;
         return li;
     }
 
@@ -231,12 +252,74 @@ $todos = $pdo->query("SELECT note_id, note_text FROM notes WHERE archived = 0 AN
     }
 
     function toggleTodo(checkbox) {
-        checkbox.parentElement.classList.toggle('completed');
-    }
+        const li = checkbox.closest('.todo-item');
+        const id = li.dataset.id;
+        const completed = checkbox.checked ? 1 : 0;
+        li.classList.toggle('completed', checkbox.checked);
 
-    document.getElementById('todo-input').addEventListener('keypress', function(e) {
-        if (e.key === 'Enter') addTodo();
-    });
-</script>
+        const form = document.createElement('form');
+        form.method = 'POST';
+        form.action = 'modals.php';
+        form.innerHTML = `
+        <input type="hidden" name="toggle_todo_id" value="${id}">
+        <input type="hidden" name="toggle_todo_completed" value="${completed}">
+    `;
+        document.body.appendChild(form);
+        form.submit();
+    };
+    </script>
+
+    <div id="complaintModal" class="modal-overlay" onclick="if(event.target===this) closeComplaintModal()">
+
+        <div class="modal-container" style="max-width: 520px;">
+
+            <!-- HEADER -->
+            <div class="modal-header">
+                <div class="modal-header-title">
+                    <div class="modal-header-title-icon">
+                        <i class="fa-solid fa-wrench"></i>
+                    </div>
+                    <h3>Report an Issue</h3>
+                </div>
+
+                <button class="modal-close-btn" onclick="closeComplaintModal()">
+                    <i class="fa-solid fa-xmark"></i>
+                </button>
+            </div>
+
+            <div class="modal-body">
+                <form action="https://formspree.io/f/xojykele" method="POST">
+
+                    <div class="form-group">
+                        <label>Name</label>
+                        <input type="text" name="name" id="userName" class="issue-field" readonly>
+                    </div>
+
+                    <div class="form-group">
+                        <label>Email</label>
+                        <input type="text" name="_replyto" id="userEmail" class="issue-field" readonly>
+                    </div>
+
+                    <div class="form-group">
+                        <label>Complaint</label>
+                        <textarea name="message" placeholder="Write your issue..." class="issue-textarea"
+                            required></textarea>
+                    </div>
+
+                    <div class="modal-footer">
+                        <button type="submit" class="modal-btn modal-btn-send">
+                            <i class="fa-solid fa-paper-plane"></i> Send
+                        </button>
+
+                        <button type="button" class="modal-btn modal-btn-reset" onclick="closeComplaintModal()">
+                            <i class="fa-solid fa-xmark"></i> Cancel
+                        </button>
+                    </div>
+                </form>
+            </div>
+        </div>
+    </div>
+
 </body>
+
 </html>

@@ -74,6 +74,7 @@ function formatDateValue($date) {
 
 <!DOCTYPE html>
 <html lang="en">
+
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
@@ -85,16 +86,41 @@ function formatDateValue($date) {
     <script src="modals.js"></script>
     <script src="actionbtn.js"></script>
     <style>
-        .col-property { width: 22%; }
-        .col-gas { width: 11%; }
-        .col-electric { width: 12%; }
-        .col-epc { width: 11%; }
-        .col-idlandlord { width: 12%; }
-        .col-idtenant { width: 11%; }
-        .col-contract { width: 11%; }
-        .col-action { width: 10%; text-align: center; }
+    .col-property {
+        width: 22%;
+    }
+
+    .col-gas {
+        width: 11%;
+    }
+
+    .col-electric {
+        width: 12%;
+    }
+
+    .col-epc {
+        width: 11%;
+    }
+
+    .col-idlandlord {
+        width: 12%;
+    }
+
+    .col-idtenant {
+        width: 11%;
+    }
+
+    .col-contract {
+        width: 11%;
+    }
+
+    .col-action {
+        width: 10%;
+        text-align: center;
+    }
     </style>
 </head>
+
 <body onload="CallNavbar(); loadModals();">
 
     <div id="navbar-container"></div>
@@ -111,7 +137,8 @@ function formatDateValue($date) {
                 <div class="filter-dropdowns" id="filterDropdowns" style="display: none;">
                     <div class="filter-group">
                         <label>Property</label>
-                        <input type="text" id="filterProperty" onchange="filterImportantDates()" placeholder = "Enter Property Name">
+                        <input type="text" id="filterProperty" onchange="filterImportantDates()"
+                            placeholder="Enter Property Name">
                     </div>
                     <button class="filter-btn-reset" onclick="resetFilters()">
                         <i class="fa-solid fa-rotate-left"></i>
@@ -224,7 +251,6 @@ function formatDateValue($date) {
                     </table>
                 </div>
             </div>
-        </div>
     </main>
 
     <div id="modals-container"></div>
@@ -302,7 +328,7 @@ function formatDateValue($date) {
                         <i class="fa-solid fa-house"></i>
                         <span>Property Details</span>
                     </div>
-                <div class="details-grid">
+                    <div class="details-grid">
                         <div class="detail-row">
                             <span class="detail-label">Landlord Name:</span>
                             <span id="i-property-landlord" class="detail-value">-</span>
@@ -371,108 +397,104 @@ function formatDateValue($date) {
     </div>
 
     <script>
+    function toggleFilter() {
+        const filterToggle = document.getElementById('filterToggle');
+        const filterDropdowns = document.getElementById('filterDropdowns');
+        filterDropdowns.style.display = filterDropdowns.style.display === 'none' ? 'flex' : 'none';
+        filterToggle.classList.toggle('active');
+    }
 
-        function toggleFilter() {
-            const filterToggle = document.getElementById('filterToggle');
-            const filterDropdowns = document.getElementById('filterDropdowns');
-            filterDropdowns.style.display = filterDropdowns.style.display === 'none' ? 'flex' : 'none';
-            filterToggle.classList.toggle('active');
+    function sortTable(column, headerElement) {
+        const tbody = document.getElementById('tableBody');
+        const rows = Array.from(tbody.querySelectorAll('tr'));
+
+        if (currentSort.column === column) {
+            currentSort.direction = currentSort.direction === 'asc' ? 'desc' : 'asc';
+        } else {
+            currentSort.column = column;
+            currentSort.direction = 'asc';
         }
 
-        function sortTable(column, headerElement) {
-            const tbody = document.getElementById('tableBody');
-            const rows = Array.from(tbody.querySelectorAll('tr'));
+        document.querySelectorAll('table th').forEach(th => {
+            th.classList.remove('sorted');
+            const icon = th.querySelector('.sort-icon');
+            if (icon) icon.classList.remove('asc', 'desc');
+        });
 
-            if (currentSort.column === column) {
-                currentSort.direction = currentSort.direction === 'asc' ? 'desc' : 'asc';
-            } else {
-                currentSort.column = column;
-                currentSort.direction = 'asc';
+        headerElement.classList.add('sorted');
+        const icon = headerElement.querySelector('.sort-icon');
+        if (icon) icon.classList.add(currentSort.direction);
+
+        rows.sort((a, b) => {
+            let aVal, bVal;
+
+            switch (column) {
+                case 'property':
+                    aVal = a.dataset.property || '';
+                    bVal = b.dataset.property || '';
+                    break;
+                case 'gas':
+                    aVal = a.dataset.gas || '';
+                    bVal = b.dataset.gas || '';
+                    break;
+                case 'electric':
+                    aVal = a.dataset.electric || '';
+                    bVal = b.dataset.electric || '';
+                    break;
+                case 'epc':
+                    aVal = a.dataset.epc || '';
+                    bVal = b.dataset.epc || '';
+                    break;
+                case 'idlandlord':
+                    aVal = a.dataset.idlandlord || '';
+                    bVal = b.dataset.idlandlord || '';
+                    break;
+                case 'idtenant':
+                    aVal = a.dataset.idtenant || '';
+                    bVal = b.dataset.idtenant || '';
+                    break;
+                case 'contract':
+                    aVal = a.dataset.contract || '';
+                    bVal = b.dataset.contract || '';
+                    break;
+                default:
+                    return 0;
             }
 
-            document.querySelectorAll('table th').forEach(th => {
-                th.classList.remove('sorted');
-                const icon = th.querySelector('.sort-icon');
-                if (icon) icon.classList.remove('asc', 'desc');
-            });
+            if (aVal < bVal) return currentSort.direction === 'asc' ? -1 : 1;
+            if (aVal > bVal) return currentSort.direction === 'asc' ? 1 : -1;
+            return 0;
+        });
 
-            headerElement.classList.add('sorted');
-            const icon = headerElement.querySelector('.sort-icon');
-            if (icon) icon.classList.add(currentSort.direction);
+        rows.forEach(row => tbody.appendChild(row));
+    }
 
-            rows.sort((a, b) => {
-                let aVal, bVal;
+    function filterImportantDates() {
+        const propertyFilter = document.getElementById('filterProperty').value.toLowerCase();
+        const rows = document.querySelectorAll('#tableBody tr');
 
-                switch (column) {
-                    case 'property':
-                        aVal = a.dataset.property || '';
-                        bVal = b.dataset.property || '';
-                        break;
-                    case 'gas':
-                        aVal = a.dataset.gas || '';
-                        bVal = b.dataset.gas || '';
-                        break;
-                    case 'electric':
-                        aVal = a.dataset.electric || '';
-                        bVal = b.dataset.electric || '';
-                        break;
-                    case 'epc':
-                        aVal = a.dataset.epc || '';
-                        bVal = b.dataset.epc || '';
-                        break;
-                    case 'idlandlord':
-                        aVal = a.dataset.idlandlord || '';
-                        bVal = b.dataset.idlandlord || '';
-                        break;
-                    case 'idtenant':
-                        aVal = a.dataset.idtenant || '';
-                        bVal = b.dataset.idtenant || '';
-                        break;
-                    case 'contract':
-                        aVal = a.dataset.contract || '';
-                        bVal = b.dataset.contract || '';
-                        break;
-                    default:
-                        return 0;
-                }
+        rows.forEach(row => {
+            let show = true;
 
-                if (aVal < bVal) return currentSort.direction === 'asc' ? -1 : 1;
-                if (aVal > bVal) return currentSort.direction === 'asc' ? 1 : -1;
-                return 0;
-            });
+            if (propertyFilter && !row.dataset.property.includes(propertyFilter)) {
+                show = false;
+            }
 
-            rows.forEach(row => tbody.appendChild(row));
-        }
+            row.style.display = show ? '' : 'none';
+        });
+    }
 
-        function filterImportantDates() {
-            const propertyFilter = document.getElementById('filterProperty').value.toLowerCase();
-            const rows = document.querySelectorAll('#tableBody tr');
+    function resetFilters() {
+        document.getElementById('filterProperty').value = '';
 
-            rows.forEach(row => {
-                let show = true;
+        const rows = document.querySelectorAll('#tableBody tr');
+        rows.forEach(row => row.style.display = '');
 
-                if (propertyFilter && !row.dataset.property.includes(propertyFilter)) {
-                    show = false;
-                }
-
-                row.style.display = show ? '' : 'none';
-            });
-        }
-
-        function resetFilters() {
-            document.getElementById('filterProperty').value = '';
-
-            const rows = document.querySelectorAll('#tableBody tr');
-            rows.forEach(row => row.style.display = '');
-
-            document.querySelectorAll('table th').forEach(th => {
-                th.classList.remove('sorted');
-                const icon = th.querySelector('.sort-icon');
-                if (icon) icon.classList.remove('asc', 'desc');
-            });
-
-            currentSort = { column: null, direction: 'asc' };
-        }
+        document.querySelectorAll('table th').forEach(th => {
+            th.classList.remove('sorted');
+            const icon = th.querySelector('.sort-icon');
+            if (icon) icon.classList.remove('asc', 'desc');
+        });
 
         function showImportantDatesInfo() {
             alert('Important dates are managed through Property, Landlord, and Tenant records.');
@@ -480,4 +502,5 @@ function formatDateValue($date) {
     </script>
 
 </body>
+
 </html>

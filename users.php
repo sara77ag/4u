@@ -1,6 +1,6 @@
 <?php
 session_start();
-if(!isset($_SESSION['user_id'])) {
+if (!isset($_SESSION['user_id'])) {
     header("Location: index.php");
     exit();
 }
@@ -17,19 +17,6 @@ try {
 if ($_SERVER['REQUEST_METHOD'] === 'POST' && isset($_POST['archive_id'])) {
     $stmt = $pdo->prepare("UPDATE users SET archived = 1, date_archived = date('now') WHERE user_id = ?");
     $stmt->execute([$_POST['archive_id']]);
-    header("Location: users.php");
-    exit();
-}
-
-// Handle password reset
-if ($_SERVER['REQUEST_METHOD'] === 'POST' && isset($_POST['reset_password_id'])) {
-    $newPassword = bin2hex(random_bytes(8)); // Generate random password
-    $hashedPassword = password_hash($newPassword, PASSWORD_DEFAULT);
-    
-    $stmt = $pdo->prepare("UPDATE users SET password = ?, password_reset_date = date('now') WHERE user_id = ?");
-    $stmt->execute([$hashedPassword, $_POST['reset_password_id']]);
-    
-    // In real app, email this to user. For now, just redirect.
     header("Location: users.php");
     exit();
 }
@@ -55,9 +42,38 @@ $stmt = $pdo->query("
 ");
 
 $users = $stmt->fetchAll(PDO::FETCH_ASSOC);
+
+// Handle password reset (admin resets for a user)
+if ($_SERVER['REQUEST_METHOD'] === 'POST' && isset($_POST['reset_password_id'])) {
+
+    $stmt = $pdo->prepare("SELECT username, name, email, password_reset_date FROM users WHERE user_id = ?");
+    $stmt->execute([$_POST['reset_password_id']]);
+    $targetUser = $stmt->fetch(PDO::FETCH_ASSOC);
+
+    if ($targetUser) {
+        $newPassword = substr(str_shuffle('ABCDEFGHJKLMNPQRSTUVWXYZabcdefghjkmnpqrstuvwxyz23456789'), 0, 10);
+        $hashedPassword = password_hash($newPassword, PASSWORD_DEFAULT);
+
+        $stmt = $pdo->prepare("UPDATE users SET password = ?, password_reset_date = date('now') WHERE user_id = ?");
+        $stmt->execute([$hashedPassword, $_POST['reset_password_id']]);
+
+        require_once 'mailer.php';
+        $sent = sendPasswordResetEmail($targetUser['email'], $targetUser['name'], $targetUser['username'], $newPassword);
+
+        if ($sent) {
+            $_SESSION['flash_success'] = "New password sent to: " . $targetUser['email'];
+        } else {
+            $_SESSION['flash_error'] = "Password reset but failed to send email to: " . $targetUser['email'];
+        }
+    }
+
+    header("Location: users.php");
+    exit();
+}
 ?>
 <!DOCTYPE html>
 <html lang="en">
+
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
@@ -69,10 +85,32 @@ $users = $stmt->fetchAll(PDO::FETCH_ASSOC);
     <script src="modals.js"></script>
     <script src="actionbtn.js"></script>
 </head>
+
 <body onload="CallNavbar(); loadModals();">
     <div id="navbar-container"></div>
 
     <main class="main-content">
+        <?php if (isset($_SESSION['flash_success'])): ?>
+        <div class="flash-success" style="
+        background:#d4edda; color:#155724; border:1px solid #c3e6cb;
+        border-radius:8px; padding:12px 20px; margin-bottom:16px;
+        display:flex; align-items:center; gap:10px;">
+            <i class="fa-solid fa-circle-check"></i>
+            <?= htmlspecialchars($_SESSION['flash_success']) ?>
+        </div>
+        <?php unset($_SESSION['flash_success']); ?>
+        <?php endif; ?>
+
+        <?php if (isset($_SESSION['flash_error'])): ?>
+        <div class="flash-error" style="
+        background:#f8d7da; color:#721c24; border:1px solid #f5c6cb;
+        border-radius:8px; padding:12px 20px; margin-bottom:16px;
+        display:flex; align-items:center; gap:10px;">
+            <i class="fa-solid fa-circle-xmark"></i>
+            <?= htmlspecialchars($_SESSION['flash_error']) ?>
+        </div>
+        <?php unset($_SESSION['flash_error']); ?>
+        <?php endif; ?>
         <h1 class="page-title">Users</h1>
 
         <div class="main-container">
@@ -203,10 +241,6 @@ $users = $stmt->fetchAll(PDO::FETCH_ASSOC);
                 </div>
                 <h2 id="username">Landlord Name</h2>
             </div>
-            <button class="modal-close-btn" onclick="actionbtn.closeModal()">
-                <i class="fa-solid fa-xmark"></i>
-            </button>
-        </div>
 
         <!-- Tabs Navigation -->
         <div class="action-tabs-nav">
@@ -256,6 +290,7 @@ $users = $stmt->fetchAll(PDO::FETCH_ASSOC);
                         <span id="u-user-datearchived" class="detail-value">-</span>
                     </div>
                 </div>
+            </div>
         </div>
 
         <div id="u-tab-files" class="tab-content">
@@ -277,7 +312,7 @@ $users = $stmt->fetchAll(PDO::FETCH_ASSOC);
     </div>
 </div>    
 
-    <script>
+        <script>
         function toggleFilter() {
             const filterToggle = document.getElementById('filterToggle');
             const filterDropdowns = document.getElementById('filterDropdowns');
@@ -348,6 +383,7 @@ $users = $stmt->fetchAll(PDO::FETCH_ASSOC);
                 row.remove();
             }
         }
-    </script>
+        </script>
 </body>
+
 </html>
