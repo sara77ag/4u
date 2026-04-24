@@ -25,16 +25,37 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST' && isset($_POST['archive_id'])) {
 $stmt = $pdo->query("
     SELECT 
         vb.booking_id,
+        vb.property_id,
         vb.viewer_name,
         vb.viewer_phone,
         vb.email,
         vb.date_time,
         vb.status,
+        vb.user_id,
+        vb.archived,
+        vb.date_archived,
+
         p.property_address,
-        u.name as agent_name
+        p.property_type,
+        p.monthly_rent,
+        p.room_count,
+        p.bathroom_count,
+        p.epc_rating,
+        p.allowed_pets,
+        p.has_garden,
+        p.council_band,
+        l.name AS landlord_name,
+        l.contact_method AS landlord_contact_method,
+
+        u.name AS agent_name,
+
+        t.name AS tenant_name
     FROM viewing_bookings vb
     LEFT JOIN properties p ON vb.property_id = p.property_id
+    LEFT JOIN landlords l ON p.landlord_id = l.landlord_id
     LEFT JOIN users u ON vb.user_id = u.user_id
+    LEFT JOIN contracts c ON p.property_id = c.property_id AND c.archived = 0
+    LEFT JOIN tenants t ON c.tenant_id = t.tenant_id AND t.archived = 0
     WHERE vb.archived = 0
     ORDER BY vb.date_time DESC
 ");
@@ -53,6 +74,7 @@ $viewings = $stmt->fetchAll(PDO::FETCH_ASSOC);
     <link rel="stylesheet" href="tables.css">
     <script src="navbar.js"></script>
     <script src="modals.js"></script>
+    <script src="actionbtn.js"></script>
     <style>
     .col-name {
         width: 16%;
@@ -119,7 +141,7 @@ $viewings = $stmt->fetchAll(PDO::FETCH_ASSOC);
                     </div>
                     <div class="filter-group">
                         <label>Agent</label>
-                        <input type="text" id="filterAgent" onchange="filterViewings()">
+                        <input type="text" id="filterAgent" onchange="filterViewings()" placeholder="Enter Agent">
                     </div>
                     <button class="filter-btn-reset" onclick="resetFilters()">
                         <i class="fa-solid fa-rotate-left"></i>
@@ -176,9 +198,33 @@ $viewings = $stmt->fetchAll(PDO::FETCH_ASSOC);
         default => 'fa-calendar'
     };
 ?>
-                            <tr data-name="<?= strtolower($v['viewer_name']) ?>"
+                            <?php
+                                $propertyStatus = !empty($v['tenant_name']) ? 'occupied' : 'available';
+                            ?>
+                            <tr
+                                data-bookingid="<?= $v['booking_id'] ?>"
+                                data-propertyid="<?= $v['property_id'] ?>"
+                                data-viewer="<?= htmlspecialchars($v['viewer_name']) ?>"
+                                data-phone="<?= htmlspecialchars($v['viewer_phone']) ?>"
                                 data-status="<?= htmlspecialchars($v['status']) ?>"
-                                data-datetime="<?= htmlspecialchars($v['date_time']) ?>">
+                                data-datetime="<?= htmlspecialchars($v['date_time']) ?>"
+                                data-userid="<?= htmlspecialchars($v['user_id']) ?>"
+                                data-email="<?= htmlspecialchars($v['email']) ?>"
+                                data-archived="<?= htmlspecialchars($v['archived']) ?>"
+                                data-datearchived="<?= htmlspecialchars($v['date_archived']) ?>"
+
+                                data-landlord="<?= htmlspecialchars($v['landlord_name'] ?? '') ?>"
+                                data-type="<?= htmlspecialchars($v['property_type'] ?? '') ?>"
+                                data-propertystatus="<?= $propertyStatus ?>"
+                                data-price="<?= htmlspecialchars($v['monthly_rent'] ?? '') ?>"
+                                data-tenant="<?= htmlspecialchars($v['tenant_name'] ?? '') ?>"
+                                data-rooms="<?= htmlspecialchars($v['room_count'] ?? '') ?>"
+                                data-bathrooms="<?= htmlspecialchars($v['bathroom_count'] ?? '') ?>"
+                                data-epc="<?= htmlspecialchars($v['epc_rating'] ?? '') ?>"
+                                data-pets="<?= isset($v['allowed_pets']) ? $v['allowed_pets'] : '' ?>"
+                                data-garden="<?= isset($v['has_garden']) ? $v['has_garden'] : '' ?>"
+                                data-council="<?= htmlspecialchars($v['council_band'] ?? '') ?>"
+                            >
                                 <td class="viewer-name"><?= htmlspecialchars($v['viewer_name']) ?></td>
                                 <td><?= htmlspecialchars($v['viewer_phone']) ?></td>
                                 <td class="viewer-email"><?= htmlspecialchars($v['email']) ?></td>
@@ -194,14 +240,12 @@ $viewings = $stmt->fetchAll(PDO::FETCH_ASSOC);
                                 </td>
                                 <td>
                                     <div class="action-buttons">
-                                        <button class="action-btn action-btn-notes" title="View"
-                                            onclick="actionbtn.Viewingnote(this)">
+                                        <!--<button class="action-btn action-btn-notes" title="Notes" onclick="actionbtn.viewViewingNotes(this)">
                                             <i class="far fa-sticky-note"></i>
-                                        </button>
-
+                                        </button> -->
+                                        
                                         <?php if (in_array($_SESSION['role'], ['admin', 'agent'])): ?>
-                                        <button class="action-btn action-btn-edit" title="Edit"
-                                            onclick="editViewing(this)">
+                                        <button class="action-btn action-btn-edit" title="Edit" onclick="actionbtn.editViewing(this)">
                                             <i class="fa-solid fa-pen"></i>
                                         </button>
                                         <?php endif; ?>
@@ -239,7 +283,7 @@ $viewings = $stmt->fetchAll(PDO::FETCH_ASSOC);
                     <div class="action-modal-header-icon">
                         <i class="fa-solid fa-house"></i>
                     </div>
-                    <h2 id="viewier-name">-</h2>
+                    <h2 id="viewerName">-</h2>
                 </div>
                 <button class="modal-close-btn" onclick="actionbtn.closeModal()">
                     <i class="fa-solid fa-xmark"></i>
@@ -369,7 +413,7 @@ $viewings = $stmt->fetchAll(PDO::FETCH_ASSOC);
                             <i class="fa-solid fa-plus"></i> Add Note
                         </button>
                     </div>
-                    <div id="v-notesList" class="notes-list">
+                    <div id="v-notesList" class="notes-list" date-notes-list> </div>
                     </div>
                 </div>
             </div>
@@ -492,49 +536,13 @@ $viewings = $stmt->fetchAll(PDO::FETCH_ASSOC);
         document.getElementById('filterDateTime').value = '';
         document.getElementById('filterAgent').value = '';
 
-        const rows = document.querySelectorAll('#tableBody tr');
-        rows.forEach(row => row.style.display = '');
-
-        document.querySelectorAll('table th').forEach(th => {
-            th.classList.remove('sorted');
-            const icon = th.querySelector('.sort-icon');
-            if (icon) icon.classList.remove('asc', 'desc');
-        });
-        currentSort = {
-            column: null,
-            direction: 'asc'
-        };
-    }
-
-    function viewViewing(btn) {
-        const row = btn.closest('tr');
-        const name = row.querySelector('.viewer-name').textContent;
-        alert('View Viewer: ' + name);
-    }
-
-    function editViewing(btn) {
-        const row = btn.closest('tr');
-        const name = row.querySelector('.viewer-name').textContent;
-        alert('Edit Viewer: ' + name);
-    }
-
-    // to open the view modal directly from search results
-    window.addEventListener('load', () => {
-
-        const params = new URLSearchParams(window.location.search);
-        const viewingId = params.get('id');
-        const shouldOpen = params.get('open');
-
-        if (viewingId && shouldOpen) {
-            const row = document.querySelector(`tr[data-viewing-id="${viewingId}"]`);
-
-            if (row) {
-                actionbtn.viewViewing({
-                    closest: () => row
-                });
-            }
+            document.querySelectorAll('table th').forEach(th => {
+                th.classList.remove('sorted');
+                const icon = th.querySelector('.sort-icon');
+                if (icon) icon.classList.remove('asc', 'desc');
+            });
+            currentSort = { column: null, direction: 'asc' };
         }
-    });
     </script>
 
 </body>

@@ -434,6 +434,67 @@ window.actionbtn = (() => {
       { id: 'i-property-garden',     key: 'garden',          type: 'select',   tab: 'property',  editable: true,  options: ['Yes','No'] },
       { id: 'i-property-council',    key: 'council',         type: 'text',     tab: 'property',  editable: true,  fallback: 'No Record' },
     ],
+
+    viewing: [
+      { id: 'v-viewing-id',           key: '_id',           type: 'text',   tab: 'viewing', editable: false },
+      { id: 'v-viewing-propertyid',   key: 'property_id',   type: 'text',   tab: 'viewing', editable: false },
+      { id: 'v-viewing-viewer',       key: 'viewer_name',   type: 'text',   tab: 'viewing', editable: true },
+      { id: 'v-viewing-phone',        key: 'viewer_phone',  type: 'text',   tab: 'viewing', editable: true },
+      { id: 'v-viewing-status',       key: 'status',        type: 'select', tab: 'viewing', editable: true, options: ['scheduled', 'completed', 'cancelled', 'no_show'] },
+      { id: 'v-viewing-datetime',     key: 'date_time',     type: 'datetime', tab: 'viewing', editable: true },
+      { id: 'v-viewing-userid',       key: 'user_id',       type: 'text',   tab: 'viewing', editable: false },
+      { id: 'v-viewing-email',        key: 'email',         type: 'text',   tab: 'viewing', editable: true },
+      { id: 'v-viewing-archived',     key: 'archived',      type: 'select', tab: 'viewing', editable: true, options: ['0', '1'] },
+      { id: 'v-viewing-datearchived', key: 'date_archived', type: 'date',   tab: 'viewing', editable: false },
+
+      { id: 'v-property-landlord',    key: 'landlord',      type: 'text',   tab: 'property', editable: false },
+      { id: 'v-property-type',        key: 'type',          type: 'text',   tab: 'property', editable: false },
+      { id: 'v-property-status',      key: 'property_status', type: 'badge', tab: 'property', editable: false },
+      { id: 'v-property-price',       key: 'price',         type: 'number', tab: 'property', editable: false },
+      { id: 'v-property-tenant',      key: 'tenant',        type: 'text',   tab: 'property', editable: false },
+      { id: 'v-property-rooms',       key: 'rooms',         type: 'number', tab: 'property', editable: false },
+      { id: 'v-property-bathrooms',   key: 'bathrooms',     type: 'number', tab: 'property', editable: false },
+      { id: 'v-property-epc',         key: 'epc',           type: 'text',   tab: 'property', editable: false },
+      { id: 'v-property-pets',        key: 'pets',          type: 'text',   tab: 'property', editable: false },
+      { id: 'v-property-garden',      key: 'garden',        type: 'text',   tab: 'property', editable: false },
+      { id: 'v-property-council',     key: 'council',       type: 'text',   tab: 'property', editable: false },
+    ],
+
+    user: [
+      { id: 'u-user-username',          key: 'username',            type: 'text',   tab: 'user',  editable: false },
+      { id: 'u-user-name',              key: 'name',                type: 'text',   tab: 'user',  editable: true },
+      { id: 'u-user-phone',             key: 'phone',               type: 'text',   tab: 'user',  editable: true },
+      { id: 'u-user-email',             key: 'email',               type: 'text',   tab: 'user',  editable: true },
+      { id: 'u-user-password',          key: 'password',            type: 'text',   tab: 'user',  editable: true },
+      { id: 'u-user-passwordresetdate', key: 'password_reset_date', type: 'date',   tab: 'user',  editable: false },
+      { id: 'u-user-role',              key: 'role',                type: 'select', tab: 'user',  editable: true, options: ['admin', 'agent', 'read_only'] },
+      { id: 'u-user-archived',          key: 'archived',            type: 'select', tab: 'user',  editable: true, options: ['0', '1'] },
+      { id: 'u-user-datearchived',      key: 'date_archived',       type: 'date',   tab: 'user',  editable: false },
+
+      { id: 'u-user-IdNumber',          key: 'id_number',           type: 'text',   tab: 'files', editable: true },
+      { id: 'u-user-Idexpirydate',      key: 'id_expiry_date',      type: 'date',   tab: 'files', editable: true },
+    ],
+
+    importantdate: [
+      { id: 'i-date-landlord-id',    key: 'landlordIdExpiry', type: 'date',    tab: 'dates',     editable: true,  fallback: 'No Record' },
+      { id: 'i-date-tenant-id',      key: 'tenantIdExpiry',   type: 'date',    tab: 'dates',     editable: true,  fallback: 'No Record' },
+      { id: 'i-date-contract-end',   key: 'endDate',          type: 'date',    tab: 'dates',     editable: false, fallback: 'No Record' },
+      { id: 'i-date-gas',            key: 'gasDate',          type: 'date',    tab: 'dates',     editable: true,  fallback: 'No Record' },
+      { id: 'i-date-electric',       key: 'electricDate',     type: 'date',    tab: 'dates',     editable: true,  fallback: 'No Record' },
+      { id: 'i-date-epc',            key: 'epcDate',          type: 'date',    tab: 'dates',     editable: true,  fallback: 'No Record' },
+
+      { id: 'i-property-landlord',   key: 'landlord',        type: 'text',     tab: 'property',  editable: true,  fallback: 'No Record'   },
+      { id: 'i-property-status',     key: 'status',          type: 'badge',    tab: 'property',  editable: false,  fallback: 'No Record'  },
+      { id: 'i-property-price',      key: 'price',           type: 'number',   tab: 'property',  editable: true,  prefix: '£', format: 'currency',  fallback: 'No Record'  },
+      { id: 'i-property-type',       key: 'type',            type: 'select',   tab: 'property',  editable: true,  options: ['Flat','House','Apartment','Bungalow'],  fallback: 'No Record'  },
+      { id: 'i-property-tenant',     key: 'tenant',          type: 'text',     tab: 'property',  editable: false, fallback: 'No Tenant' },
+      { id: 'i-property-rooms',      key: 'rooms',           type: 'number',   tab: 'property',  editable: true,  fallback: 'No Record' },
+      { id: 'i-property-bathrooms',  key: 'bathrooms',       type: 'number',   tab: 'property',  editable: true,  fallback: 'No Record' },
+      { id: 'i-property-epc',        key: 'epc',             type: 'text',     tab: 'property',  editable: true,  fallback: 'No Record' },
+      { id: 'i-property-pets',       key: 'pets',            type: 'select',   tab: 'property',  editable: true,  options: ['Yes','No'] },
+      { id: 'i-property-garden',     key: 'garden',          type: 'select',   tab: 'property',  editable: true,  options: ['Yes','No'] },
+      { id: 'i-property-council',    key: 'council',         type: 'text',     tab: 'property',  editable: true,  fallback: 'No Record' },
+    ],
    
     payment: [
   { id: 'pay-payment-tenant',   key: 'tenant',   type: 'text',     tab: 'payment', editable: false, fallback: 'No Record' },
@@ -446,6 +507,7 @@ window.actionbtn = (() => {
 ],
 
   };
+
 
   const SAVE_MAP = {
     property: {
@@ -482,6 +544,34 @@ window.actionbtn = (() => {
       id_expiry_date: "l-landlord-idexpiry",
       contact_method: "l-landlord-contact-method",
     },
+
+    viewing: {
+      _id:              'v-viewing-id',
+      property_id:     'v-viewing-propertyid',
+      viewer_name:     'v-viewing-viewer',
+      viewer_phone:    'v-viewing-phone',
+      status:          'v-viewing-status',
+      date_time:       'v-viewing-datetime',
+      user_id:         'v-viewing-userid',
+      email:           'v-viewing-email',
+      archived:        'v-viewing-archived',
+      date_archived:    'v-viewing-datearchived',
+    },
+
+    user: {
+      username:         'u-user-username',
+      name:             'u-user-name',
+      phone:            'u-user-phone',
+      email:            'u-user-email',
+      password:         'u-user-password',
+      password_reset_date:'u-user-passwordresetdate',
+      id_number:         'u-user-IdNumber',
+      id_expiry_date:   'u-user-Idexpirydate',
+      role:             'u-user-role',
+      archived:         'u-user-archived',
+      date_archived:     'u-user-datearchived',
+    },
+
 
     viewing: {
       _id:              'v-viewing-id',
@@ -1517,4 +1607,7 @@ function fetchTenantHistory(tenantId) {
           <div class="cell" style="grid-column:1/-1; color:red;">Failed to load payment records</div>
         </div>`;
     });
-}
+  }
+    
+  
+  
