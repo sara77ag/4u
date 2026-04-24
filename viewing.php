@@ -115,7 +115,7 @@ $viewings = $stmt->fetchAll(PDO::FETCH_ASSOC);
                     </div>
                     <div class="filter-group">
                         <label>Agent</label>
-                        <input type="text" id="filterAgent" onchange="filterViewings()">
+                        <input type="text" id="filterAgent" onchange="filterViewings()" placeholder="Enter Agent">
                     </div>
                     <button class="filter-btn-reset" onclick="resetFilters()">
                         <i class="fa-solid fa-rotate-left"></i>
