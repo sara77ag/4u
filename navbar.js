@@ -220,3 +220,20 @@ function closeProfileModal() {
 }
 
 window.CallNavbar = CallNavbar;
+
+
+function resetMyPassword() {
+    if (!confirm('Do You Want To Reset Your Password?')) return;
+
+    fetch('reset_self_password.php', { method: 'POST' })
+        .then(r => r.json())
+        .then(data => {
+            if (data.success) {
+                alert('New password sent to your email!');
+                location.reload();
+            } else {
+                alert('Failed to send email. Please try again.');
+            }
+        })
+        .catch(() => alert('Something went wrong.'));
+}
