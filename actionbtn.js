@@ -446,6 +446,7 @@ window.actionbtn = (() => {
 ],
 
   };
+
   const SAVE_MAP = {
     property: {
       id: "_id",
@@ -1325,6 +1326,7 @@ function toDateTimeInputValue(value) {
 
   // Public API
 
+  (function () {
   return {
     viewProperty(btn)  { openEntityModal('property', extractPropertyData(btn), 'view'); },
     editProperty(btn)  { openEntityModal('property', extractPropertyData(btn), 'edit'); },
@@ -1349,7 +1351,8 @@ function toDateTimeInputValue(value) {
     saveTenant,
     savePayment
   };
-})();
+}
+)();
 
 function openFile(fileType) {
   alert(`Opening ${fileType.toUpperCase()} file... (Implement PDF later)`);
