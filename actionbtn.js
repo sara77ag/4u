@@ -373,8 +373,19 @@ window.actionbtn = (() => {
         editable: false,
       },
     ],
-  };
+  
+   
+    payment: [
+  { id: 'pay-payment-tenant',   key: 'tenant',   type: 'text',     tab: 'payment', editable: false, fallback: 'No Record' },
+  { id: 'pay-payment-property', key: 'property', type: 'text',     tab: 'payment', editable: false, fallback: 'No Record' },
+  { id: 'pay-payment-amount',   key: 'amount',   type: 'number',   tab: 'payment', editable: true,  prefix: '£', format: 'currency', fallback: 'No Record' },
+  { id: 'pay-payment-datetime', key: 'datetime', type: 'datetime', tab: 'payment', editable: true,  fallback: 'No Record' },
+  { id: 'pay-payment-period',   key: 'period',   type: 'text',     tab: 'payment', editable: true,  fallback: 'No Record' },
+  { id: 'pay-payment-nextdue',  key: 'nextdue',  type: 'date',     tab: 'payment', editable: true,  fallback: 'No Record' },
+  { id: 'pay-payment-status',   key: 'dbStatus', type: 'select',   tab: 'payment', editable: true,  options: ['completed', 'pending', 'not complete'], fallback: 'No Record' },
+],
 
+  };
   const SAVE_MAP = {
     property: {
       id: "_id",
@@ -490,7 +501,27 @@ window.actionbtn = (() => {
     };
   }
 
-  // Render
+
+
+  function extractPaymentData(btn) {
+    const row = btn.closest('tr');
+    const id  = row.dataset.id || '';
+
+   return {
+    _id:       id,
+    id:        id,
+    title:     row.dataset.tenant || 'Payment',
+    tenantId:  row.dataset.tenantId || '',
+    propertyId: row.dataset.propertyId || '',
+    tenant:    row.dataset.tenant || '',
+    property:  row.dataset.property || '',
+    amount:    row.dataset.amount || '',
+    datetime:  row.dataset.datetime || '',
+    period:    row.dataset.period || '',
+    nextdue:   row.dataset.nextdue || '',
+    dbStatus:  row.dataset.dbStatus || ''
+   };
+ }
 
   function formatViewValue(field, rawValue) {
     const val = rawValue ?? field.fallback ?? "N/A";
@@ -506,8 +537,22 @@ window.actionbtn = (() => {
     if (!el) return;
     const raw = data[field.key];
 
-    if (field.type === "badge") {
-      const val = raw || "";
+    if (field.type === 'date') {
+  const isEmpty = raw === null || raw === undefined || raw === '';
+  const value = raw ? formatDate(raw) : (field.fallback || 'N/A');
+  el.innerHTML = `<span class="${isEmpty ? 'tenant-vacant' : ''}">${value}</span>`;
+  return;
+}
+
+if (field.type === 'datetime') {
+  const isEmpty = raw === null || raw === undefined || raw === '';
+  const value = raw ? formatDateTime(raw) : (field.fallback || 'N/A');
+  el.innerHTML = `<span class="${isEmpty ? 'tenant-vacant' : ''}">${value}</span>`;
+  return;
+}
+
+    if (field.type === 'badge') {
+      const val = raw || '';
       el.textContent = val.charAt(0).toUpperCase() + val.slice(1);
       el.className = `status-badge-modal status-${val}`;
       return;
@@ -518,6 +563,7 @@ window.actionbtn = (() => {
     const value = formatViewValue(field, raw);
     el.innerHTML = `<span class="${isEmpty ? "tenant-vacant" : ""}">${value}</span>`;
   }
+
 
   function renderFieldEdit(field, data) {
     if (!field.editable) return;
@@ -542,11 +588,16 @@ window.actionbtn = (() => {
         el.innerHTML = `<select data-field-id="${field.id}">${emptyOption}${opts}</select>`;
         break;
       }
-      case "date":
-        el.innerHTML = `<input class="date-input" type="date" value="${raw}" data-field-id="${field.id}">`;
+      case 'date':
+        el.innerHTML = `<input class="date-input" type="date" value="${toDateInputValue(raw)}" data-field-id="${field.id}">`;
         break;
-      case "number":
-        el.innerHTML = `<input type="number" value="${raw}" placeholder="${isEmpty ? placeholder : ""}" data-field-id="${field.id}">`;
+
+        case 'datetime':
+        el.innerHTML = `<input type="datetime-local" value="${toDateTimeInputValue(raw)}" data-field-id="${field.id}">`;
+        break;  
+
+      case 'number':
+        el.innerHTML = `<input type="number" value="${raw}" placeholder="${isEmpty ? placeholder : ''}" data-field-id="${field.id}">`;
         break;
       default:
         el.innerHTML = `<input type="text" value="${raw}" placeholder="${isEmpty ? placeholder : ""}" data-field-id="${field.id}">`;
@@ -685,9 +736,10 @@ window.actionbtn = (() => {
   // Modal
 
   const TITLE_MAP = {
-    property: { titleId: "propertyTitle", titleKey: "address" },
-    landlord: { titleId: "landlordName", titleKey: "name" },
-    tenant: { titleId: "tenantName", titleKey: "name" },
+    property: { titleId: 'propertyTitle', titleKey: 'address' },
+    landlord: { titleId: 'landlordName',  titleKey: 'name'    },
+    tenant:   { titleId: 'tenantName',    titleKey: 'name'    },
+    payment:  { titleId: 'paymentTitle',  titleKey: 'title'   }
   };
 
   function renderTitle(entityType, data) {
@@ -698,21 +750,24 @@ window.actionbtn = (() => {
   }
 
   const MODAL_IDS = {
-    property: "viewPropertyModal",
-    landlord: "viewLandlordModal",
-    tenant: "viewTenantModal",
+    property: 'viewPropertyModal',
+    landlord: 'viewLandlordModal',
+    tenant:   'viewTenantModal',
+    payment:  'viewPaymentModal',
   };
 
   const TAB_PREFIXES = {
-    property: "p-tab-",
-    landlord: "l-tab-",
-    tenant: "t-tab-",
+    property: 'p-tab-',
+    landlord: 'l-tab-',
+    tenant:   't-tab-',
+    payment:  'pay-tab-',
   };
 
   const DEFAULT_TABS = {
-    property: "property",
-    landlord: "landlord",
-    tenant: "tenant",
+    property: 'property',
+    landlord: 'landlord',
+    tenant:   'tenant',
+    payment:  'payment',
   };
 
   function openModal(entityType) {
@@ -813,11 +868,10 @@ window.actionbtn = (() => {
     renderTitle(entityType, data);
     renderFields(entityType, data, mode);
 
-    if (entityType === "property") {
-      computePaymentDue(data);
-    }
-    if (entityType === "landlord") fetchLandlordProperties(data._id);
-    if (entityType === "tenant") fetchTenantHistory(data._id || data.id);
+    if (entityType === 'property') { computePaymentDue(data); }
+    if (entityType === 'landlord') fetchLandlordProperties(data._id);
+    if (entityType === 'tenant')   fetchTenantHistory(data._id || data.id);
+    if (entityType === 'payment')  fetchPaymentRecords(data.tenantId, data.propertyId);
 
     fetchNotes(data._id || data.id, entityType);
 
@@ -923,6 +977,28 @@ window.actionbtn = (() => {
       .catch((err) => console.error(err));
   }
 
+
+
+function savePayment() {
+  const payload = {
+    id:                  state.entity._id || state.entity.id,
+    transaction_amount:  document.querySelector('#pay-payment-amount input')?.value || '',
+    date_of_transaction: document.querySelector('#pay-payment-datetime input')?.value || '',
+    payment_period:      document.querySelector('#pay-payment-period input')?.value || '',
+    next_due:            document.querySelector('#pay-payment-nextdue input')?.value || '',
+    status:              document.querySelector('#pay-payment-status select')?.value || ''
+  };
+
+  fetch('update_payment.php', {
+    method:  'POST',
+    headers: { 'Content-Type': 'application/json' },
+    body:    JSON.stringify(payload)
+  })
+    .then(r => r.json())
+    .then(() => location.reload())
+    .catch(err => console.error(err));
+}
+
   // Add Note
 
   function addNote() {
@@ -988,12 +1064,36 @@ window.actionbtn = (() => {
     return isNaN(d) ? dateStr : d.toLocaleDateString("en-GB");
   }
 
-  // Global Click Handler
 
-  document.addEventListener("click", (e) => {
-    const tabBtn = e.target.closest(".tab-btn");
-    if (tabBtn && state.modal) {
-      switchTab(tabBtn.dataset.tab, e);
+function formatDateTime(dateStr) {
+  if (!dateStr) return '-';
+  const d = new Date(String(dateStr).replace(' ', 'T'));
+  return isNaN(d) ? dateStr : d.toLocaleString('en-GB', { hour12: false });
+}
+
+function toDateInputValue(value) {
+  if (!value) return '';
+  return String(value).split('T')[0].split(' ')[0];
+}
+
+function toDateTimeInputValue(value) {
+  if (!value) return '';
+  return String(value).replace(' ', 'T').slice(0, 16);
+}
+
+
+  // Global Click Handler 
+
+  document.addEventListener('click', (e) => {
+    const tabBtn = e.target.closest('.tab-btn');
+    if (tabBtn && state.modal) { switchTab(tabBtn.dataset.tab, e); return; }
+
+    const saveBtn = e.target.closest('[data-action="save"]');
+    if (saveBtn) {
+      if (state.entityType === 'property') saveProperty();
+      if (state.entityType === 'landlord') saveLandlord();
+      if (state.entityType === 'tenant')   saveTenant();
+      if (state.entityType === 'payment')  savePayment();
       return;
     }
 
@@ -1026,36 +1126,28 @@ window.actionbtn = (() => {
   // Public API
 
   return {
-    viewProperty(btn) {
-      openEntityModal("property", extractPropertyData(btn), "view");
-    },
-    editProperty(btn) {
-      openEntityModal("property", extractPropertyData(btn), "edit");
-    },
-    viewLandlord(btn) {
-      openEntityModal("landlord", extractLandlordData(btn), "view");
-    },
-    editLandlord(btn) {
-      openEntityModal("landlord", extractLandlordData(btn), "edit");
-    },
-    viewTenant(btn) {
-      openEntityModal("tenant", extractTenantData(btn), "view");
-    },
-    editTenant(btn) {
-      openEntityModal("tenant", extractTenantData(btn), "edit");
-    },
+    viewProperty(btn)  { openEntityModal('property', extractPropertyData(btn), 'view'); },
+    editProperty(btn)  { openEntityModal('property', extractPropertyData(btn), 'edit'); },
+    viewLandlord(btn)  { openEntityModal('landlord', extractLandlordData(btn), 'view'); },
+    editLandlord(btn)  { openEntityModal('landlord', extractLandlordData(btn), 'edit'); },
+    viewTenant(btn)    { openEntityModal('tenant',   extractTenantData(btn),   'view'); },
+    editTenant(btn) { openEntityModal('tenant', extractTenantData(btn), 'edit'); },
+    viewPayment(btn)  { openEntityModal('payment', extractPaymentData(btn), 'view'); },
+    editPayment(btn)  { openEntityModal('payment', extractPaymentData(btn), 'edit'); },
     closeModal,
     switchTab,
     addNote,
     saveProperty,
     saveLandlord,
     saveTenant,
+    savePayment
   };
 })();
 
 function openFile(fileType) {
   alert(`Opening ${fileType.toUpperCase()} file... (Implement PDF later)`);
 }
+
 
 function fetchTenantHistory(tenantId) {
   const container = document.querySelector(".contant-row-t");
@@ -1123,7 +1215,103 @@ function fetchTenantHistory(tenantId) {
           <div class="cell">
             <span class="status-badge ${statusClass}">${statusLabel}</span>
           </div>`;
-        container.appendChild(row);
-      });
+          container.appendChild(row);
+      } );
+  
+
+    })
+    .catch(() => {
+      const header = container.querySelector('.data-row.header');
+      container.innerHTML = '';
+      if (header) container.appendChild(header);
+
+      container.innerHTML += `<div class="data-row">
+        <div class="cell" style="grid-column:1/-1; color:red;">Failed to load tenancy history</div>
+      </div>`;
     });
 }
+  
+ function fetchPaymentRecords(tenantId, propertyId) {
+   const container = document.querySelector('.contant-row-pay');
+   if (!container) return;
+
+   const header = container.querySelector('.data-row.header');
+  container.innerHTML = '';
+  if (header) container.appendChild(header);
+
+   const loading = document.createElement('div');
+  loading.className = 'data-row';
+  loading.innerHTML = `<div class="cell" style="grid-column:1/-1;">
+    <i class="fa-solid fa-spinner fa-spin"></i> Loading...
+  </div>`;
+  container.appendChild(loading);
+
+   const safe = (s) => String(s || '')
+    .replace(/&/g, '&amp;')
+    .replace(/</g, '&lt;')
+    .replace(/>/g, '&gt;');
+
+  const fmtDT = (d) => {
+    if (!d) return '-';
+    const dt = new Date(String(d).replace(' ', 'T'));
+    return isNaN(dt) ? d : dt.toLocaleString('en-GB', { hour12: false });
+  };
+
+
+  fetch(`get_payment_records.php?tenant_id=${tenantId}&property_id=${propertyId}`)
+    .then(r => r.json())
+    .then(records => {
+      const header = container.querySelector('.data-row.header');
+      container.innerHTML = '';
+      if (header) container.appendChild(header);
+
+      if (!records.length) {
+        container.innerHTML += `
+          <div class="data-row">
+            <div class="cell" style="grid-column:1/-1;">No payment records found</div>
+          </div>`;
+        return;
+      }
+
+      records.forEach(rec => {
+        const row = document.createElement('div');
+        row.className = 'data-row';
+
+        let statusClass = 'status-due';
+        let statusLabel = rec.status || 'Pending';
+
+        if (rec.status === 'completed') {
+          statusClass = 'status-paid';
+          statusLabel = 'Completed';
+        } else if (rec.status === 'not complete') {
+          statusClass = 'status-overdue';
+          statusLabel = 'Not Complete';
+        } else {
+          statusClass = 'status-due';
+          statusLabel = 'Pending';
+        }
+
+       row.innerHTML = `
+       <div class="cell">£${Number(rec.transaction_amount).toLocaleString()}</div>
+       <div class="cell">${safe(rec.payment_period || '-')}</div>
+       <div class="cell">${fmtDT(rec.date_of_transaction)}</div>
+       <div class="cell"><span class="status-badge ${statusClass}">${statusLabel}</span></div>
+     `;
+
+        container.appendChild(row);
+      });
+    })
+    .catch(() => {
+      const header = container.querySelector('.data-row.header');
+      container.innerHTML = '';
+      if (header) container.appendChild(header);
+
+      container.innerHTML += `
+        <div class="data-row">
+          <div class="cell" style="grid-column:1/-1; color:red;">Failed to load payment records</div>
+        </div>`;
+    });
+  }
+    
+  
+  
