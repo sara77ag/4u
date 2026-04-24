@@ -79,7 +79,7 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST' && isset($_POST['reset_self_password']
     $u = $stmt->fetch(PDO::FETCH_ASSOC);
 
     if ($u) {
-        sendPasswordResetEmail($u['email'], $u['name'], $newPassword);
+        sendPasswordResetEmail($u['email'], $u['name'], $newPassword, $u['username']);
     }
 
     header("Location: " . $_SERVER['PHP_SELF']);
@@ -284,12 +284,10 @@ $role = $_SESSION['role'] ?? '';
                     <?php endif; ?>
                 </div>
 
-                <form method="POST">
-                    <input type="hidden" name="reset_self_password" value="1">
+                <button type="button" class="reset-password" onclick="resetMyPassword()">
+                    Reset Password
+                </button>
 
-                    <button type="submit" class="reset-password">
-                        Reset Password
-                    </button>
                 </form>
 
             </div>
