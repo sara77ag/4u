@@ -63,9 +63,9 @@ function formatDateValue($value) {
     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.1/css/all.min.css">
     <link rel="stylesheet" href="style.css">
     <link rel="stylesheet" href="tables.css">
-    <script src="navbar.js" defer></script>
-    <script src="modals.js" defer></script>
-    <script src="actionbtn.js" defer></script>
+    <script src="navbar.js"></script>
+    <script src="modals.js"></script>
+    <script src="actionbtn.js"></script>
     <style>
     .col-tenant {
         width: 15%;
