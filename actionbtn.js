@@ -433,9 +433,7 @@ window.actionbtn = (() => {
       { id: 'i-property-pets',       key: 'pets',            type: 'select',   tab: 'property',  editable: true,  options: ['Yes','No'] },
       { id: 'i-property-garden',     key: 'garden',          type: 'select',   tab: 'property',  editable: true,  options: ['Yes','No'] },
       { id: 'i-property-council',    key: 'council',         type: 'text',     tab: 'property',  editable: true,  fallback: 'No Record' },
-    ]
-  };
-  
+    ],
    
     payment: [
   { id: 'pay-payment-tenant',   key: 'tenant',   type: 'text',     tab: 'payment', editable: false, fallback: 'No Record' },
