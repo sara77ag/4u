@@ -237,6 +237,9 @@ function formatDateValue($date) {
                                         <?php if (in_array($_SESSION['role'], ['admin', 'agent'])): ?>
                                         <button class="action-btn action-btn-edit" title="Edit"
                                             onclick="actionbtn.editImportantDate(this)">
+
+                                            <!--<?php if (in_array($_SESSION['role'], ['admin', 'agent'])): ?>
+                                        <button class="action-btn action-btn-edit" title="Edit" onclick="actionbtn.editImportantDate(this)">
                                             <i class="fa-solid fa-pen"></i>
                                         </button>
                                         <?php endif; ?>
@@ -249,7 +252,7 @@ function formatDateValue($date) {
                                                 <i class="fa-solid fa-trash"></i>
                                             </button>
                                         </form>
-                                        <?php endif; ?>
+                                        <?php endif; ?>-->
                                     </div>
                                 </td>
                             </tr>
@@ -450,16 +453,18 @@ function formatDateValue($date) {
                     bVal = b.dataset.electric || '';
                     break;
                 case 'epc':
-                    aVal = a.dataset.epc || '';
-                    bVal = b.dataset.epc || '';
+                    aVal = a.dataset.epcDate || '';
+                    bVal = b.dataset.epcDate || '';
                     break;
+
                 case 'idlandlord':
-                    aVal = a.dataset.idlandlord || '';
-                    bVal = b.dataset.idlandlord || '';
+                    aVal = a.dataset.landlordIdExpiry || '';
+                    bVal = b.dataset.landlordIdExpiry || '';
                     break;
+
                 case 'idtenant':
-                    aVal = a.dataset.idtenant || '';
-                    bVal = b.dataset.idtenant || '';
+                    aVal = a.dataset.tenantIdExpiry || '';
+                    bVal = b.dataset.tenantIdExpiry || '';
                     break;
                 case 'contract':
                     aVal = a.dataset.contract || '';
@@ -503,10 +508,11 @@ function formatDateValue($date) {
             const icon = th.querySelector('.sort-icon');
             if (icon) icon.classList.remove('asc', 'desc');
         });
+    }
 
-        function showImportantDatesInfo() {
-            alert('Important dates are managed through Property, Landlord, and Tenant records.');
-        }
+    function showImportantDatesInfo() {
+        alert('Important dates are managed through Property, Landlord, and Tenant records.');
+    }
     </script>
 
 </body>

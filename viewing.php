@@ -254,7 +254,10 @@ $viewings = $stmt->fetchAll(PDO::FETCH_ASSOC);
                                         <form method="POST" style="display:inline;">
                                             <input type="hidden" name="archive_id" value="<?= $v['booking_id'] ?>">
                                             <button type="submit" class="action-btn action-btn-delete" title="Archive"
-                                                onclick="return confirm('Archive this viewing?\n<?= htmlspecialchars($v['viewer_name']) ?>')">
+                                                onclick="openArchiveModal(
+                                                <?= (int)$v['booking_id'] ?>,
+                                                '<?= htmlspecialchars($v['viewer_name'] . ' - ' . ($v['property_address'] ?? 'N/A'), ENT_QUOTES) ?>'
+                                            ); return false;">
                                                 <i class="fa-solid fa-trash"></i>
                                             </button>
                                         </form>
@@ -420,11 +423,38 @@ $viewings = $stmt->fetchAll(PDO::FETCH_ASSOC);
         </div>
     </div>
 
+    <div id="archiveModal" class="action-modal-overlay">
+        <div class="action-modal-container" style="max-width: 480px;">
+            <div class="action-modal-header">
+                <div class="action-header-left">
+                    <div class="action-modal-header-icon">
+                        <i class="fa-solid fa-calendar-check"></i>
+                    </div>
+                    <h3>Archive Viewing</h3>
+                </div>
+                <button class="modal-close-btn" onclick="closeArchiveModal()">
+                    <i class="fa-solid fa-xmark"></i>
+                </button>
+            </div>
+
+            <div class="delete-body">
+                <p class="p-text">Are you sure you want to archive this viewing?</p>
+                <p id="archiveViewingName" class="delete-entity"></p>
+
+                <div class="modal-footer">
+                    <button class="modal-btn modal-btn-delete" onclick="confirmArchive()">
+                        Yes, Archive
+                    </button>
+                </div>
+
+                <form id="archiveForm" method="POST" style="display:none;">
+                    <input type="hidden" name="archive_id" id="archive_id">
+                </form>
+            </div>
+        </div>
+    </div>
+
     <script>
-    let currentSort = {
-        column: null,
-        direction: 'asc'
-    };
 
     function toggleFilter() {
         const filterToggle = document.getElementById('filterToggle');
@@ -543,6 +573,24 @@ $viewings = $stmt->fetchAll(PDO::FETCH_ASSOC);
             });
             currentSort = { column: null, direction: 'asc' };
         }
+
+    let selectedViewingId = null;
+
+    function openArchiveModal(id, viewingName) {
+        selectedViewingId = id;
+        document.getElementById('archiveViewingName').innerText = viewingName;
+        document.getElementById('archiveModal').style.display = 'flex';
+    }
+
+    function closeArchiveModal() {
+        document.getElementById('archiveModal').style.display = 'none';
+        selectedViewingId = null;
+    }
+
+    function confirmArchive() {
+        document.getElementById('archive_id').value = selectedViewingId;
+        document.getElementById('archiveForm').submit();
+    }
     </script>
 
 </body>

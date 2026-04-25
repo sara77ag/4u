@@ -24,28 +24,16 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST' && isset($_POST['archive_id'])) {
 // Fetch all users
 $stmt = $pdo->query("
     SELECT 
-        user_id,
-        username,
-        name,
-        email,
-        phone,
-        role,
-        password,
-        password_reset_date,
-        id_number,
-        id_expiry_date,
-        archived,
-        date_archived
+        user_id, username, name, email, phone, role, password,
+        password_reset_date, id_number, id_expiry_date, archived, date_archived
     FROM users
     WHERE archived = 0
     ORDER BY name
 ");
-
 $users = $stmt->fetchAll(PDO::FETCH_ASSOC);
 
-// Handle password reset (admin resets for a user)
+// Handle password reset
 if ($_SERVER['REQUEST_METHOD'] === 'POST' && isset($_POST['reset_password_id'])) {
-
     $stmt = $pdo->prepare("SELECT username, name, email, password_reset_date FROM users WHERE user_id = ?");
     $stmt->execute([$_POST['reset_password_id']]);
     $targetUser = $stmt->fetch(PDO::FETCH_ASSOC);
@@ -90,11 +78,12 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST' && isset($_POST['reset_password_id']))
     <div id="navbar-container"></div>
 
     <main class="main-content">
+
         <?php if (isset($_SESSION['flash_success'])): ?>
         <div class="flash-success" style="
-        background:#d4edda; color:#155724; border:1px solid #c3e6cb;
-        border-radius:8px; padding:12px 20px; margin-bottom:16px;
-        display:flex; align-items:center; gap:10px;">
+            background:#d4edda; color:#155724; border:1px solid #c3e6cb;
+            border-radius:8px; padding:12px 20px; margin-bottom:16px;
+            display:flex; align-items:center; gap:10px;">
             <i class="fa-solid fa-circle-check"></i>
             <?= htmlspecialchars($_SESSION['flash_success']) ?>
         </div>
@@ -103,14 +92,25 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST' && isset($_POST['reset_password_id']))
 
         <?php if (isset($_SESSION['flash_error'])): ?>
         <div class="flash-error" style="
-        background:#f8d7da; color:#721c24; border:1px solid #f5c6cb;
-        border-radius:8px; padding:12px 20px; margin-bottom:16px;
-        display:flex; align-items:center; gap:10px;">
+            background:#f8d7da; color:#721c24; border:1px solid #f5c6cb;
+            border-radius:8px; padding:12px 20px; margin-bottom:16px;
+            display:flex; align-items:center; gap:10px;">
             <i class="fa-solid fa-circle-xmark"></i>
             <?= htmlspecialchars($_SESSION['flash_error']) ?>
         </div>
         <?php unset($_SESSION['flash_error']); ?>
         <?php endif; ?>
+
+        <?php if (isset($_GET['error']) && $_GET['error'] === 'duplicate'): ?>
+        <div class="flash-error" style="
+            background:#f8d7da; color:#721c24; border:1px solid #f5c6cb;
+            border-radius:8px; padding:12px 20px; margin-bottom:16px;
+            display:flex; align-items:center; gap:10px;">
+            <i class="fa-solid fa-circle-xmark"></i>
+            A user with that username, email, phone number, or ID number already exists.
+        </div>
+        <?php endif; ?>
+
         <h1 class="page-title">Users</h1>
 
         <div class="main-container">
@@ -153,9 +153,10 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST' && isset($_POST['reset_password_id']))
             <div class="cards-container">
                 <div class="cards-grid" id="usersGrid">
                     <?php foreach ($users as $user): 
-    $roleDisplay = ucfirst(str_replace('_', ' ', $user['role']));
-?>
-                    <div class="card" data-userid="<?= $user['user_id'] ?>"
+                        $roleDisplay = ucfirst(str_replace('_', ' ', $user['role']));
+                    ?>
+                    <div class="card"
+                        data-userid="<?= $user['user_id'] ?>"
                         data-username="<?= htmlspecialchars($user['username']) ?>"
                         data-name="<?= htmlspecialchars($user['name']) ?>"
                         data-phone="<?= htmlspecialchars($user['phone']) ?>"
@@ -185,13 +186,10 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST' && isset($_POST['reset_password_id']))
                                 <i class="fa-solid fa-phone"></i>
                                 <span><?= htmlspecialchars($user['phone']) ?></span>
                             </div>
-
                             <span class="blue-badge"><?= htmlspecialchars($roleDisplay) ?></span>
-
                             <form method="POST" style="display:inline;">
                                 <input type="hidden" name="reset_password_id" value="<?= $user['user_id'] ?>">
-                                <button type="submit" class="reset-password-link"
-                                    style="border:none;background:none;color:#007bff;cursor:pointer;text-decoration:underline;"
+                                <button type="submit" class="reset-password-link" style="border:none;background:none;color:#007bff;cursor:pointer;text-decoration:underline;"
                                     onclick="return confirm('Reset password for <?= htmlspecialchars($user['name']) ?>?')">
                                     Reset Password
                                 </button>
@@ -213,7 +211,10 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST' && isset($_POST['reset_password_id']))
                             <form method="POST" style="display:inline;">
                                 <input type="hidden" name="archive_id" value="<?= $user['user_id'] ?>">
                                 <button type="submit" class="action-btn action-btn-delete" title="Archive"
-                                    onclick="return confirm('Archive this user?\n<?= htmlspecialchars($user['name']) ?>')">
+                                    onclick="openArchiveModal(
+                                    <?= (int)$user['user_id'] ?>,
+                                    '<?= htmlspecialchars($user['name'], ENT_QUOTES) ?>'
+                                ); return false;">
                                     <i class="fa-solid fa-trash"></i>
                                 </button>
                             </form>
@@ -241,6 +242,21 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST' && isset($_POST['reset_password_id']))
                     </div>
                     <h2 id="username">Landlord Name</h2>
                 </div>
+    <?php // Action Buttons: View User ?>
+    <div id="viewUserModal" class="action-modal-overlay">
+        <div class="action-modal-container">
+            <div class="action-modal-header">
+                <div class="action-header-left">
+                    <div class="action-modal-header-icon">
+                        <i class="fa-solid fa-user-tie"></i>
+                    </div>
+                    <h2 id="username">User Name</h2>
+                </div>
+
+                <button class="modal-close-btn" onclick="actionbtn.closeModal()">
+                    <i class="fa-solid fa-xmark"></i>
+                </button>
+            </div>
 
                 <!-- Tabs Navigation -->
                 <div class="action-tabs-nav">
@@ -251,6 +267,14 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST' && isset($_POST['reset_password_id']))
                         <i class="fa-solid fa-folder"></i> Files
                     </button>
                 </div>
+            <div class="action-tabs-nav">
+                <button class="tab-btn active" data-tab="user">
+                    <i class="fa-solid fa-user"></i> User Details
+                </button>
+                <button class="tab-btn" data-tab="files">
+                    <i class="fa-solid fa-folder"></i> Files
+                </button>
+            </div>
 
                 <!-- Tab Content -->
                 <div class="action-tabs-content">
@@ -292,6 +316,44 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST' && isset($_POST['reset_password_id']))
                         </div>
                     </div>
                 </div>
+            <div class="action-tabs-content">
+                <div id="u-tab-user" class="tab-content active">
+                    <div class="tab-header">
+                        <i class="fa-solid fa-user"></i>
+                        <span>User Details</span>
+                    </div>
+
+                    <div class="details-grid">
+                        <div class="detail-row">
+                            <span class="detail-label">Username:</span>
+                            <span id="u-user-username" class="detail-value">-</span>
+                        </div>
+                        <div class="detail-row">
+                            <span class="detail-label">Name:</span>
+                            <span id="u-user-name" class="detail-value">-</span>
+                        </div>
+                        <div class="detail-row">
+                            <span class="detail-label">Phone Number:</span>
+                            <span id="u-user-phone" class="detail-value">-</span>
+                        </div>
+                        <div class="detail-row">
+                            <span class="detail-label">Email:</span>
+                            <span id="u-user-email" class="detail-value">-</span>
+                        </div>
+                        <div class="detail-row">
+                            <span class="detail-label">Role:</span>
+                            <span id="u-user-role" class="detail-value">-</span>
+                        </div>
+                        <div class="detail-row">
+                            <span class="detail-label">Archived:</span>
+                            <span id="u-user-archived" class="detail-value">-</span>
+                        </div>
+                        <div class="detail-row">
+                            <span class="detail-label">Date Archived:</span>
+                            <span id="u-user-datearchived" class="detail-value">-</span>
+                        </div>
+                    </div>
+                </div>
 
                 <div id="u-tab-files" class="tab-content">
                     <div class="tab-header">
@@ -311,79 +373,115 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST' && isset($_POST['reset_password_id']))
                 </div>
             </div>
         </div>
+                <div id="u-tab-files" class="tab-content">
+                    <div class="tab-header">
+                        <i class="fa-solid fa-folder"></i>
+                        <span>Files</span>
+                    </div>
 
-        <script>
-        function toggleFilter() {
-            const filterToggle = document.getElementById('filterToggle');
-            const filterDropdowns = document.getElementById('filterDropdowns');
-            filterDropdowns.style.display = filterDropdowns.style.display === 'none' ? 'flex' : 'none';
-            filterToggle.classList.toggle('active');
-        }
+                    <div class="details-grid">
+                        <div class="detail-row">
+                            <span class="detail-label">ID Number:</span>
+                            <span id="u-user-IdNumber" class="detail-value">-</span>
+                        </div>
+                        <div class="detail-row">
+                            <span class="detail-label">ID Expiry Date:</span>
+                            <span id="u-user-Idexpirydate" class="detail-value">-</span>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
 
-        function filterUsers() {
-            const roleFilter = document.getElementById('filterRole').value;
+    <div id="archiveModal" class="action-modal-overlay">
+        <div class="action-modal-container" style="max-width: 480px;">
+            <div class="action-modal-header">
+                <div class="action-header-left">
+                    <div class="action-modal-header-icon">
+                        <i class="fa-solid fa-user-tie"></i>
+                    </div>
+                    <h3>Archive User</h3>
+                </div>
+                <button class="modal-close-btn" onclick="closeArchiveModal()">
+                    <i class="fa-solid fa-xmark"></i>
+                </button>
+            </div>
 
-            const cards = document.querySelectorAll('.card');
-            cards.forEach(card => {
-                let show = true;
+            <div class="delete-body">
+                <p class="p-text">Are you sure you want to archive this user?</p>
+                <p id="archiveUserName" class="delete-entity"></p>
 
-                if (roleFilter && card.dataset.role !== roleFilter) {
-                    show = false;
-                }
+                <div class="modal-footer">
+                    <button class="modal-btn modal-btn-delete" onclick="confirmArchive()">
+                        Yes, Archive
+                    </button>
+                </div>
 
-                card.style.display = show ? '' : 'none';
-            });
-        }
+                <form id="archiveForm" method="POST" style="display:none;">
+                    <input type="hidden" name="archive_id" id="archive_id">
+                </form>
+            </div>
+        </div>
+    </div>
 
-        function sortUsers() {
-            const sortValue = document.getElementById('sortBy').value;
-            const [column, direction] = sortValue.split('-');
-            const cards = Array.from(document.querySelectorAll('.card'));
+    <script>
+    function toggleFilter() {
+        const filterToggle = document.getElementById('filterToggle');
+        const filterDropdowns = document.getElementById('filterDropdowns');
+        filterDropdowns.style.display = filterDropdowns.style.display === 'none' ? 'flex' : 'none';
+        filterToggle.classList.toggle('active');
+    }
 
-            cards.sort((a, b) => {
-                let aVal, bVal;
-                if (column === 'name') {
-                    aVal = a.dataset.name.toLowerCase();
-                    bVal = b.dataset.name.toLowerCase();
-                } else {
-                    aVal = a.dataset.role.toLowerCase();
-                    bVal = b.dataset.role.toLowerCase();
-                }
+    function filterUsers() {
+        const roleFilter = document.getElementById('filterRole').value;
+        document.querySelectorAll('.card').forEach(card => {
+            card.style.display = (!roleFilter || card.dataset.role === roleFilter) ? '' : 'none';
+        });
+    }
 
-                if (aVal < bVal) return direction === 'asc' ? -1 : 1;
-                if (aVal > bVal) return direction === 'asc' ? 1 : -1;
-                return 0;
-            });
+    function sortUsers() {
+        const sortValue = document.getElementById('sortBy').value;
+        const [column, direction] = sortValue.split('-');
+        const cards = Array.from(document.querySelectorAll('.card'));
 
-            const grid = document.getElementById('usersGrid');
-            cards.forEach(card => grid.appendChild(card));
-        }
+        cards.sort((a, b) => {
+            let aVal = column === 'name' ? a.dataset.name.toLowerCase() : a.dataset.role.toLowerCase();
+            let bVal = column === 'name' ? b.dataset.name.toLowerCase() : b.dataset.role.toLowerCase();
+            if (aVal < bVal) return direction === 'asc' ? -1 : 1;
+            if (aVal > bVal) return direction === 'asc' ? 1 : -1;
+            return 0;
+        });
 
-        function resetFilters() {
-            document.getElementById('filterRole').value = '';
-            document.getElementById('sortBy').value = 'name-asc';
+        const grid = document.getElementById('usersGrid');
+        cards.forEach(card => grid.appendChild(card));
+    }
 
-            const cards = document.querySelectorAll('.card');
-            cards.forEach(card => card.style.display = '');
+    function resetFilters() {
+        document.getElementById('filterRole').value = '';
+        document.getElementById('sortBy').value = 'name-asc';
+        document.querySelectorAll('.card').forEach(card => card.style.display = '');
+        sortUsers();
+    }
 
-            sortUsers();
-        }
+    let selectedUserId = null;
 
+    function openArchiveModal(id, userName) {
+        selectedUserId = id;
+        document.getElementById('archiveUserName').innerText = userName;
+        document.getElementById('archiveModal').style.display = 'flex';
+    }
 
-        function editUser(btn) {
-            const card = btn.closest('.card');
-            const name = card.querySelector('.card-name').textContent.trim();
-            alert('Edit User: ' + name);
-        }
+    function closeArchiveModal() {
+        document.getElementById('archiveModal').style.display = 'none';
+        selectedUserId = null;
+    }
 
-        function deleteProperty(btn) {
-            const row = btn.closest('tr');
-            const id = row.querySelector('.card-name').textContent;
-            if (confirm('Are you sure you want to delete ' + name + '?')) {
-                row.remove();
-            }
-        }
-        </script>
+    function confirmArchive() {
+        document.getElementById('archive_id').value = selectedUserId;
+        document.getElementById('archiveForm').submit();
+    }
+    </script>
 </body>
 
 </html>

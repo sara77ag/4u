@@ -58,6 +58,17 @@ $landlords = $stmt->fetchAll(PDO::FETCH_ASSOC);
     <div id="navbar-container"></div>
 
     <main class="main-content">
+
+        <?php if (isset($_GET['error']) && $_GET['error'] === 'duplicate'): ?>
+        <div class="flash-error" style="
+            background:#f8d7da; color:#721c24; border:1px solid #f5c6cb;
+            border-radius:8px; padding:12px 20px; margin-bottom:16px;
+            display:flex; align-items:center; gap:10px;">
+            <i class="fa-solid fa-circle-xmark"></i>
+            A landlord with that email, phone number, or ID number already exists.
+        </div>
+        <?php endif; ?>
+
         <h1 class="page-title">Landlords</h1>
 
         <div class="main-container">
@@ -102,9 +113,9 @@ $landlords = $stmt->fetchAll(PDO::FETCH_ASSOC);
             <div class="cards-container">
                 <div class="cards-grid" id="landlordsGrid">
                     <?php foreach ($landlords as $landlord): 
-                   $numProps = (int)$landlord['number_of_properties'];
-                   $propText = $numProps === 1 ? '1 Property' : $numProps . ' Properties';
-               ?>
+                       $numProps = (int)$landlord['number_of_properties'];
+                       $propText = $numProps === 1 ? '1 Property' : $numProps . ' Properties';
+                    ?>
                     <div class="card" data-id="<?= $landlord['landlord_id'] ?>"
                         data-name="<?= htmlspecialchars($landlord['name']) ?>"
                         data-phone="<?= htmlspecialchars($landlord['phone']) ?>"
@@ -165,9 +176,7 @@ $landlords = $stmt->fetchAll(PDO::FETCH_ASSOC);
 
     <div id="modals-container"></div>
 
-    <!-- ============================================ -->
-    <!-- Action Buttons Modal: View Landlord -->
-    <!-- ============================================ -->
+    <?php // Action Buttons Modal: View Landlord ?>
     <div id="viewLandlordModal" class="action-modal-overlay">
         <div class="action-modal-container">
             <div class="action-modal-header">
@@ -199,7 +208,7 @@ $landlords = $stmt->fetchAll(PDO::FETCH_ASSOC);
 
             <div class="action-tabs-content">
 
-                <!-- Landlord Tab -->
+                <?php // Landlord Tab ?>
                 <div id="l-tab-landlord" class="tab-content active">
                     <div class="tab-header">
                         <i class="fa-solid fa-user-tie"></i>
@@ -241,7 +250,7 @@ $landlords = $stmt->fetchAll(PDO::FETCH_ASSOC);
                     </div>
                 </div>
 
-                <!-- Properties Tab -->
+                <?php // Properties Tab ?>
                 <div id="l-tab-properties" class="tab-content">
                     <div class="tab-header">
                         <i class="fa-solid fa-house"></i>
@@ -249,7 +258,6 @@ $landlords = $stmt->fetchAll(PDO::FETCH_ASSOC);
                         <span class="count-prperties" id="l-properties-count">0</span>
                     </div>
                     <div class="contant-row-p">
-                        <!-- Header Row -->
                         <div class="data-row header">
                             <div class="cell">Address</div>
                             <div class="cell">Type</div>
@@ -257,12 +265,10 @@ $landlords = $stmt->fetchAll(PDO::FETCH_ASSOC);
                             <div class="cell">Tenant</div>
                             <div class="cell">Rent</div>
                         </div>
-                        <!-- Dynamic rows injected here -->
-
                     </div>
                 </div>
 
-                <!-- Files Tab -->
+                <?php // Files Tab ?>
                 <div id="l-tab-files" class="tab-content">
                     <div class="tab-header">
                         <i class="fa-solid fa-folder"></i>
@@ -287,7 +293,7 @@ $landlords = $stmt->fetchAll(PDO::FETCH_ASSOC);
                     </div>
                 </div>
 
-                <!-- Notes Tab -->
+                <?php // Notes Tab ?>
                 <div id="l-tab-notes" class="tab-content">
                     <div class="tab-header">
                         <i class="fa-solid fa-sticky-note"></i>
@@ -309,10 +315,9 @@ $landlords = $stmt->fetchAll(PDO::FETCH_ASSOC);
         </div>
     </div>
 
-    <!-- Archive Confirm Modal -->
+    <?php // Archive Confirm Modal ?>
     <div id="archiveModal" class="action-modal-overlay">
         <div class="action-modal-container" style="max-width: 480px;">
-
             <div class="action-modal-header">
                 <div class="action-header-left">
                     <div class="action-modal-header-icon">
@@ -320,23 +325,18 @@ $landlords = $stmt->fetchAll(PDO::FETCH_ASSOC);
                     </div>
                     <h3>Archive Landlord</h3>
                 </div>
-
                 <button class="modal-close-btn" onclick="closeArchiveModal()">
                     <i class="fa-solid fa-xmark"></i>
                 </button>
             </div>
-
             <div class="delete-body">
-
                 <p class="p-text"> Are you sure you want to archive this landlord? </p>
                 <p id="archiveLandlordName" class="delete-entity"></p>
-
                 <div class="modal-footer">
                     <button class="modal-btn modal-btn-delete" onclick="confirmArchive()">
                         Yes, Archive
                     </button>
                 </div>
-
                 <form id="archiveForm" method="POST" style="display:none;">
                     <input type="hidden" name="archive_id" id="archive_id">
                 </form>
@@ -395,7 +395,6 @@ $landlords = $stmt->fetchAll(PDO::FETCH_ASSOC);
         document.querySelectorAll('.card').forEach(card => card.style.display = '');
     }
 
-
     let selectedLandlordId = null;
 
     function openArchiveModal(id, address) {
@@ -414,16 +413,13 @@ $landlords = $stmt->fetchAll(PDO::FETCH_ASSOC);
         document.getElementById('archiveForm').submit();
     }
 
-    // to open the view modal directly from search results
     window.addEventListener('DOMContentLoaded', () => {
-
         const params = new URLSearchParams(window.location.search);
         const landlordId = params.get('id');
         const shouldOpen = params.get('open');
 
         if (landlordId && shouldOpen === '1') {
             const card = document.querySelector(`.card[data-id="${landlordId}"]`);
-
             if (card) {
                 const btn = card.querySelector('.action-btn-view');
                 if (btn) {

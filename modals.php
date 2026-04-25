@@ -30,7 +30,7 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
         header('Location: dashboard.php');
         exit();
     }
-    
+
     // TODO: Toggle complete
     if (isset($_POST['toggle_todo_id'])) {
         $stmt = $pdo->prepare("UPDATE notes SET completed = ? WHERE note_id = ?");
@@ -64,20 +64,40 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
 
     // Add Landlord
     if (isset($_POST['landlord_name'])) {
-        $stmt = $pdo->prepare("
-            INSERT INTO landlords (name, phone, address, email, id_type, id_number,
-                                   id_expiry_date, number_of_properties, archived)
-            VALUES (?, ?, ?, ?, ?, ?, ?, 0, 0)
-        ");
-        $stmt->execute([
-            trim($_POST['landlord_name']),
-            trim($_POST['landlord_phone']),
-            trim($_POST['landlord_address']),
-            trim($_POST['landlord_email']),
-            $_POST['landlord_id_type'],
-            trim($_POST['landlord_id_number']),
-            $_POST['landlord_id_expiry']
-        ]);
+        $phone = trim($_POST['landlord_phone']);
+        $email = trim($_POST['landlord_email']);
+        $idNumber = trim($_POST['landlord_id_number']);
+
+        $check = $pdo->prepare("SELECT COUNT(*) FROM landlords WHERE email = ? OR phone = ? OR id_number = ?");
+        $check->execute([$email, $phone, $idNumber]);
+        if ($check->fetchColumn() > 0) {
+            header("Location: landlords.php?error=duplicate");
+            exit();
+        }
+
+        try {
+            $stmt = $pdo->prepare("
+                INSERT INTO landlords (name, phone, address, email, id_type, id_number,
+                                       id_expiry_date, number_of_properties, archived)
+                VALUES (?, ?, ?, ?, ?, ?, ?, 0, 0)
+            ");
+            $stmt->execute([
+                trim($_POST['landlord_name']),
+                $phone,
+                trim($_POST['landlord_address']),
+                $email,
+                $_POST['landlord_id_type'],
+                $idNumber,
+                $_POST['landlord_id_expiry']
+            ]);
+        } catch (PDOException $e) {
+            if (strpos($e->getMessage(), 'UNIQUE constraint failed') !== false) {
+                header("Location: landlords.php?error=duplicate");
+                exit();
+            }
+            throw $e;
+        }
+
         header('Location: landlords.php');
         exit();
     }
@@ -96,11 +116,27 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
         $paymentFreq = $_POST['tenant_payment_frequency'];
         $rent = (float)$_POST['tenant_rent'];
 
-        $stmt = $pdo->prepare("
-            INSERT INTO tenants (name, phone, email, id_type, id_number, id_expiry_date, archived)
-            VALUES (?, ?, ?, ?, ?, ?, 0)
-        ");
-        $stmt->execute([$name, $phone, $email, $idType, $idNumber, $idExpiry]);
+        $check = $pdo->prepare("SELECT COUNT(*) FROM tenants WHERE email = ? OR phone = ? OR id_number = ?");
+        $check->execute([$email, $phone, $idNumber]);
+        if ($check->fetchColumn() > 0) {
+            header("Location: tenants.php?error=duplicate");
+            exit();
+        }
+
+        try {
+            $stmt = $pdo->prepare("
+                INSERT INTO tenants (name, phone, email, id_type, id_number, id_expiry_date, archived)
+                VALUES (?, ?, ?, ?, ?, ?, 0)
+            ");
+            $stmt->execute([$name, $phone, $email, $idType, $idNumber, $idExpiry]);
+        } catch (PDOException $e) {
+            if (strpos($e->getMessage(), 'UNIQUE constraint failed') !== false) {
+                header("Location: tenants.php?error=duplicate");
+                exit();
+            }
+            throw $e;
+        }
+
         $tenantId = $pdo->lastInsertId();
 
         $prop = $pdo->prepare("SELECT property_id FROM properties WHERE property_id = ?");
@@ -135,131 +171,122 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
         header('Location: viewing.php');
         exit();
     }
-   
+
     // Add Payment
     if (isset($_POST['payment_tenant_id'])) {
         $tenantId = (int)$_POST['payment_tenant_id'];
         $propertyId = (int)$_POST['payment_property_id'];
         $amount = (float)$_POST['payment_amount'];
         $paymentPeriod = trim($_POST['payment_period']);
-        $paymentMethod = trim($_POST['payment_method']); // collected from form
+        $paymentMethod = trim($_POST['payment_method']);
         $paymentDate = $_POST['payment_date'];
         $paymentTime = $_POST['payment_time'];
 
-        // Basic validation
         if (!$tenantId || !$propertyId || !$amount || !$paymentPeriod || !$paymentDate || !$paymentTime) {
             die('Missing required payment fields');
         }
 
-        // Combine date + time
         $dateTime = $paymentDate . ' ' . $paymentTime . ':00';
-
-        // Calculate next due date
         $nextDue = date('Y-m-d', strtotime($paymentDate . ' +1 month'));
 
-        // Save payment
         $stmt = $pdo->prepare("
             INSERT INTO transactions (
-                tenant_id,
-                property_id,
-                transaction_amount,
-                date_of_transaction,
-                payment_period,
-                next_due,
-                status,
-                archived
+                tenant_id, property_id, transaction_amount, date_of_transaction,
+                payment_period, next_due, status, archived
             )
             VALUES (?, ?, ?, ?, ?, ?, ?, 0)
         ");
-
         $stmt->execute([
-            $tenantId,
-            $propertyId,
-            $amount,
-            $dateTime,
-            $paymentPeriod,
-            $nextDue,
-            'completed'
+            $tenantId, $propertyId, $amount, $dateTime,
+            $paymentPeriod, $nextDue, 'completed'
         ]);
 
         header('Location: payments.php');
         exit();
     }
 
-
     // Add User
     if (isset($_POST['user_username'])) {
-        $stmt = $pdo->prepare("
-            INSERT INTO users (username, name, phone, email, password, password_reset_date,
-                              id_number, id_expiry_date, role, archived)
-            VALUES (?, ?, ?, ?, ?, date('now'), ?, ?, ?, 0)
-        ");
-        $stmt->execute([
-            trim($_POST['user_username']),
-            trim($_POST['user_name']),
-            trim($_POST['user_phone']),
-            trim($_POST['user_email']),
-            password_hash($_POST['user_password'], PASSWORD_DEFAULT),
-            trim($_POST['user_id_number']),
-            $_POST['user_id_expiry'],
-            $_POST['user_role']
-        ]);
+        $username = trim($_POST['user_username']);
+        $email = trim($_POST['user_email']);
+        $phone = trim($_POST['user_phone']);
+        $idNumber = trim($_POST['user_id_number']);
+
+        $check = $pdo->prepare("SELECT COUNT(*) FROM users WHERE username = ? OR email = ? OR phone = ? OR id_number = ?");
+        $check->execute([$username, $email, $phone, $idNumber]);
+        if ($check->fetchColumn() > 0) {
+            header("Location: users.php?error=duplicate");
+            exit();
+        }
+
+        try {
+            $stmt = $pdo->prepare("
+                INSERT INTO users (username, name, phone, email, password, password_reset_date,
+                                  id_number, id_expiry_date, role, archived)
+                VALUES (?, ?, ?, ?, ?, date('now'), ?, ?, ?, 0)
+            ");
+            $stmt->execute([
+                $username,
+                trim($_POST['user_name']),
+                $phone,
+                $email,
+                password_hash($_POST['user_password'], PASSWORD_DEFAULT),
+                $idNumber,
+                $_POST['user_id_expiry'],
+                $_POST['user_role']
+            ]);
+        } catch (PDOException $e) {
+            if (strpos($e->getMessage(), 'UNIQUE constraint failed') !== false) {
+                header("Location: users.php?error=duplicate");
+                exit();
+            }
+            throw $e;
+        }
+
         header('Location: users.php');
         exit();
     }
 
     // Add Contract
-if (isset($_POST['contract_property_id'])) {
+    if (isset($_POST['contract_property_id'])) {
+        $propertyId = (int)$_POST['contract_property_id'];
+        $tenantId = (int)$_POST['contract_tenant_id'];
+        $start = $_POST['contract_start'];
+        $end = $_POST['contract_end'];
+        $rent = (float)$_POST['contract_rent'];
+        $frequency = $_POST['contract_frequency'];
 
-    $propertyId = (int)$_POST['contract_property_id'];
-    $tenantId = (int)$_POST['contract_tenant_id'];
-    $start = $_POST['contract_start'];
-    $end = $_POST['contract_end'];
-    $rent = (float)$_POST['contract_rent'];
-    $frequency = $_POST['contract_frequency'];
+        if (!$propertyId || !$tenantId || !$start || !$end) {
+            die('Missing required fields');
+        }
 
-    // Basic validation
-    if (!$propertyId || !$tenantId || !$start || !$end) {
-        die('Missing required fields');
-    }
+        if ($start >= $end) {
+            die('Invalid contract dates');
+        }
 
-    if ($start >= $end) {
-        die('Invalid contract dates');
-    }
+        $check = $pdo->prepare("
+            SELECT COUNT(*) FROM contracts
+            WHERE property_id = ?
+            AND (
+                (? <= contract_end) AND (? >= contract_start)
+            )
+        ");
+        $check->execute([$propertyId, $start, $end]);
 
-    // Check conflict
-    $check = $pdo->prepare("
-        SELECT COUNT(*) FROM contracts
-        WHERE property_id = ?
-        AND (
-            (? <= contract_end) AND (? >= contract_start)
-        )
-    ");
-    $check->execute([$propertyId, $start, $end]);
+        if ($check->fetchColumn() > 0) {
+            header("Location: properties.php?contract=conflict&msg=overlap");
+            exit();
+        }
 
-    if ($check->fetchColumn() > 0) {
-        header("Location: properties.php?contract=conflict&msg=overlap");
+        $stmt = $pdo->prepare("
+            INSERT INTO contracts (tenant_id, property_id, contract_start, contract_end, rent, frequency)
+            VALUES (?, ?, ?, ?, ?, ?)
+        ");
+        $stmt->execute([$tenantId, $propertyId, $start, $end, $rent, $frequency]);
+
+        header('Location: properties.php');
         exit();
     }
-
-    // Insert contract
-    $stmt = $pdo->prepare("
-        INSERT INTO contracts (tenant_id, property_id, contract_start, contract_end, rent, frequency)
-        VALUES (?, ?, ?, ?, ?, ?)
-    ");
-
-    $stmt->execute([
-        $tenantId,
-        $propertyId,
-        $start,
-        $end,
-        $rent,
-        $frequency
-    ]);
-
-    header('Location: properties.php');
-    exit();
-}
 
     exit();
 }
@@ -273,9 +300,7 @@ try {
 }
 ?>
 
-<!-- ============================================ -->
-<!-- Modal: Add Property -->
-<!-- ============================================ -->
+<?php // Modal: Add Property ?>
 <div id="addPropertyModal" class="modal-overlay">
     <div class="modal-container">
         <div class="modal-header">
@@ -346,10 +371,7 @@ try {
     </div>
 </div>
 
-
-<!-- ============================================ -->
-<!-- Modal: Add Landlord -->
-<!-- ============================================ -->
+<?php // Modal: Add Landlord ?>
 <div id="addLandlordModal" class="modal-overlay">
     <div class="modal-container">
         <div class="modal-header">
@@ -419,9 +441,7 @@ try {
     </div>
 </div>
 
-<!-- ============================================ -->
-<!-- Modal: Add Tenant -->
-<!-- ============================================ -->
+<?php // Modal: Add Tenant ?>
 <div id="addTenantModal" class="modal-overlay">
     <div class="modal-container">
         <div class="modal-header">
@@ -515,9 +535,7 @@ try {
     </div>
 </div>
 
-<!-- ============================================ -->
-<!-- Modal: Book Viewing -->
-<!-- ============================================ -->
+<?php // Modal: Book Viewing ?>
 <div id="bookViewingModal" class="modal-overlay">
     <div class="modal-container">
         <div class="modal-header">
@@ -577,9 +595,8 @@ try {
         </form>
     </div>
 </div>
-<!-- ============================================ -->
-<!-- Modal: Upload File -->
-<!-- ============================================ -->
+
+<?php // Modal: Upload File ?>
 <div id="uploadFileModal" class="modal-overlay">
     <div class="modal-container">
         <div class="modal-header">
@@ -657,9 +674,7 @@ try {
     </div>
 </div>
 
-<!-- ============================================ -->
-<!-- Modal: Add Payment -->
-<!-- ============================================ -->
+<?php // Modal: Add Payment ?>
 <div id="addPaymentModal" class="modal-overlay">
     <div class="modal-container">
         <div class="modal-header">
@@ -747,9 +762,7 @@ try {
     </div>
 </div>
 
-<!-- ============================================ -->
-<!-- Modal: Add Contract -->
-<!-- ============================================ -->
+<?php // Modal: Add Contract ?>
 <div id="addContractModal" class="modal-overlay">
     <div class="modal-container">
         <div class="modal-header">
@@ -842,9 +855,7 @@ try {
     </div>
 </div>
 
-<!-- ============================================ -->
-<!-- Modal: Add User -->
-<!-- ============================================ -->
+<?php // Modal: Add User ?>
 <div id="addUserModal" class="modal-overlay">
     <div class="modal-container">
         <div class="modal-header">

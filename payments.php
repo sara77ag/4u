@@ -388,250 +388,345 @@ function formatDateValue($value) {
             </div>
         </div>
     </div>
-
-
-    <script>
-    const months = ["Jan", "Feb", "Mar", "Apr", "May", "Jun", "Jul", "Aug", "Sep", "Oct", "Nov", "Dec"];
-    let currentSort = {
+    <<<<<<< HEAD <script>
+        const months = ["Jan", "Feb", "Mar", "Apr", "May", "Jun", "Jul", "Aug", "Sep", "Oct", "Nov", "Dec"];
+        let currentSort = {
         column: null,
         direction: 'asc'
-    };
-
-    function parseDateTimeValue(value) {
-        if (!value) return 0;
-        const normalised = value.replace(' ', 'T');
-        const timestamp = new Date(normalised).getTime();
-        return isNaN(timestamp) ? 0 : timestamp;
-    }
-
-    function parsePeriodValue(value) {
-        if (!value) return 0;
-
-        const monthMap = {
-            jan: 0,
-            january: 0,
-            feb: 1,
-            february: 1,
-            mar: 2,
-            march: 2,
-            apr: 3,
-            april: 3,
-            may: 4,
-            jun: 5,
-            june: 5,
-            jul: 6,
-            july: 6,
-            aug: 7,
-            august: 7,
-            sep: 8,
-            sept: 8,
-            september: 8,
-            oct: 9,
-            october: 9,
-            nov: 10,
-            november: 10,
-            dec: 11,
-            december: 11
         };
+        =======
+        </div>
 
-        const parts = value.trim().split(/\s+/);
-        if (parts.length < 2) return 0;
+        <div id="archiveModal" class="action-modal-overlay">
+            <div class="action-modal-container" style="max-width: 480px;">
+                <div class="action-modal-header">
+                    <div class="action-header-left">
+                        <div class="action-modal-header-icon">
+                            <i class="fa-solid fa-credit-card"></i>
+                        </div>
+                        <h3>Archive Payment</h3>
+                    </div>
+                    <button class="modal-close-btn" onclick="closeArchiveModal()">
+                        <i class="fa-solid fa-xmark"></i>
+                    </button>
+                </div>
 
-        const month = monthMap[parts[0].toLowerCase()];
-        const year = parseInt(parts[1], 10);
+                <div class="delete-body">
+                    <p class="p-text">Are you sure you want to archive this payment?</p>
+                    <p id="archivePaymentName" class="delete-entity"></p>
 
-        if (month === undefined || isNaN(year)) return 0;
+                    <div class="modal-footer">
+                        <button class="modal-btn modal-btn-delete" onclick="confirmArchive()">
+                            Yes, Archive
+                        </button>
+                    </div>
 
-        return new Date(year, month, 1).getTime();
-    }
+                    <form id="archiveForm" method="POST" style="display:none;">
+                        <input type="hidden" name="archive_id" id="archive_id">
+                    </form>
+                </div>
+            </div>
+        </div>
 
+        <script>
+        const months = ["Jan", "Feb", "Mar", "Apr", "May", "Jun", "Jul", "Aug", "Sep", "Oct", "Nov", "Dec"]; >>>
+        >>> > c985b80f556d18c11d1435a032853684c25488cb
 
-    function toggleFilter() {
-        const dropdown = document.getElementById('filterDropdowns');
-        dropdown.style.display = dropdown.style.display === 'none' ? 'flex' : 'none';
-    }
-
-    function sortTable(column, headerElement) {
-        const tbody = document.getElementById('tableBody');
-        const rows = Array.from(tbody.querySelectorAll('tr'));
-
-        if (currentSort.column === column) {
-            currentSort.direction = currentSort.direction === 'asc' ? 'desc' : 'asc';
-        } else {
-            currentSort.column = column;
-            currentSort.direction = 'asc';
+        function parseDateTimeValue(value) {
+            if (!value) return 0;
+            const normalised = value.replace(' ', 'T');
+            const timestamp = new Date(normalised).getTime();
+            return isNaN(timestamp) ? 0 : timestamp;
         }
 
-        document.querySelectorAll('table th').forEach(th => {
-            th.classList.remove('sorted');
-            const icon = th.querySelector('.sort-icon');
-            if (icon) {
-                icon.classList.remove('asc', 'desc');
-            }
-        });
+        function parsePeriodValue(value) {
+            if (!value) return 0;
 
-        headerElement.classList.add('sorted');
-        const icon = headerElement.querySelector('.sort-icon');
-        if (icon) {
-            icon.classList.add(currentSort.direction);
+            const monthMap = {
+                jan: 0,
+                january: 0,
+                feb: 1,
+                february: 1,
+                mar: 2,
+                march: 2,
+                apr: 3,
+                april: 3,
+                may: 4,
+                jun: 5,
+                june: 5,
+                jul: 6,
+                july: 6,
+                aug: 7,
+                august: 7,
+                sep: 8,
+                sept: 8,
+                september: 8,
+                oct: 9,
+                october: 9,
+                nov: 10,
+                november: 10,
+                dec: 11,
+                december: 11
+            };
+
+            const parts = value.trim().split(/\s+/);
+            if (parts.length < 2) return 0;
+
+            const month = monthMap[parts[0].toLowerCase()];
+            const year = parseInt(parts[1], 10);
+
+            if (month === undefined || isNaN(year)) return 0;
+
+            return new Date(year, month, 1).getTime();
         }
 
-        rows.sort((a, b) => {
-            let aVal, bVal;
 
-            switch (column) {
+        function toggleFilter() {
+            const dropdown = document.getElementById('filterDropdowns');
+            dropdown.style.display = dropdown.style.display === 'none' ? 'flex' : 'none';
+        }
 
-                case 'tenant':
-                    aVal = (a.dataset.tenant || '').toLowerCase();
-                    bVal = (b.dataset.tenant || '').toLowerCase();
-                    break;
-                case 'property':
-                    aVal = (a.dataset.property || '').toLowerCase();
-                    bVal = (b.dataset.property || '').toLowerCase();
-                    break;
-                case 'amount':
-                    aVal = parseFloat(a.dataset.amount) || 0;
-                    bVal = parseFloat(b.dataset.amount) || 0;
-                    break;
-                case 'datetime':
-                    aVal = parseDateTimeValue(a.dataset.datetime || '');
-                    bVal = parseDateTimeValue(b.dataset.datetime || '');
-                    break;
-                case 'period':
-                    aVal = parsePeriodValue(a.dataset.period || '');
-                    bVal = parsePeriodValue(b.dataset.period || '');
-                    break;
-                case 'nextdue':
-                    aVal = a.dataset.nextdue || '';
-                    bVal = b.dataset.nextdue || '';
-                    break;
-                case 'status':
-                    aVal = (a.dataset.status || '').toLowerCase();
-                    bVal = (b.dataset.status || '').toLowerCase();
-                    break;
-                default:
-                    return 0;
+        function sortTable(column, headerElement) {
+            const tbody = document.getElementById('tableBody');
+            const rows = Array.from(tbody.querySelectorAll('tr'));
+
+            if (currentSort.column === column) {
+                currentSort.direction = currentSort.direction === 'asc' ? 'desc' : 'asc';
+            } else {
+                currentSort.column = column;
+                currentSort.direction = 'asc';
             }
 
-            if (aVal < bVal) return currentSort.direction === 'asc' ? -1 : 1;
-            if (aVal > bVal) return currentSort.direction === 'asc' ? 1 : -1;
-            return 0;
-        });
-
-        rows.forEach(row => tbody.appendChild(row));
-        updateAllStatuses();
-    }
-
-    function filterPayments() {
-        const statusFilter = document.getElementById('filterStatus').value;
-        const dateTimeFilter = document.getElementById('filterDateTime').value;
-        const periodFilter = document.getElementById('filterPeriod').value;
-        const rows = document.querySelectorAll('#tableBody tr');
-
-        rows.forEach(row => {
-            let show = true;
-
-            if (statusFilter && row.dataset.status !== statusFilter) {
-                show = false;
-            }
-
-            if (dateTimeFilter) {
-                const rowDateTime = parseDateTimeValue(row.dataset.datetime || '');
-                const selectedDateTime = new Date(dateTimeFilter).getTime();
-
-                if (!rowDateTime || rowDateTime < selectedDateTime) {
-                    show = false;
+            document.querySelectorAll('table th').forEach(th => {
+                th.classList.remove('sorted');
+                const icon = th.querySelector('.sort-icon');
+                if (icon) {
+                    icon.classList.remove('asc', 'desc');
                 }
-            }
+            });
 
-            if (periodFilter) {
-                const [year, month] = periodFilter.split('-');
-                const formattedFilter = months[parseInt(month, 10) - 1] + " " + year;
-
-                if ((row.dataset.period || '').trim() !== formattedFilter) {
-                    show = false;
-                }
-            }
-
-            row.style.display = show ? '' : 'none';
-        });
-    }
-
-    function resetFilters() {
-        document.getElementById('filterStatus').value = '';
-        document.getElementById('filterDate').value = '';
-        document.getElementById('filterPeriod').value = '';
-
-        document.querySelectorAll('#tableBody tr').forEach(row => row.style.display = '');
-
-        document.querySelectorAll('table th').forEach(th => {
-            th.classList.remove('sorted');
-            const icon = th.querySelector('.sort-icon');
+            headerElement.classList.add('sorted');
+            const icon = headerElement.querySelector('.sort-icon');
             if (icon) {
-                icon.classList.remove('asc', 'desc');
-            }
-        });
-
-        currentSort = {
-            column: null,
-            direction: 'asc'
-        };
-        updateAllStatuses();
-    }
-
-    function updateAllStatuses() {
-        const rows = document.querySelectorAll('#tableBody tr');
-        const today = new Date();
-        today.setHours(0, 0, 0, 0);
-
-        rows.forEach(row => {
-            const statusCell = row.querySelector('.status-badge');
-            if (!statusCell) return;
-
-            if (row.dataset.status === "paid") {
-                statusCell.innerHTML = `<i class="fa-solid fa-circle-check"></i>Paid`;
-                statusCell.className = "status-badge status-paid";
-                return;
+                icon.classList.add(currentSort.direction);
             }
 
-            const dueText = row.dataset.nextdue;
-            if (!dueText) return;
+            rows.sort((a, b) => {
+                let aVal, bVal;
 
-            const dueDate = new Date(dueText);
-            dueDate.setHours(0, 0, 0, 0);
+                switch (column) {
 
-            let statusKey = "due";
-            let statusText = "Due";
-            let icon = "fa-clock";
+                    case 'tenant':
+                        aVal = (a.dataset.tenant || '').toLowerCase();
+                        bVal = (b.dataset.tenant || '').toLowerCase();
+                        break;
+                    case 'property':
+                        aVal = (a.dataset.property || '').toLowerCase();
+                        bVal = (b.dataset.property || '').toLowerCase();
+                        break;
+                    case 'amount':
+                        aVal = parseFloat(a.dataset.amount) || 0;
+                        bVal = parseFloat(b.dataset.amount) || 0;
+                        break;
+                    case 'datetime':
+                        aVal = parseDateTimeValue(a.dataset.datetime || '');
+                        bVal = parseDateTimeValue(b.dataset.datetime || '');
+                        break;
+                    case 'period':
+                        aVal = parsePeriodValue(a.dataset.period || '');
+                        bVal = parsePeriodValue(b.dataset.period || '');
+                        break;
+                    case 'nextdue':
+                        aVal = parseDateTimeValue(a.dataset.nextdue || '');
+                        bVal = parseDateTimeValue(b.dataset.nextdue || '');
+                        break;
+                    case 'status':
+                        aVal = (a.dataset.status || '').toLowerCase();
+                        bVal = (b.dataset.status || '').toLowerCase();
+                        break;
+                    default:
+                        return 0;
+                }
 
-            if (dueDate < today) {
-                statusKey = "overdue";
-                statusText = "Overdue";
-                icon = "fa-triangle-exclamation";
-            }
+                if (aVal < bVal) return currentSort.direction === 'asc' ? -1 : 1;
+                if (aVal > bVal) return currentSort.direction === 'asc' ? 1 : -1;
+                return 0;
+            });
 
-            statusCell.innerHTML = `<i class="fa-solid ${icon}"></i>${statusText}`;
-            statusCell.className = `status-badge status-${statusKey}`;
-            row.dataset.status = statusKey;
-        });
-    }
+            <<
+            << << < HEAD
+            rows.forEach(row => tbody.appendChild(row));
+            updateAllStatuses();
+        }
 
-    function viewPayment(btn) {
-        const row = btn.closest('tr');
-        const id = row.dataset.id;
-        alert('View Payment: ' + id);
-    }
+        function filterPayments() {
+            const statusFilter = document.getElementById('filterStatus').value;
+            const dateTimeFilter = document.getElementById('filterDateTime').value;
+            const periodFilter = document.getElementById('filterPeriod').value;
+            const rows = document.querySelectorAll('#tableBody tr'); ===
+            === =
+            rows.forEach(row => tbody.appendChild(row));
+            updateAllStatuses();
+        }
 
-    function editPayment(btn) {
-        const row = btn.closest('tr');
-        const id = row.dataset.id;
-        alert('Edit Payment: ' + id);
-    }
+        function filterPayments() {
+            const statusFilter = document.getElementById('filterStatus').value;
+            const dateFilter = document.getElementById('filterDate').value;
+            const periodFilter = document.getElementById('filterPeriod').value;
+            const rows = document.querySelectorAll('#tableBody tr'); >>>
+            >>> > c985b80f556d18c11d1435a032853684c25488cb
 
-    window.addEventListener('load', () => {
-        updateAllStatuses();
-    });
-    </script>
+            rows.forEach(row => {
+                        let show = true;
+
+                        <<
+                        << << < HEAD
+                        if (statusFilter && row.dataset.status !== statusFilter) {
+                            show = false;
+                        }
+
+                        if (dateTimeFilter) {
+                            const rowDateTime = parseDateTimeValue(row.dataset.datetime || '');
+                            const selectedDateTime = new Date(dateTimeFilter).getTime();
+
+                            if (!rowDateTime || rowDateTime < selectedDateTime) {
+                                show = false;
+                            }
+                        }
+
+                        if (periodFilter) {
+                            const [year, month] = periodFilter.split('-');
+                            const formattedFilter = months[parseInt(month, 10) - 1] + " " + year;
+
+                            if ((row.dataset.period || '').trim() !== formattedFilter) {
+                                ===
+                                === =
+                                if (statusFilter && row.dataset.status !== statusFilter) {
+                                    >>>
+                                    >>> > c985b80f556d18c11d1435a032853684c25488cb
+                                    show = false;
+                                }
+
+                                if (dateFilter) {
+                                    const rowDate = (row.dataset.datetime || '').split(' ')[0];
+
+                                    if (rowDate !== dateFilter) {
+                                        show = false;
+                                    }
+                                }
+
+                                if (periodFilter) {
+                                    const [year, month] = periodFilter.split('-');
+                                    const formattedFilter = months[parseInt(month, 10) - 1] + " " + year;
+
+                                    if ((row.dataset.period || '').trim() !== formattedFilter) {
+                                        show = false;
+                                    }
+                                }
+
+                                row.style.display = show ? '' : 'none';
+                            });
+                    }
+
+                    function resetFilters() {
+                        document.getElementById('filterStatus').value = '';
+                        document.getElementById('filterDate').value = '';
+                        document.getElementById('filterPeriod').value = '';
+
+                        document.querySelectorAll('#tableBody tr').forEach(row => row.style.display = '');
+
+                        document.querySelectorAll('table th').forEach(th => {
+                            th.classList.remove('sorted');
+                            const icon = th.querySelector('.sort-icon');
+                            if (icon) {
+                                icon.classList.remove('asc', 'desc');
+                            }
+                        });
+
+                        currentSort = {
+                            column: null,
+                            direction: 'asc'
+                        };
+                        updateAllStatuses();
+                    }
+
+                    function updateAllStatuses() {
+                        const rows = document.querySelectorAll('#tableBody tr');
+                        const today = new Date();
+                        today.setHours(0, 0, 0, 0);
+
+                        rows.forEach(row => {
+                            const statusCell = row.querySelector('.status-badge');
+                            if (!statusCell) return;
+
+                            if (row.dataset.status === "paid") {
+                                statusCell.innerHTML = `<i class="fa-solid fa-circle-check"></i>Paid`;
+                                statusCell.className = "status-badge status-paid";
+                                return;
+                            }
+
+                            const dueText = row.dataset.nextdue;
+                            if (!dueText) return;
+
+                            const dueDate = new Date(dueText);
+                            dueDate.setHours(0, 0, 0, 0);
+
+                            let statusKey = "due";
+                            let statusText = "Due";
+                            let icon = "fa-clock";
+
+                            if (dueDate < today) {
+                                statusKey = "overdue";
+                                statusText = "Overdue";
+                                icon = "fa-triangle-exclamation";
+                            }
+
+                            statusCell.innerHTML = `<i class="fa-solid ${icon}"></i>${statusText}`;
+                            statusCell.className = `status-badge status-${statusKey}`;
+                            row.dataset.status = statusKey;
+                        });
+                    }
+
+                    function viewPayment(btn) {
+                        const row = btn.closest('tr');
+                        const id = row.dataset.id;
+                        alert('View Payment: ' + id);
+                    }
+
+                    function editPayment(btn) {
+                        const row = btn.closest('tr');
+                        const id = row.dataset.id;
+                        alert('Edit Payment: ' + id);
+                    }
+
+                    <<
+                    << << < HEAD window.addEventListener('load', () => {
+                        updateAllStatuses();
+                    }); ===
+                    === =
+                    let selectedPaymentId = null;
+
+                    function openArchiveModal(id, paymentName) {
+                        selectedPaymentId = id;
+                        document.getElementById('archivePaymentName').innerText = paymentName;
+                        document.getElementById('archiveModal').style.display = 'flex';
+                    }
+
+                    function closeArchiveModal() {
+                        document.getElementById('archiveModal').style.display = 'none';
+                        selectedPaymentId = null;
+                    }
+
+                    function confirmArchive() {
+                        document.getElementById('archive_id').value = selectedPaymentId;
+                        document.getElementById('archiveForm').submit();
+                    }
+
+                    window.addEventListener('load', () => {
+                        updateAllStatuses();
+                    }); >>>
+                    >>> > c985b80f556d18c11d1435a032853684c25488cb
+        </script>
 
 </body>
 
