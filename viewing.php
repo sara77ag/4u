@@ -239,6 +239,10 @@ $viewings = $stmt->fetchAll(PDO::FETCH_ASSOC);
                                             <i class="far fa-sticky-note"></i>
                                         </button> -->
 
+                                        <button class="action-btn action-btn-view" title="View" onclick="actionbtn.viewViewing(this)">
+                                            <i class="fa-solid fa-eye"></i>
+                                        </button>
+
                                         <?php if (in_array($_SESSION['role'], ['admin', 'agent'])): ?>
                                         <button class="action-btn action-btn-edit" title="Edit"
                                             onclick="actionbtn.editViewing(this)">
