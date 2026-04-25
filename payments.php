@@ -211,7 +211,7 @@ function formatDateValue($value) {
 
                                 <td class="tenant-name"><?= htmlspecialchars($p['tenant_name'] ?? '-') ?></td>
                                 <td class="property-address"><?= htmlspecialchars($p['property_address'] ?? '-') ?></td>
-                                <td class="rent-amount">£<?= number_format((float)$p['transaction_amount'], 0) ?></td>
+                                <td class="rent">£<?= number_format((float)$p['transaction_amount'], 0) ?></td>
                                 <td class="payment-datetime"><?= htmlspecialchars($dateTimeDisplay) ?></td>
                                 <td class="payment-period"><?= htmlspecialchars($p['payment_period'] ?? '-') ?></td>
                                 <td class="payment-nextdue"><?= htmlspecialchars($nextDueDisplay) ?></td>
@@ -355,18 +355,7 @@ function formatDateValue($value) {
                         <i class="fa-solid fa-folder"></i>
                         <span>Files</span>
                     </div>
-
-                    <div class="files-list">
-                        <div class="file-item">
-                            <i class="fa-solid fa-file-pdf file-icon"></i>
-                            <span class="file-name">Payment Receipt</span>
-                            <button class="file-open-btn" onclick="openFile('payment receipt')">Open</button>
-                        </div>
-                        <div class="file-item">
-                            <i class="fa-solid fa-file-pdf file-icon"></i>
-                            <span class="file-name">Invoice</span>
-                            <button class="file-open-btn" onclick="openFile('invoice')">Open</button>
-                        </div>
+                    <div class="files-list" id="pay-files-list">
                     </div>
                 </div>
 
