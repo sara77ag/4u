@@ -1412,9 +1412,7 @@ function toDateTimeInputValue(value) {
   });
 
   // Public API
-
- 
-  return {
+return {
     viewProperty(btn)  { openEntityModal('property', extractPropertyData(btn), 'view'); },
     editProperty(btn)  { openEntityModal('property', extractPropertyData(btn), 'edit'); },
     viewLandlord(btn)  { openEntityModal('landlord', extractLandlordData(btn), 'view'); },
