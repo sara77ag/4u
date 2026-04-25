@@ -1,4 +1,10 @@
 <?php
+session_start();
+if(!isset($_SESSION['user_id'])) {
+    header("Location: index.php");
+    exit();
+}
+
 $pdo = null;
 
 if ($_SERVER['REQUEST_METHOD'] === 'POST') {
@@ -14,9 +20,9 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
     if (isset($_POST['todo_text'])) {
         $stmt = $pdo->prepare("
             INSERT INTO notes (note_text, created_at, created_by, type, property_id, landlord_id, tenant_id, payment_id, viewing_id, date_id, user_id, archived)
-            VALUES (?, datetime('now'), 'system', 'todo', NULL, NULL, NULL, NULL, NULL, NULL, NULL, 0)
+            VALUES (?, datetime('now'), ?, 'todo', NULL, NULL, NULL, NULL, NULL, NULL, NULL, 0)
         ");
-        $stmt->execute([trim($_POST['todo_text'])]);
+        $stmt->execute([trim($_POST['todo_text']), $_SESSION['user_id']]);
         header('Location: dashboard.php');
         exit();
     }
@@ -24,17 +30,17 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
     // TODO: Delete
     if (isset($_POST['delete_todo_id'])) {
         $stmt = $pdo->prepare("
-            UPDATE notes SET archived = 1, date_archived = date('now') WHERE note_id = ?
+            UPDATE notes SET archived = 1, date_archived = date('now') WHERE note_id = ? AND created_by = ?
         ");
-        $stmt->execute([(int)$_POST['delete_todo_id']]);
+        $stmt->execute([(int)$_POST['delete_todo_id'], $_SESSION['user_id']]);
         header('Location: dashboard.php');
         exit();
     }
 
     // TODO: Toggle complete
     if (isset($_POST['toggle_todo_id'])) {
-        $stmt = $pdo->prepare("UPDATE notes SET completed = ? WHERE note_id = ?");
-        $stmt->execute([(int)$_POST['toggle_todo_completed'], (int)$_POST['toggle_todo_id']]);
+        $stmt = $pdo->prepare("UPDATE notes SET completed = ? WHERE note_id = ? AND created_by = ?");
+        $stmt->execute([(int)$_POST['toggle_todo_completed'], (int)$_POST['toggle_todo_id'], $_SESSION['user_id']]);
         header('Location: dashboard.php');
         exit();
     }
@@ -96,8 +102,8 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
         try {
             $stmt = $pdo->prepare("
                 INSERT INTO landlords (name, phone, address, email, id_type, id_number,
-                       id_expiry_date, archived)
-                       VALUES (?, ?, ?, ?, ?, ?, ?, 0)
+                                       id_expiry_date, number_of_properties, archived)
+                VALUES (?, ?, ?, ?, ?, ?, ?, 0, 0)
             ");
             $stmt->execute([
                 trim($_POST['landlord_name']),
@@ -376,17 +382,6 @@ try {
                     <label>EPC Due Date <span class="required">*</span></label>
                     <input type="date" name="epc_due_date" class="form-control" required>
                 </div>
-                <div class="form-group">
-                    <label>Upload Files</label>
-                    <input type="file" id="propertyFileInput" name="property_files[]" class="file-input" multiple
-                        accept=".pdf,.jpg,.jpeg,.png">
-                    <div class="file-upload-group" onclick="document.getElementById('propertyFileInput').click()">
-                        <i class="fa-solid fa-cloud-arrow-up"></i>
-                        <p>Upload Property Files</p>
-                    </div>
-                    <div id="propertyFileCount" class="file-count"></div>
-                    <div id="propertyFileList"></div>
-                </div>
             </div>
             <div class="modal-footer">
                 <button type="button" class="modal-btn modal-btn-reset" onclick="resetAddPropertyForm()">
@@ -453,15 +448,9 @@ try {
                     <input type="date" name="landlord_id_expiry" class="form-control" required>
                 </div>
                 <div class="form-group">
-                    <label>Upload Files</label>
-                    <input type="file" id="landlordFileInput" name="landlord_files[]" class="file-input" multiple
-                        accept=".pdf,.jpg,.jpeg,.png">
-                    <div class="file-upload-group" onclick="document.getElementById('landlordFileInput').click()">
-                        <i class="fa-solid fa-cloud-arrow-up"></i>
-                        <p>Upload landlord Files</p>
-                    </div>
-                    <div id="landlordFileCount" class="file-count"></div>
-                    <div id="landlordFileList"></div>
+                    <label>Number of Properties</label>
+                    <input type="number" name="landlord_number_of_properties" class="form-control" placeholder="0"
+                        min="0" value="0">
                 </div>
             </div>
             <div class="modal-footer">
@@ -556,17 +545,6 @@ try {
                         <option value="fortnightly">Fortnightly</option>
                         <option value="monthly">Monthly</option>
                     </select>
-                </div>
-                <div class="form-group">
-                    <label>Upload Files</label>
-                    <input type="file" id="tenantFileInput" name="tenant_files[]" class="file-input" multiple
-                        accept=".pdf,.jpg,.jpeg,.png">
-                    <div class="file-upload-group" onclick="document.getElementById('tenantFileInput').click()">
-                        <i class="fa-solid fa-cloud-arrow-up"></i>
-                        <p>Upload tenant Files</p>
-                    </div>
-                    <div id="tenantFileCount" class="file-count"></div>
-                    <div id="tenantFileList"></div>
                 </div>
             </div>
             <div class="modal-footer">
@@ -955,17 +933,6 @@ try {
                     <label>Password <span class="required">*</span></label>
                     <input type="password" name="user_password" class="form-control" placeholder="Enter Password"
                         required>
-                </div>
-                <div class="form-group">
-                    <label>Upload Files</label>
-                    <input type="file" id="userFileInput" name="user_files[]" class="file-input" multiple
-                        accept=".pdf,.jpg,.jpeg,.png">
-                    <div class="file-upload-group" onclick="document.getElementById('userFileInput').click()">
-                        <i class="fa-solid fa-cloud-arrow-up"></i>
-                        <p>Upload user Files</p>
-                    </div>
-                    <div id="userFileCount" class="file-count"></div>
-                    <div id="userFileList"></div>
                 </div>
             </div>
             <div class="modal-footer">
