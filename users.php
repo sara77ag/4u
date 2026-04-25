@@ -211,7 +211,10 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST' && isset($_POST['reset_password_id']))
                             <form method="POST" style="display:inline;">
                                 <input type="hidden" name="archive_id" value="<?= $user['user_id'] ?>">
                                 <button type="submit" class="action-btn action-btn-delete" title="Archive"
-                                    onclick="return confirm('Archive this user?\n<?= htmlspecialchars($user['name']) ?>')">
+                                    onclick="openArchiveModal(
+                                    <?= (int)$user['user_id'] ?>,
+                                    '<?= htmlspecialchars($user['name'], ENT_QUOTES) ?>'
+                                ); return false;">
                                     <i class="fa-solid fa-trash"></i>
                                 </button>
                             </form>
@@ -234,12 +237,17 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST' && isset($_POST['reset_password_id']))
                     <div class="action-modal-header-icon">
                         <i class="fa-solid fa-user-tie"></i>
                     </div>
-                    <h2 id="username">Landlord Name</h2>
+                    <h2 id="username">User Name</h2>
                 </div>
+
+                <button class="modal-close-btn" onclick="actionbtn.closeModal()">
+                    <i class="fa-solid fa-xmark"></i>
+                </button>
+            </div>
 
             <div class="action-tabs-nav">
                 <button class="tab-btn active" data-tab="user">
-                    <i class="fa-solid fa-house"></i> User Details
+                    <i class="fa-solid fa-user"></i> User Details
                 </button>
                 <button class="tab-btn" data-tab="files">
                     <i class="fa-solid fa-folder"></i> Files
@@ -247,12 +255,12 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST' && isset($_POST['reset_password_id']))
             </div>
 
             <div class="action-tabs-content">
-                <?php // User Tab ?>
                 <div id="u-tab-user" class="tab-content active">
                     <div class="tab-header">
                         <i class="fa-solid fa-user"></i>
                         <span>User Details</span>
                     </div>
+
                     <div class="details-grid">
                         <div class="detail-row">
                             <span class="detail-label">Username:</span>
@@ -285,12 +293,12 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST' && isset($_POST['reset_password_id']))
                     </div>
                 </div>
 
-                <?php // Files Tab ?>
                 <div id="u-tab-files" class="tab-content">
                     <div class="tab-header">
                         <i class="fa-solid fa-folder"></i>
                         <span>Files</span>
                     </div>
+
                     <div class="details-grid">
                         <div class="detail-row">
                             <span class="detail-label">ID Number:</span>
@@ -302,6 +310,37 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST' && isset($_POST['reset_password_id']))
                         </div>
                     </div>
                 </div>
+            </div>
+        </div>
+    </div>
+
+    <div id="archiveModal" class="action-modal-overlay">
+        <div class="action-modal-container" style="max-width: 480px;">
+            <div class="action-modal-header">
+                <div class="action-header-left">
+                    <div class="action-modal-header-icon">
+                        <i class="fa-solid fa-user-tie"></i>
+                    </div>
+                    <h3>Archive User</h3>
+                </div>
+                <button class="modal-close-btn" onclick="closeArchiveModal()">
+                    <i class="fa-solid fa-xmark"></i>
+                </button>
+            </div>
+
+            <div class="delete-body">
+                <p class="p-text">Are you sure you want to archive this user?</p>
+                <p id="archiveUserName" class="delete-entity"></p>
+
+                <div class="modal-footer">
+                    <button class="modal-btn modal-btn-delete" onclick="confirmArchive()">
+                        Yes, Archive
+                    </button>
+                </div>
+
+                <form id="archiveForm" method="POST" style="display:none;">
+                    <input type="hidden" name="archive_id" id="archive_id">
+                </form>
             </div>
         </div>
     </div>
@@ -345,18 +384,22 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST' && isset($_POST['reset_password_id']))
         sortUsers();
     }
 
-    function editUser(btn) {
-        const card = btn.closest('.card');
-        const name = card.querySelector('.card-name').textContent.trim();
-        alert('Edit User: ' + name);
+    let selectedUserId = null;
+
+    function openArchiveModal(id, userName) {
+        selectedUserId = id;
+        document.getElementById('archiveUserName').innerText = userName;
+        document.getElementById('archiveModal').style.display = 'flex';
     }
 
-    function deleteProperty(btn) {
-        const row = btn.closest('tr');
-        const id = row.querySelector('.card-name').textContent;
-        if (confirm('Are you sure you want to delete ' + name + '?')) {
-            row.remove();
-        }
+    function closeArchiveModal() {
+        document.getElementById('archiveModal').style.display = 'none';
+        selectedUserId = null;
+    }
+
+    function confirmArchive() {
+        document.getElementById('archive_id').value = selectedUserId;
+        document.getElementById('archiveForm').submit();
     }
     </script>
 </body>
