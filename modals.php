@@ -41,23 +41,41 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
 
     // Add Property
     if (isset($_POST['property_address'])) {
-        $stmt = $pdo->prepare("
-            INSERT INTO properties (property_address, property_type, monthly_rent, landlord_id,
-                                    gas_cert_due, electric_cert_due, epc_due_date, landlord_id_expiry_date,
-                                    room_count, bathroom_count, epc_rating, has_garden, allowed_pets,
-                                    council_band, archived)
-            VALUES (?, ?, ?, ?, ?, ?, ?, ?, 0, 0, 'E', 0, 0, 'D', 0)
-        ");
-        $stmt->execute([
-            trim($_POST['property_address']),
-            $_POST['property_type'],
-            (float)$_POST['monthly_rent'],
-            (int)$_POST['landlord_id'],
-            $_POST['gas_cert_date'],
-            $_POST['electric_cert_date'],
-            $_POST['epc_due_date'],
-            $_POST['gas_cert_date']
-        ]);
+        $address = trim($_POST['property_address']);
+
+        $check = $pdo->prepare("SELECT COUNT(*) FROM properties WHERE property_address = ?");
+        $check->execute([$address]);
+        if ($check->fetchColumn() > 0) {
+            header("Location: properties.php?error=duplicate");
+            exit();
+        }
+
+        try {
+            $stmt = $pdo->prepare("
+                INSERT INTO properties (property_address, property_type, monthly_rent, landlord_id,
+                                        gas_cert_due, electric_cert_due, epc_due_date, landlord_id_expiry_date,
+                                        room_count, bathroom_count, epc_rating, has_garden, allowed_pets,
+                                        council_band, archived)
+                VALUES (?, ?, ?, ?, ?, ?, ?, ?, 0, 0, 'E', 0, 0, 'D', 0)
+            ");
+            $stmt->execute([
+                $address,
+                $_POST['property_type'],
+                (float)$_POST['monthly_rent'],
+                (int)$_POST['landlord_id'],
+                $_POST['gas_cert_date'],
+                $_POST['electric_cert_date'],
+                $_POST['epc_due_date'],
+                $_POST['gas_cert_date']
+            ]);
+        } catch (PDOException $e) {
+            if (strpos($e->getMessage(), 'UNIQUE constraint failed') !== false) {
+                header("Location: properties.php?error=duplicate");
+                exit();
+            }
+            throw $e;
+        }
+
         header('Location: properties.php');
         exit();
     }
