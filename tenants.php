@@ -58,13 +58,34 @@ $tenants = $pdo->query($query)->fetchAll(PDO::FETCH_ASSOC);
     <script src="actionbtn.js"></script>
 
     <style>
-    .col-name { width: 16%; }
-    .col-number { width: 12%; }
-    .col-email { width: 22%; }
-    .col-address { width: 20%; }
-    .col-status { width: 10%; }
-    .col-contract { width: 15%; }
-    .col-action { width: 10%; text-align: center; }
+    .col-name {
+        width: 16%;
+    }
+
+    .col-number {
+        width: 12%;
+    }
+
+    .col-email {
+        width: 22%;
+    }
+
+    .col-address {
+        width: 20%;
+    }
+
+    .col-status {
+        width: 10%;
+    }
+
+    .col-contract {
+        width: 15%;
+    }
+
+    .col-action {
+        width: 10%;
+        text-align: center;
+    }
     </style>
 </head>
 
@@ -128,12 +149,18 @@ $tenants = $pdo->query($query)->fetchAll(PDO::FETCH_ASSOC);
                     <table id="tenantsTable">
                         <thead>
                             <tr>
-                                <th class="sortable col-name" onclick="sortTable('name', this)">Name <i class="fa-solid fa-sort"></i></th>
-                                <th class="sortable col-number" onclick="sortTable('number', this)">Number <i class="fa-solid fa-sort"></i></th>
-                                <th class="sortable col-email" onclick="sortTable('email', this)">Email <i class="fa-solid fa-sort"></i></th>
-                                <th class="sortable col-address" onclick="sortTable('address', this)">Address <i class="fa-solid fa-sort"></i></th>
-                                <th class="sortable col-status" onclick="sortTable('status', this)">Status <i class="fa-solid fa-sort"></i></th>
-                                <th class="sortable col-contract" onclick="sortTable('contract', this)">Contract <i class="fa-solid fa-sort"></i></th>
+                                <th class="sortable col-name" onclick="sortTable('name', this)">Name <i
+                                        class="fa-solid fa-sort"></i></th>
+                                <th class="sortable col-number" onclick="sortTable('number', this)">Number <i
+                                        class="fa-solid fa-sort"></i></th>
+                                <th class="sortable col-email" onclick="sortTable('email', this)">Email <i
+                                        class="fa-solid fa-sort"></i></th>
+                                <th class="sortable col-address" onclick="sortTable('address', this)">Address <i
+                                        class="fa-solid fa-sort"></i></th>
+                                <th class="sortable col-status" onclick="sortTable('status', this)">Status <i
+                                        class="fa-solid fa-sort"></i></th>
+                                <th class="sortable col-contract" onclick="sortTable('contract', this)">Contract <i
+                                        class="fa-solid fa-sort"></i></th>
                                 <th class="col-action">Action</th>
                             </tr>
                         </thead>
@@ -156,7 +183,8 @@ $tenants = $pdo->query($query)->fetchAll(PDO::FETCH_ASSOC);
                                 <td class="tenant-name"><?= htmlspecialchars($t['name']) ?></td>
                                 <td><?= htmlspecialchars($t['phone']) ?></td>
                                 <td class="td-email"><?= htmlspecialchars($t['email']) ?></td>
-                                <td class="tenant-address"><?= htmlspecialchars($t['property_address'] ?? 'Unassigned') ?></td>
+                                <td class="tenant-address">
+                                    <?= htmlspecialchars($t['property_address'] ?? 'Unassigned') ?></td>
                                 <td><span class="status-badge"></span></td>
                                 <td class="contract-info">
                                     <?php if (!empty($t['contract_start']) && !empty($t['contract_end'])): ?>
@@ -293,25 +321,25 @@ $tenants = $pdo->query($query)->fetchAll(PDO::FETCH_ASSOC);
                             <div class="cell">Status</div>
                         </div>
                         <div class="data-row">
-                            <div class="cell">221B Baker Street</div>
-                            <div class="cell">Alex</div>
-                            <div class="cell">01/01/2023</div>
-                            <div class="cell">01/01/2024</div>
-                            <div class="cell"><span class="status-badge status-previous">Previous</span></div>
+                            <div class="cell">-</div>
+                            <div class="cell">-</div>
+                            <div class="cell">-</div>
+                            <div class="cell">-</div>
+                            <div class="cell">-</div>
                         </div>
                         <div class="data-row">
-                            <div class="cell">Oxford Road 10</div>
-                            <div class="cell">Alex</div>
-                            <div class="cell">01/01/2024</div>
-                            <div class="cell">01/01/2025</div>
-                            <div class="cell"><span class="status-badge status-previous">Previous</span></div>
+                            <div class="cell">-</div>
+                            <div class="cell">-</div>
+                            <div class="cell">-</div>
+                            <div class="cell">-</div>
+                            <div class="cell">-</div>
                         </div>
                         <div class="data-row">
-                            <div class="cell">Green Lane 5</div>
-                            <div class="cell">Alex</div>
-                            <div class="cell">01/01/2025</div>
+                            <div class="cell">-</div>
+                            <div class="cell">-</div>
+                            <div class="cell">-</div>
                             <div class="cell"> - </div>
-                            <div class="cell"><span class="status-badge status-active">Current</span></div>
+                            <div class="cell">-</div>
                         </div>
                     </div>
                 </div>
@@ -377,7 +405,8 @@ $tenants = $pdo->query($query)->fetchAll(PDO::FETCH_ASSOC);
                         <span>Notes</span>
                     </div>
                     <div class="notes-input-section">
-                        <textarea id="t-noteTextarea" class="note-textarea" placeholder="Write your note here..."></textarea>
+                        <textarea id="t-noteTextarea" class="note-textarea"
+                            placeholder="Write your note here..."></textarea>
                         <button id="t-addNoteBtn" class="add-note-btn" onclick="actionbtn.addNote()">
                             <i class="fa-solid fa-plus"></i> Add Note
                         </button>
@@ -448,13 +477,32 @@ $tenants = $pdo->query($query)->fetchAll(PDO::FETCH_ASSOC);
         rows.sort((a, b) => {
             let aVal, bVal;
             switch (column) {
-                case 'name':    aVal = a.querySelector('.tenant-name').textContent.toLowerCase(); bVal = b.querySelector('.tenant-name').textContent.toLowerCase(); break;
-                case 'number':  aVal = a.cells[1].textContent.toLowerCase(); bVal = b.cells[1].textContent.toLowerCase(); break;
-                case 'email':   aVal = a.querySelector('.td-email').textContent.toLowerCase(); bVal = b.querySelector('.td-email').textContent.toLowerCase(); break;
-                case 'address': aVal = a.querySelector('.tenant-address').textContent.toLowerCase(); bVal = b.querySelector('.tenant-address').textContent.toLowerCase(); break;
-                case 'status':  aVal = a.querySelector('.status-badge').textContent.toLowerCase(); bVal = b.querySelector('.status-badge').textContent.toLowerCase(); break;
-                case 'contract':aVal = a.querySelector('.contract-info').textContent.toLowerCase(); bVal = b.querySelector('.contract-info').textContent.toLowerCase(); break;
-                default: return 0;
+                case 'name':
+                    aVal = a.querySelector('.tenant-name').textContent.toLowerCase();
+                    bVal = b.querySelector('.tenant-name').textContent.toLowerCase();
+                    break;
+                case 'number':
+                    aVal = a.cells[1].textContent.toLowerCase();
+                    bVal = b.cells[1].textContent.toLowerCase();
+                    break;
+                case 'email':
+                    aVal = a.querySelector('.td-email').textContent.toLowerCase();
+                    bVal = b.querySelector('.td-email').textContent.toLowerCase();
+                    break;
+                case 'address':
+                    aVal = a.querySelector('.tenant-address').textContent.toLowerCase();
+                    bVal = b.querySelector('.tenant-address').textContent.toLowerCase();
+                    break;
+                case 'status':
+                    aVal = a.querySelector('.status-badge').textContent.toLowerCase();
+                    bVal = b.querySelector('.status-badge').textContent.toLowerCase();
+                    break;
+                case 'contract':
+                    aVal = a.querySelector('.contract-info').textContent.toLowerCase();
+                    bVal = b.querySelector('.contract-info').textContent.toLowerCase();
+                    break;
+                default:
+                    return 0;
             }
             if (aVal < bVal) return currentSort.direction === 'asc' ? -1 : 1;
             if (aVal > bVal) return currentSort.direction === 'asc' ? 1 : -1;
@@ -510,7 +558,10 @@ $tenants = $pdo->query($query)->fetchAll(PDO::FETCH_ASSOC);
             const icon = th.querySelector('.sort-icon');
             if (icon) icon.classList.remove('asc', 'desc');
         });
-        currentSort = { column: null, direction: 'asc' };
+        currentSort = {
+            column: null,
+            direction: 'asc'
+        };
     }
 
     function updateAllStatuses() {
@@ -538,9 +589,19 @@ $tenants = $pdo->query($query)->fetchAll(PDO::FETCH_ASSOC);
             }
 
             let status, key, icon;
-            if (today >= startDate && today <= endDate) { status = 'Active'; key = 'active'; icon = 'fa-circle-check'; }
-            else if (today > endDate) { status = 'Former'; key = 'former'; icon = 'fa-clock'; }
-            else { status = 'New'; key = 'new'; icon = 'fa-user-plus'; }
+            if (today >= startDate && today <= endDate) {
+                status = 'Active';
+                key = 'active';
+                icon = 'fa-circle-check';
+            } else if (today > endDate) {
+                status = 'Former';
+                key = 'former';
+                icon = 'fa-clock';
+            } else {
+                status = 'New';
+                key = 'new';
+                icon = 'fa-user-plus';
+            }
 
             statusCell.innerHTML = `<i class="fa-solid ${icon}"></i> ${status}`;
             statusCell.className = `status-badge status-${key}`;
