@@ -241,8 +241,11 @@ function formatDateValue($value) {
                         type="submit"
                         class="action-btn action-btn-delete"
                         title="Archive"
-                        onclick="return confirm('Archive this payment?\nPayment ID: <?= (int)$p['transaction_id'] ?>')"
-                    >
+                        onclick="openArchiveModal(
+                            <?= (int)$p['transaction_id'] ?>,
+                            '<?= htmlspecialchars(($p['tenant_name'] ?? 'Unknown Tenant') . ' - £' . number_format((float)$p['transaction_amount'], 0), ENT_QUOTES) ?>'
+                        ); return false;">
+                    
                         <i class="fa-solid fa-trash"></i>
                     </button>
                 </form>
@@ -390,11 +393,40 @@ function formatDateValue($value) {
         </div>
     </div>
 </div>
-        
+      
+<div id="archiveModal" class="action-modal-overlay">
+    <div class="action-modal-container" style="max-width: 480px;">
+        <div class="action-modal-header">
+            <div class="action-header-left">
+                <div class="action-modal-header-icon">
+                    <i class="fa-solid fa-credit-card"></i>
+                </div>
+                <h3>Archive Payment</h3>
+            </div>
+            <button class="modal-close-btn" onclick="closeArchiveModal()">
+                <i class="fa-solid fa-xmark"></i>
+            </button>
+        </div>
+
+        <div class="delete-body">
+            <p class="p-text">Are you sure you want to archive this payment?</p>
+            <p id="archivePaymentName" class="delete-entity"></p>
+
+            <div class="modal-footer">
+                <button class="modal-btn modal-btn-delete" onclick="confirmArchive()">
+                    Yes, Archive
+                </button>
+            </div>
+
+            <form id="archiveForm" method="POST" style="display:none;">
+                <input type="hidden" name="archive_id" id="archive_id">
+            </form>
+        </div>
+    </div>
+</div>
 
     <script>
         const months = ["Jan","Feb","Mar","Apr","May","Jun","Jul","Aug","Sep","Oct","Nov","Dec"];
-        let currentSort = { column: null, direction: 'asc' };
 
     function parseDateTimeValue(value) {
         if (!value) return 0;
@@ -501,8 +533,8 @@ function formatDateValue($value) {
                     bVal = parsePeriodValue(b.dataset.period || '');
                     break;
                 case 'nextdue':
-                    aVal = a.dataset.nextdue || '';
-                    bVal = b.dataset.nextdue || '';
+                    aVal = parseDateTimeValue(a.dataset.nextdue || '');
+                    bVal = parseDateTimeValue(b.dataset.nextdue || '');
                     break;
                 case 'status':
                     aVal = (a.dataset.status || '').toLowerCase();
@@ -521,39 +553,38 @@ function formatDateValue($value) {
             updateAllStatuses();
         }
         function filterPayments() {
-    const statusFilter = document.getElementById('filterStatus').value;
-    const dateTimeFilter = document.getElementById('filterDateTime').value;
-    const periodFilter = document.getElementById('filterPeriod').value;
-    const rows = document.querySelectorAll('#tableBody tr');
+            const statusFilter = document.getElementById('filterStatus').value;
+            const dateFilter = document.getElementById('filterDate').value;
+            const periodFilter = document.getElementById('filterPeriod').value;
+            const rows = document.querySelectorAll('#tableBody tr');
 
-        rows.forEach(row => {
-            let show = true;
+            rows.forEach(row => {
+                let show = true;
 
-            if (statusFilter && row.dataset.status !== statusFilter) {
-                show = false;
-            }
-
-        if (dateTimeFilter) {
-            const rowDateTime = parseDateTimeValue(row.dataset.datetime || '');
-            const selectedDateTime = new Date(dateTimeFilter).getTime();
-
-            if (!rowDateTime || rowDateTime < selectedDateTime) {
-                show = false;
-            }
-        }
-
-        if (periodFilter) {
-            const [year, month] = periodFilter.split('-');
-            const formattedFilter = months[parseInt(month, 10) - 1] + " " + year;
-
-                if ((row.dataset.period || '').trim() !== formattedFilter) {
+                if (statusFilter && row.dataset.status !== statusFilter) {
                     show = false;
                 }
-            }
 
-            row.style.display = show ? '' : 'none';
-        });
-    }
+                if (dateFilter) {
+                    const rowDate = (row.dataset.datetime || '').split(' ')[0];
+
+                    if (rowDate !== dateFilter) {
+                        show = false;
+                    }
+                }
+
+                if (periodFilter) {
+                    const [year, month] = periodFilter.split('-');
+                    const formattedFilter = months[parseInt(month, 10) - 1] + " " + year;
+
+                    if ((row.dataset.period || '').trim() !== formattedFilter) {
+                        show = false;
+                    }
+                }
+
+                row.style.display = show ? '' : 'none';
+            });
+        }
 
     function resetFilters() {
         document.getElementById('filterStatus').value = '';
@@ -621,6 +652,24 @@ function formatDateValue($value) {
             const row = btn.closest('tr');
             const id = row.dataset.id;
             alert('Edit Payment: ' + id);
+        }
+
+        let selectedPaymentId = null;
+
+        function openArchiveModal(id, paymentName) {
+            selectedPaymentId = id;
+            document.getElementById('archivePaymentName').innerText = paymentName;
+            document.getElementById('archiveModal').style.display = 'flex';
+        }
+
+        function closeArchiveModal() {
+            document.getElementById('archiveModal').style.display = 'none';
+            selectedPaymentId = null;
+        }
+
+        function confirmArchive() {
+            document.getElementById('archive_id').value = selectedPaymentId;
+            document.getElementById('archiveForm').submit();
         }
 
         window.addEventListener('load', () => {
