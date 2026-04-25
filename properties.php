@@ -109,6 +109,16 @@ $properties = $stmt->fetchAll(PDO::FETCH_ASSOC);
     <div id="navbar-container"></div>
 
     <main class="main-content">
+        <?php if (isset($_GET['error']) && $_GET['error'] === 'duplicate'): ?>
+        <div class="flash-error" style="
+            background:#f8d7da; color:#721c24; border:1px solid #f5c6cb;
+            border-radius:8px; padding:12px 20px; margin-bottom:16px;
+            display:flex; align-items:center; gap:10px;">
+            <i class="fa-solid fa-circle-xmark"></i>
+            A property with that address already exists.
+        </div>
+        <?php endif; ?>
+
         <h1 class="page-title">Properties</h1>
 
         <div class="main-container">
@@ -289,9 +299,7 @@ $properties = $stmt->fetchAll(PDO::FETCH_ASSOC);
 
     <div id="modals-container"></div>
 
-    <!-- ============================================ -->
     <!-- Action Buttons: View Property -->
-    <!-- ============================================ -->
     <div id="viewPropertyModal" class="action-modal-overlay">
         <div class="action-modal-container">
             <!-- Header -->
