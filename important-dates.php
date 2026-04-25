@@ -147,14 +147,14 @@ function formatDateValue($date) {
 
                 <div class="controls-spacer"></div>
 
-                <?php if (in_array($_SESSION['role'], ['admin', 'agent'])): ?>
-                <button class="btn-add green" onclick="openAddContractModal()">
+                <!--<?php if (in_array($_SESSION['role'], ['admin', 'agent'])): ?> <button class="btn-add green"
+                    onclick="openAddContractModal()">
                     <i class="fa-solid fa-plus"></i>Contract
-                </button>
-                <button class="btn-add blue" onclick="openAddPropertyModal()">
-                    <i class="fa-solid fa-plus"></i>Property
-                </button>
-                <?php endif; ?>
+                    </button>
+                    <button class="btn-add blue" onclick="openAddPropertyModal()">
+                        <i class="fa-solid fa-plus"></i>Property
+                    </button>
+                    <?php endif; ?> -->
             </div>
 
 
@@ -176,10 +176,10 @@ function formatDateValue($date) {
                                     EPC <i class="fa-solid fa-sort sort-icon"></i>
                                 </th>
                                 <th class="sortable col-idlandlord" onclick="sortTable('idlandlord', this)">
-                                    Landlord Id <br>Verification <i class="fa-solid fa-sort sort-icon"></i>
+                                    Landlord Id Expiry <i class="fa-solid fa-sort sort-icon"></i>
                                 </th>
                                 <th class="sortable col-idtenant" onclick="sortTable('idtenant', this)">
-                                    Tenant Id <br>Verification <i class="fa-solid fa-sort sort-icon"></i>
+                                    Tenant Id Expiry <i class="fa-solid fa-sort sort-icon"></i>
                                 </th>
                                 <th class="sortable col-contract" onclick="sortTable('contract', this)">
                                     Contract <i class="fa-solid fa-sort sort-icon"></i>
@@ -237,22 +237,19 @@ function formatDateValue($date) {
                                         <?php if (in_array($_SESSION['role'], ['admin', 'agent'])): ?>
                                         <button class="action-btn action-btn-edit" title="Edit"
                                             onclick="actionbtn.editImportantDate(this)">
-
-                                            <!--<?php if (in_array($_SESSION['role'], ['admin', 'agent'])): ?>
-                                        <button class="action-btn action-btn-edit" title="Edit" onclick="actionbtn.editImportantDate(this)">
                                             <i class="fa-solid fa-pen"></i>
                                         </button>
                                         <?php endif; ?>
 
-                                        <?php if ($_SESSION['role'] === 'admin'): ?>
-                                        <form method="POST" style="display:inline;">
+                                        <!-- <?php if ($_SESSION['role'] === 'admin'): ?> <form method="POST"
+                                            style="display:inline;">
                                             <input type="hidden" name="archive_id" value="<?= $row['property_id'] ?>">
                                             <button type="submit" class="action-btn action-btn-delete" title="Archive"
                                                 onclick="return confirm('Archive this property?\n<?= htmlspecialchars($row['property_address']) ?>')">
                                                 <i class="fa-solid fa-trash"></i>
                                             </button>
-                                        </form>
-                                        <?php endif; ?>-->
+                                            </form>
+                                            <?php endif; ?> -->
                                     </div>
                                 </td>
                             </tr>
