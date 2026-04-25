@@ -76,6 +76,61 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
             throw $e;
         }
 
+        //Save uploaded property files
+        $newPropertyId = (int)$pdo->lastInsertId();
+
+        // Ensure files table exists
+        $pdo->exec("
+            CREATE TABLE IF NOT EXISTS files (
+                file_id       INTEGER PRIMARY KEY AUTOINCREMENT,
+                file_name     TEXT NOT NULL,
+                file_type     TEXT NOT NULL,
+                file_path     TEXT NOT NULL,
+                uploaded_at   TEXT NOT NULL,
+                file_category TEXT NOT NULL,
+                property_id   INTEGER,
+                tenant_id     INTEGER,
+                landlord_id   INTEGER,
+                user_id       INTEGER,
+                payment_id    INTEGER,
+                archived      INTEGER NOT NULL DEFAULT 0
+            )
+        ");
+
+        $categoryMap = [
+            'gas_file'             => 'gas_cert',
+            'electric_file'        => 'electric_cert',
+            'epc_file'             => 'epc',
+            'ownership_proof_file' => 'ownership_proof',
+        ];
+
+        $allowedExts = ['pdf', 'jpg', 'jpeg', 'png'];
+        $folder      = "files/properties/$newPropertyId";
+        $fullFolder  = __DIR__ . '/' . $folder;
+        if (!is_dir($fullFolder)) { mkdir($fullFolder, 0755, true); }
+
+        foreach ($categoryMap as $inputName => $category) {
+            if (!isset($_FILES[$inputName]) || $_FILES[$inputName]['error'] !== UPLOAD_ERR_OK) {
+                continue; // optional — skip if not uploaded
+            }
+            $file = $_FILES[$inputName];
+            $ext  = strtolower(pathinfo($file['name'], PATHINFO_EXTENSION));
+            if (!in_array($ext, $allowedExts)) { continue; }
+
+            $filename   = time() . '_' . preg_replace('/[^a-zA-Z0-9._-]/', '_', $file['name']);
+            $fullPath   = $fullFolder . '/' . $filename;
+            $storedPath = $folder    . '/' . $filename;
+
+            if (!move_uploaded_file($file['tmp_name'], $fullPath)) { continue; }
+
+            $stmt = $pdo->prepare("
+                INSERT INTO files (file_name, file_type, file_path, uploaded_at,
+                                   file_category, property_id, archived)
+                VALUES (?, ?, ?, datetime('now'), ?, ?, 0)
+            ");
+            $stmt->execute([$filename, strtoupper($ext), $storedPath, $category, $newPropertyId]);
+        }
+
         header('Location: properties.php');
         exit();
     }
@@ -114,6 +169,35 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
                 exit();
             }
             throw $e;
+        }
+
+        $newLandlordId = (int)$pdo->lastInsertId();
+
+        //Save uploaded landlord files 
+        $pdo->exec("CREATE TABLE IF NOT EXISTS files (
+            file_id INTEGER PRIMARY KEY AUTOINCREMENT,
+            file_name TEXT NOT NULL, file_type TEXT NOT NULL,
+            file_path TEXT NOT NULL, uploaded_at TEXT NOT NULL,
+            file_category TEXT NOT NULL, property_id INTEGER,
+            tenant_id INTEGER, landlord_id INTEGER, user_id INTEGER,
+            payment_id INTEGER, archived INTEGER NOT NULL DEFAULT 0
+        )");
+        $landlordCategoryMap = ['landlord_id_file' => 'id_document'];
+        $allowedExts = ['pdf','jpg','jpeg','png'];
+        $folder     = "files/landlords/$newLandlordId";
+        $fullFolder = __DIR__ . '/' . $folder;
+        if (!is_dir($fullFolder)) { mkdir($fullFolder, 0755, true); }
+        foreach ($landlordCategoryMap as $inputName => $category) {
+            if (!isset($_FILES[$inputName]) || $_FILES[$inputName]['error'] !== UPLOAD_ERR_OK) continue;
+            $file = $_FILES[$inputName];
+            $ext  = strtolower(pathinfo($file['name'], PATHINFO_EXTENSION));
+            if (!in_array($ext, $allowedExts)) continue;
+            $filename   = time() . '_' . preg_replace('/[^a-zA-Z0-9._-]/', '_', $file['name']);
+            $fullPath   = $fullFolder . '/' . $filename;
+            $storedPath = $folder    . '/' . $filename;
+            if (!move_uploaded_file($file['tmp_name'], $fullPath)) continue;
+            $stmt = $pdo->prepare("INSERT INTO files (file_name, file_type, file_path, uploaded_at, file_category, landlord_id, archived) VALUES (?, ?, ?, datetime('now'), ?, ?, 0)");
+            $stmt->execute([$filename, strtoupper($ext), $storedPath, $category, $newLandlordId]);
         }
 
         header('Location: landlords.php');
@@ -167,6 +251,28 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
         ");
         $stmt->execute([$tenantId, $propertyId, $contractStart, $contractEnd, $rent, $paymentFreq]);
 
+        //Save uploaded tenant files
+        $tenantCategoryMap = [
+            'tenant_contract_file' => 'contract',
+            'tenant_id_file'       => 'id_document',
+        ];
+        $allowedExts = ['pdf','jpg','jpeg','png'];
+        $folder     = "files/tenants/$tenantId";
+        $fullFolder = __DIR__ . '/' . $folder;
+        if (!is_dir($fullFolder)) { mkdir($fullFolder, 0755, true); }
+        foreach ($tenantCategoryMap as $inputName => $category) {
+            if (!isset($_FILES[$inputName]) || $_FILES[$inputName]['error'] !== UPLOAD_ERR_OK) continue;
+            $file = $_FILES[$inputName];
+            $ext  = strtolower(pathinfo($file['name'], PATHINFO_EXTENSION));
+            if (!in_array($ext, $allowedExts)) continue;
+            $filename   = time() . '_' . preg_replace('/[^a-zA-Z0-9._-]/', '_', $file['name']);
+            $fullPath   = $fullFolder . '/' . $filename;
+            $storedPath = $folder    . '/' . $filename;
+            if (!move_uploaded_file($file['tmp_name'], $fullPath)) continue;
+            $stmt2 = $pdo->prepare("INSERT INTO files (file_name, file_type, file_path, uploaded_at, file_category, tenant_id, archived) VALUES (?, ?, ?, datetime('now'), ?, ?, 0)");
+            $stmt2->execute([$filename, strtoupper($ext), $storedPath, $category, $tenantId]);
+        }
+
         header('Location: tenants.php');
         exit();
     }
@@ -219,6 +325,30 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
             $paymentPeriod, $nextDue, 'completed'
         ]);
 
+        $newPaymentId = (int)$pdo->lastInsertId();
+
+        //Save uploaded payment files
+        $paymentCategoryMap = [
+            'payment_receipt_file' => 'payment_receipt',
+            'payment_invoice_file' => 'invoice',
+        ];
+        $allowedExts = ['pdf','jpg','jpeg','png'];
+        $folder     = "files/payments/$newPaymentId";
+        $fullFolder = __DIR__ . '/' . $folder;
+        if (!is_dir($fullFolder)) { mkdir($fullFolder, 0755, true); }
+        foreach ($paymentCategoryMap as $inputName => $category) {
+            if (!isset($_FILES[$inputName]) || $_FILES[$inputName]['error'] !== UPLOAD_ERR_OK) continue;
+            $file = $_FILES[$inputName];
+            $ext  = strtolower(pathinfo($file['name'], PATHINFO_EXTENSION));
+            if (!in_array($ext, $allowedExts)) continue;
+            $filename   = time() . '_' . preg_replace('/[^a-zA-Z0-9._-]/', '_', $file['name']);
+            $fullPath   = $fullFolder . '/' . $filename;
+            $storedPath = $folder    . '/' . $filename;
+            if (!move_uploaded_file($file['tmp_name'], $fullPath)) continue;
+            $stmtF = $pdo->prepare("INSERT INTO files (file_name, file_type, file_path, uploaded_at, file_category, tenant_id, property_id, payment_id, archived) VALUES (?, ?, ?, datetime('now'), ?, ?, ?, ?, 0)");
+            $stmtF->execute([$filename, strtoupper($ext), $storedPath, $category, $tenantId, $propertyId, $newPaymentId]);
+        }
+
         header('Location: payments.php');
         exit();
     }
@@ -261,6 +391,27 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
             throw $e;
         }
 
+        $newUserId = (int)$pdo->lastInsertId();
+
+        //Save uploaded user files
+        $userCategoryMap = ['user_id_file' => 'id_document'];
+        $allowedExts = ['pdf','jpg','jpeg','png'];
+        $folder     = "files/users/$newUserId";
+        $fullFolder = __DIR__ . '/' . $folder;
+        if (!is_dir($fullFolder)) { mkdir($fullFolder, 0755, true); }
+        foreach ($userCategoryMap as $inputName => $category) {
+            if (!isset($_FILES[$inputName]) || $_FILES[$inputName]['error'] !== UPLOAD_ERR_OK) continue;
+            $file = $_FILES[$inputName];
+            $ext  = strtolower(pathinfo($file['name'], PATHINFO_EXTENSION));
+            if (!in_array($ext, $allowedExts)) continue;
+            $filename   = time() . '_' . preg_replace('/[^a-zA-Z0-9._-]/', '_', $file['name']);
+            $fullPath   = $fullFolder . '/' . $filename;
+            $storedPath = $folder    . '/' . $filename;
+            if (!move_uploaded_file($file['tmp_name'], $fullPath)) continue;
+            $stmtF = $pdo->prepare("INSERT INTO files (file_name, file_type, file_path, uploaded_at, file_category, user_id, archived) VALUES (?, ?, ?, datetime('now'), ?, ?, 0)");
+            $stmtF->execute([$filename, strtoupper($ext), $storedPath, $category, $newUserId]);
+        }
+
         header('Location: users.php');
         exit();
     }
@@ -283,24 +434,65 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
         }
 
         $check = $pdo->prepare("
-            SELECT COUNT(*) FROM contracts
-            WHERE property_id = ?
-            AND (
-                (? <= contract_end) AND (? >= contract_start)
-            )
-        ");
-        $check->execute([$propertyId, $start, $end]);
+    SELECT 1 FROM contracts
+    WHERE property_id = ?
+    AND archived = 0
+    AND (
+        contract_start <= ?
+        AND contract_end >= ?
+    )
+");
 
-        if ($check->fetchColumn() > 0) {
-            header("Location: properties.php?contract=conflict&msg=overlap");
-            exit();
-        }
+$check->execute([
+    $propertyId,
+    $end,   // الجديد ينتهي
+    $start  // الجديد يبدأ
+]);
+
+if ($check->fetch()) {
+    header("Location: properties.php?contract=conflict");
+    exit();
+}
+
+        // Get landlord_id from property
+        $landlordStmtC = $pdo->prepare("SELECT landlord_id FROM properties WHERE property_id = ?");
+        $landlordStmtC->execute([$propertyId]);
+        $landlordIdForC = $landlordStmtC->fetchColumn();
 
         $stmt = $pdo->prepare("
-            INSERT INTO contracts (tenant_id, property_id, contract_start, contract_end, rent, frequency)
-            VALUES (?, ?, ?, ?, ?, ?)
+            INSERT INTO contracts (tenant_id, property_id, landlord_id, contract_start, contract_end, rent, frequency)
+            VALUES (?, ?, ?, ?, ?, ?, ?)
         ");
-        $stmt->execute([$tenantId, $propertyId, $start, $end, $rent, $frequency]);
+        $stmt->execute([$tenantId, $propertyId, $landlordIdForC, $start, $end, $rent, $frequency]);
+
+        $newContractRelatedId = $propertyId; 
+        
+        //Save uploaded contract files 
+        $_cCols = [];
+        foreach ($pdo->query("PRAGMA table_info(files)")->fetchAll(PDO::FETCH_ASSOC) as $_cCol) { $_cCols[] = $_cCol['name']; }
+        if (!in_array('user_id', $_cCols))    { $pdo->exec("ALTER TABLE files ADD COLUMN user_id INTEGER"); }
+        if (!in_array('payment_id', $_cCols)) { $pdo->exec("ALTER TABLE files ADD COLUMN payment_id INTEGER"); }
+
+        $contractFileMap = [
+            'contract_file'        => 'contract',
+        ];
+        $allowedExts = ['pdf','jpg','jpeg','png'];
+        $folder      = "files/properties/$propertyId";
+        $fullFolder  = __DIR__ . '/' . $folder;
+        if (!is_dir($fullFolder)) { mkdir($fullFolder, 0755, true); }
+
+        foreach ($contractFileMap as $inputName => $category) {
+            if (!isset($_FILES[$inputName]) || $_FILES[$inputName]['error'] !== UPLOAD_ERR_OK) continue;
+            $file = $_FILES[$inputName];
+            $ext  = strtolower(pathinfo($file['name'], PATHINFO_EXTENSION));
+            if (!in_array($ext, $allowedExts)) continue;
+            $filename   = time() . '_' . preg_replace('/[^a-zA-Z0-9._-]/', '_', $file['name']);
+            $fullPath   = $fullFolder . '/' . $filename;
+            $storedPath = $folder    . '/' . $filename;
+            if (!move_uploaded_file($file['tmp_name'], $fullPath)) continue;
+            $stmtCF = $pdo->prepare("INSERT INTO files (file_name, file_type, file_path, uploaded_at, file_category, property_id, tenant_id, landlord_id, archived) VALUES (?, ?, ?, datetime('now'), ?, ?, ?, ?, 0)");
+            $stmtCF->execute([$filename, strtoupper($ext), $storedPath, $category, $propertyId, $tenantId, $landlordIdForC]);
+        }
 
         header('Location: properties.php');
         exit();
@@ -330,7 +522,7 @@ try {
                 <i class="fa-solid fa-xmark"></i>
             </button>
         </div>
-        <form id="addPropertyForm" class="modal-body" method="POST" action="modals.php">
+        <form id="addPropertyForm" class="modal-body" method="POST" action="modals.php" enctype="multipart/form-data">
             <div class="modal-form-grid">
                 <div class="form-group">
                     <label>Property Address <span class="required">*</span></label>
@@ -376,17 +568,93 @@ try {
                     <label>EPC Due Date <span class="required">*</span></label>
                     <input type="date" name="epc_due_date" class="form-control" required>
                 </div>
-                <div class="form-group">
-                    <label>Upload Files</label>
-                    <input type="file" id="propertyFileInput" name="property_files[]" class="file-input" multiple
-                        accept=".pdf,.jpg,.jpeg,.png">
-                    <div class="file-upload-group" onclick="document.getElementById('propertyFileInput').click()">
-                        <i class="fa-solid fa-cloud-arrow-up"></i>
-                        <p>Upload Property Files</p>
+
+                <!--Document uploads -->
+                <div class="form-group form-group--full">
+                    <label style="font-weight:600; color:#1a365d; font-size:13px; margin-bottom:10px; display:block;">
+                        <i class="fa-solid fa-folder-open" style="margin-right:6px;"></i>Property Documents <span
+                            style="color:#a0aec0; font-weight:400;">(optional — only PDF, JPG, PNG)</span>
+                    </label>
+                    <div class="doc-upload-grid">
+
+
+                        <!-- Gas -->
+                        <div class="doc-slot" id="slot-gas">
+                            <input type="file" name="gas_file" id="inp-gas" class="doc-file-input"
+                                accept=".pdf,.jpg,.jpeg,.png" onchange="previewDocSlot('gas', this)">
+                            <div class="doc-slot-inner" onclick="document.getElementById('inp-gas').click()">
+                                <i class="fa-solid fa-fire-flame-curved doc-slot-icon" style="color:#e53e3e;"></i>
+                                <span class="doc-slot-label">Gas Safety Certificate</span>
+                                <span class="doc-slot-hint">Click to upload</span>
+                            </div>
+                            <div class="doc-slot-preview" id="prev-gas" style="display:none;">
+                                <i class="fa-solid fa-file-pdf"></i>
+                                <span class="doc-prev-name" id="prevname-gas"></span>
+                                <button type="button" class="doc-remove-btn" onclick="clearDocSlot('gas')">
+                                    <i class="fa-solid fa-times"></i>
+                                </button>
+                            </div>
+                        </div>
+
+                        <!-- Electrical-->
+                        <div class="doc-slot" id="slot-electric">
+                            <input type="file" name="electric_file" id="inp-electric" class="doc-file-input"
+                                accept=".pdf,.jpg,.jpeg,.png" onchange="previewDocSlot('electric', this)">
+                            <div class="doc-slot-inner" onclick="document.getElementById('inp-electric').click()">
+                                <i class="fa-solid fa-bolt doc-slot-icon" style="color:#d69e2e;"></i>
+                                <span class="doc-slot-label">Electrical Certificate</span>
+                                <span class="doc-slot-hint">Click to upload</span>
+                            </div>
+                            <div class="doc-slot-preview" id="prev-electric" style="display:none;">
+                                <i class="fa-solid fa-file-pdf"></i>
+                                <span class="doc-prev-name" id="prevname-electric"></span>
+                                <button type="button" class="doc-remove-btn" onclick="clearDocSlot('electric')">
+                                    <i class="fa-solid fa-times"></i>
+                                </button>
+                            </div>
+                        </div>
+
+                        <!-- EPC -->
+                        <div class="doc-slot" id="slot-epc">
+                            <input type="file" name="epc_file" id="inp-epc" class="doc-file-input"
+                                accept=".pdf,.jpg,.jpeg,.png" onchange="previewDocSlot('epc', this)">
+                            <div class="doc-slot-inner" onclick="document.getElementById('inp-epc').click()">
+                                <i class="fa-solid fa-leaf doc-slot-icon" style="color:#38a169;"></i>
+                                <span class="doc-slot-label">EPC Certificate</span>
+                                <span class="doc-slot-hint">Click to upload</span>
+                            </div>
+                            <div class="doc-slot-preview" id="prev-epc" style="display:none;">
+                                <i class="fa-solid fa-file-pdf"></i>
+                                <span class="doc-prev-name" id="prevname-epc"></span>
+                                <button type="button" class="doc-remove-btn" onclick="clearDocSlot('epc')">
+                                    <i class="fa-solid fa-times"></i>
+                                </button>
+                            </div>
+                        </div>
+
+                        <!-- Ownership Proof -->
+                        <div class="doc-slot" id="slot-ownership-proof">
+                            <input type="file" name="ownership_proof_file" id="inp-ownership-proof"
+                                class="doc-file-input" accept=".pdf,.jpg,.jpeg,.png"
+                                onchange="previewDocSlot('ownership-proof', this)">
+                            <div class="doc-slot-inner"
+                                onclick="document.getElementById('inp-ownership-proof').click()">
+                                <i class="fa-solid fa-file-shield doc-slot-icon" style="color:#805ad5;"></i>
+                                <span class="doc-slot-label">Ownership Proof</span>
+                                <span class="doc-slot-hint">Click to upload</span>
+                            </div>
+                            <div class="doc-slot-preview" id="prev-ownership-proof" style="display:none;">
+                                <i class="fa-solid fa-file-pdf"></i>
+                                <span class="doc-prev-name" id="prevname-ownership-proof"></span>
+                                <button type="button" class="doc-remove-btn" onclick="clearDocSlot('ownership-proof')">
+                                    <i class="fa-solid fa-times"></i>
+                                </button>
+                            </div>
+                        </div>
+
                     </div>
-                    <div id="propertyFileCount" class="file-count"></div>
-                    <div id="propertyFileList"></div>
                 </div>
+
             </div>
             <div class="modal-footer">
                 <button type="button" class="modal-btn modal-btn-reset" onclick="resetAddPropertyForm()">
@@ -412,7 +680,7 @@ try {
                 <i class="fa-solid fa-xmark"></i>
             </button>
         </div>
-        <form id="addLandlordForm" class="modal-body" method="POST" action="modals.php">
+        <form id="addLandlordForm" class="modal-body" method="POST" action="modals.php" enctype="multipart/form-data">
             <div class="modal-form-grid">
                 <div class="form-group">
                     <label>Full Name <span class="required">*</span></label>
@@ -452,16 +720,32 @@ try {
                     <label>ID Expiry Date <span class="required">*</span></label>
                     <input type="date" name="landlord_id_expiry" class="form-control" required>
                 </div>
-                <div class="form-group">
-                    <label>Upload Files</label>
-                    <input type="file" id="landlordFileInput" name="landlord_files[]" class="file-input" multiple
-                        accept=".pdf,.jpg,.jpeg,.png">
-                    <div class="file-upload-group" onclick="document.getElementById('landlordFileInput').click()">
-                        <i class="fa-solid fa-cloud-arrow-up"></i>
-                        <p>Upload landlord Files</p>
+                <div class="form-group form-group--full">
+                    <label style="font-weight:600; color:#1a365d; font-size:13px; margin-bottom:10px; display:block;">
+                        <i class="fa-solid fa-folder-open" style="margin-right:6px;"></i>Landlord Documents <span
+                            style="color:#a0aec0; font-weight:400;">(optional — only PDF, JPG, PNG)</span>
+                    </label>
+                    <div class="doc-upload-grid">
+
+                        <!-- Copy of ID / Passport -->
+                        <div class="doc-slot" id="slot-landlord-id">
+                            <input type="file" name="landlord_id_file" id="inp-landlord-id" class="doc-file-input"
+                                accept=".pdf,.jpg,.jpeg,.png" onchange="previewDocSlot('landlord-id', this)">
+                            <div class="doc-slot-inner" onclick="document.getElementById('inp-landlord-id').click()">
+                                <i class="fa-solid fa-id-card doc-slot-icon" style="color:#3182ce;"></i>
+                                <span class="doc-slot-label">Copy of ID / Passport</span>
+                                <span class="doc-slot-hint">Click to upload</span>
+                            </div>
+                            <div class="doc-slot-preview" id="prev-landlord-id" style="display:none;">
+                                <i class="fa-solid fa-file-pdf"></i>
+                                <span class="doc-prev-name" id="prevname-landlord-id"></span>
+                                <button type="button" class="doc-remove-btn" onclick="clearDocSlot('landlord-id')">
+                                    <i class="fa-solid fa-times"></i>
+                                </button>
+                            </div>
+                        </div>
+
                     </div>
-                    <div id="landlordFileCount" class="file-count"></div>
-                    <div id="landlordFileList"></div>
                 </div>
             </div>
             <div class="modal-footer">
@@ -488,7 +772,7 @@ try {
                 <i class="fa-solid fa-xmark"></i>
             </button>
         </div>
-        <form id="addTenantForm" class="modal-body" method="POST" action="modals.php">
+        <form id="addTenantForm" class="modal-body" method="POST" action="modals.php" enctype="multipart/form-data">
             <div class="modal-form-grid">
                 <div class="form-group">
                     <label>Property <span class="required">*</span></label>
@@ -557,16 +841,52 @@ try {
                         <option value="monthly">Monthly</option>
                     </select>
                 </div>
-                <div class="form-group">
-                    <label>Upload Files</label>
-                    <input type="file" id="tenantFileInput" name="tenant_files[]" class="file-input" multiple
-                        accept=".pdf,.jpg,.jpeg,.png">
-                    <div class="file-upload-group" onclick="document.getElementById('tenantFileInput').click()">
-                        <i class="fa-solid fa-cloud-arrow-up"></i>
-                        <p>Upload tenant Files</p>
+                <div class="form-group form-group--full">
+                    <label style="font-weight:600; color:#1a365d; font-size:13px; margin-bottom:10px; display:block;">
+                        <i class="fa-solid fa-folder-open" style="margin-right:6px;"></i>Tenant Documents <span
+                            style="color:#a0aec0; font-weight:400;">(optional — only PDF, JPG, PNG)</span>
+                    </label>
+                    <div class="doc-upload-grid">
+
+                        <!-- Tenancy Contract -->
+                        <div class="doc-slot" id="slot-tenant-contract">
+                            <input type="file" name="tenant_contract_file" id="inp-tenant-contract"
+                                class="doc-file-input" accept=".pdf,.jpg,.jpeg,.png"
+                                onchange="previewDocSlot('tenant-contract', this)">
+                            <div class="doc-slot-inner"
+                                onclick="document.getElementById('inp-tenant-contract').click()">
+                                <i class="fa-solid fa-file-contract doc-slot-icon"></i>
+                                <span class="doc-slot-label">Tenancy Contract</span>
+                                <span class="doc-slot-hint">Click to upload</span>
+                            </div>
+                            <div class="doc-slot-preview" id="prev-tenant-contract" style="display:none;">
+                                <i class="fa-solid fa-file-pdf"></i>
+                                <span class="doc-prev-name" id="prevname-tenant-contract"></span>
+                                <button type="button" class="doc-remove-btn" onclick="clearDocSlot('tenant-contract')">
+                                    <i class="fa-solid fa-times"></i>
+                                </button>
+                            </div>
+                        </div>
+
+                        <!-- Copy of ID / Passport -->
+                        <div class="doc-slot" id="slot-tenant-id">
+                            <input type="file" name="tenant_id_file" id="inp-tenant-id" class="doc-file-input"
+                                accept=".pdf,.jpg,.jpeg,.png" onchange="previewDocSlot('tenant-id', this)">
+                            <div class="doc-slot-inner" onclick="document.getElementById('inp-tenant-id').click()">
+                                <i class="fa-solid fa-id-card doc-slot-icon" style="color:#3182ce;"></i>
+                                <span class="doc-slot-label">Copy of ID / Passport</span>
+                                <span class="doc-slot-hint">Click to upload</span>
+                            </div>
+                            <div class="doc-slot-preview" id="prev-tenant-id" style="display:none;">
+                                <i class="fa-solid fa-file-pdf"></i>
+                                <span class="doc-prev-name" id="prevname-tenant-id"></span>
+                                <button type="button" class="doc-remove-btn" onclick="clearDocSlot('tenant-id')">
+                                    <i class="fa-solid fa-times"></i>
+                                </button>
+                            </div>
+                        </div>
+
                     </div>
-                    <div id="tenantFileCount" class="file-count"></div>
-                    <div id="tenantFileList"></div>
                 </div>
             </div>
             <div class="modal-footer">
@@ -784,16 +1104,54 @@ try {
                     <label>Payment Time <span class="required">*</span></label>
                     <input type="time" name="payment_time" class="form-control" required>
                 </div>
-                <div class="form-group">
-                    <label>Upload Files</label>
-                    <input type="file" id="paymentFileInput" name="payment_files[]" class="file-input" multiple
-                        accept=".pdf,.jpg,.jpeg,.png">
-                    <div class="file-upload-group" onclick="document.getElementById('paymentFileInput').click()">
-                        <i class="fa-solid fa-cloud-arrow-up"></i>
-                        <p>Upload Payment Proof & other files</p>
+                <div class="form-group form-group--full">
+                    <label style="font-weight:600; color:#1a365d; font-size:13px; margin-bottom:10px; display:block;">
+                        <i class="fa-solid fa-folder-open" style="margin-right:6px;"></i>Payment Documents <span
+                            style="color:#a0aec0; font-weight:400;">(optional — only PDF, JPG, PNG)</span>
+                    </label>
+                    <div class="doc-upload-grid">
+
+                        <!-- Payment Receipt -->
+                        <div class="doc-slot" id="slot-payment-receipt">
+                            <input type="file" name="payment_receipt_file" id="inp-payment-receipt"
+                                class="doc-file-input" accept=".pdf,.jpg,.jpeg,.png"
+                                onchange="previewDocSlot('payment-receipt', this)">
+                            <div class="doc-slot-inner"
+                                onclick="document.getElementById('inp-payment-receipt').click()">
+                                <i class="fa-solid fa-receipt doc-slot-icon" style="color:#38a169;"></i>
+                                <span class="doc-slot-label">Payment Receipt</span>
+                                <span class="doc-slot-hint">Click to upload</span>
+                            </div>
+                            <div class="doc-slot-preview" id="prev-payment-receipt" style="display:none;">
+                                <i class="fa-solid fa-file-pdf"></i>
+                                <span class="doc-prev-name" id="prevname-payment-receipt"></span>
+                                <button type="button" class="doc-remove-btn" onclick="clearDocSlot('payment-receipt')">
+                                    <i class="fa-solid fa-times"></i>
+                                </button>
+                            </div>
+                        </div>
+
+                        <!-- Invoice -->
+                        <div class="doc-slot" id="slot-payment-invoice">
+                            <input type="file" name="payment_invoice_file" id="inp-payment-invoice"
+                                class="doc-file-input" accept=".pdf,.jpg,.jpeg,.png"
+                                onchange="previewDocSlot('payment-invoice', this)">
+                            <div class="doc-slot-inner"
+                                onclick="document.getElementById('inp-payment-invoice').click()">
+                                <i class="fa-solid fa-file-invoice doc-slot-icon" style="color:#d69e2e;"></i>
+                                <span class="doc-slot-label">Invoice</span>
+                                <span class="doc-slot-hint">Click to upload</span>
+                            </div>
+                            <div class="doc-slot-preview" id="prev-payment-invoice" style="display:none;">
+                                <i class="fa-solid fa-file-pdf"></i>
+                                <span class="doc-prev-name" id="prevname-payment-invoice"></span>
+                                <button type="button" class="doc-remove-btn" onclick="clearDocSlot('payment-invoice')">
+                                    <i class="fa-solid fa-times"></i>
+                                </button>
+                            </div>
+                        </div>
+
                     </div>
-                    <div id="paymentFileCount" class="file-count"></div>
-                    <div id="paymentFileList"></div>
                 </div>
             </div>
             <div class="modal-footer">
@@ -877,16 +1235,34 @@ try {
                     <label>Contract End Date <span class="required">*</span></label>
                     <input type="date" name="contract_end" class="form-control" required>
                 </div>
-                <div class="form-group">
-                    <label>Upload Files</label>
-                    <input type="file" id="contractFileInput" name="contract_files[]" class="file-input" multiple
-                        accept=".pdf,.jpg,.jpeg,.png">
-                    <div class="file-upload-group" onclick="document.getElementById('contractFileInput').click()">
-                        <i class="fa-solid fa-cloud-arrow-up"></i>
-                        <p>Upload Contract & other files</p>
+                <!-- Document uploads -->
+                <div class="form-group form-group--full">
+                    <label style="font-weight:600; color:#1a365d; font-size:13px; margin-bottom:10px; display:block;">
+                        <i class="fa-solid fa-folder-open" style="margin-right:6px;"></i>Contract Documents
+                        <span style="color:#a0aec0; font-weight:400;">(optional — only PDF, JPG, PNG)</span>
+                    </label>
+                    <div class="doc-upload-grid">
+
+                        <!-- Tenancy Contract -->
+                        <div class="doc-slot" id="slot-contract-file">
+                            <input type="file" name="contract_file" id="inp-contract-file" class="doc-file-input"
+                                accept=".pdf,.jpg,.jpeg,.png" onchange="previewDocSlot('contract-file', this)">
+                            <div class="doc-slot-inner" onclick="document.getElementById('inp-contract-file').click()">
+                                <i class="fa-solid fa-file-contract doc-slot-icon"></i>
+                                <span class="doc-slot-label">Tenancy Contract</span>
+                                <span class="doc-slot-hint">Click to upload</span>
+                            </div>
+                            <div class="doc-slot-preview" id="prev-contract-file" style="display:none;">
+                                <i class="fa-solid fa-file-pdf"></i>
+                                <span class="doc-prev-name" id="prevname-contract-file"></span>
+                                <button type="button" class="doc-remove-btn" onclick="clearDocSlot('contract-file')">
+                                    <i class="fa-solid fa-times"></i>
+                                </button>
+                            </div>
+                        </div>
+
+
                     </div>
-                    <div id="contractFileCount" class="file-count"></div>
-                    <div id="contractFileList"></div>
                 </div>
             </div>
             <div class="modal-footer">
@@ -913,7 +1289,7 @@ try {
                 <i class="fa-solid fa-xmark"></i>
             </button>
         </div>
-        <form id="addUserForm" class="modal-body" method="POST" action="modals.php">
+        <form id="addUserForm" class="modal-body" method="POST" action="modals.php" enctype="multipart/form-data">
             <div class="modal-form-grid">
                 <div class="form-group">
                     <label>Username <span class="required">*</span></label>
@@ -956,16 +1332,32 @@ try {
                     <input type="password" name="user_password" class="form-control" placeholder="Enter Password"
                         required>
                 </div>
-                <div class="form-group">
-                    <label>Upload Files</label>
-                    <input type="file" id="userFileInput" name="user_files[]" class="file-input" multiple
-                        accept=".pdf,.jpg,.jpeg,.png">
-                    <div class="file-upload-group" onclick="document.getElementById('userFileInput').click()">
-                        <i class="fa-solid fa-cloud-arrow-up"></i>
-                        <p>Upload user Files</p>
+                <div class="form-group form-group--full">
+                    <label style="font-weight:600; color:#1a365d; font-size:13px; margin-bottom:10px; display:block;">
+                        <i class="fa-solid fa-folder-open" style="margin-right:6px;"></i>User Documents <span
+                            style="color:#a0aec0; font-weight:400;">(optional — only PDF, JPG, PNG)</span>
+                    </label>
+                    <div class="doc-upload-grid">
+
+                        <!-- Copy of ID / Passport -->
+                        <div class="doc-slot" id="slot-user-id">
+                            <input type="file" name="user_id_file" id="inp-user-id" class="doc-file-input"
+                                accept=".pdf,.jpg,.jpeg,.png" onchange="previewDocSlot('user-id', this)">
+                            <div class="doc-slot-inner" onclick="document.getElementById('inp-user-id').click()">
+                                <i class="fa-solid fa-id-card doc-slot-icon" style="color:#3182ce;"></i>
+                                <span class="doc-slot-label">Copy of ID / Passport</span>
+                                <span class="doc-slot-hint">Click to upload</span>
+                            </div>
+                            <div class="doc-slot-preview" id="prev-user-id" style="display:none;">
+                                <i class="fa-solid fa-file-pdf"></i>
+                                <span class="doc-prev-name" id="prevname-user-id"></span>
+                                <button type="button" class="doc-remove-btn" onclick="clearDocSlot('user-id')">
+                                    <i class="fa-solid fa-times"></i>
+                                </button>
+                            </div>
+                        </div>
+
                     </div>
-                    <div id="userFileCount" class="file-count"></div>
-                    <div id="userFileList"></div>
                 </div>
             </div>
             <div class="modal-footer">

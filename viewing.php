@@ -221,7 +221,7 @@ $viewings = $stmt->fetchAll(PDO::FETCH_ASSOC);
                                 data-council="<?= htmlspecialchars($v['council_band'] ?? '') ?>"
                                 data-agent="<?= htmlspecialchars($v['agent_name'] ?? '') ?>"
                                 data-property="<?= htmlspecialchars($v['property_address'] ?? '') ?>">
-                                <td class="viewer-name"><?= htmlspecialchars($v['viewer_name']) ?></td>
+                                <td class="tenant-name"><?= htmlspecialchars($v['viewer_name']) ?></td>
                                 <td><?= htmlspecialchars($v['viewer_phone']) ?></td>
                                 <td class="viewer-email"><?= htmlspecialchars($v['email']) ?></td>
                                 <td class="viewing-property"><?= htmlspecialchars($v['property_address'] ?? '') ?>
@@ -240,7 +240,8 @@ $viewings = $stmt->fetchAll(PDO::FETCH_ASSOC);
                                             <i class="far fa-sticky-note"></i>
                                         </button> -->
 
-                                        <button class="action-btn action-btn-view" title="View" onclick="actionbtn.viewViewing(this)">
+                                        <button class="action-btn action-btn-view" title="View"
+                                            onclick="actionbtn.viewViewing(this)">
                                             <i class="fa-solid fa-eye"></i>
                                         </button>
 

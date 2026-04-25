@@ -375,77 +375,438 @@ window.actionbtn = (() => {
     ],
 
     viewing: [
-      { id: 'v-viewing-id',           key: '_id',           type: 'text',   tab: 'viewing', editable: false },
-      { id: 'v-viewing-propertyid',   key: 'property_id',   type: 'text',   tab: 'viewing', editable: false },
-      { id: 'v-viewing-viewer',       key: 'viewer_name',   type: 'text',   tab: 'viewing', editable: true },
-      { id: 'v-viewing-phone',        key: 'viewer_phone',  type: 'text',   tab: 'viewing', editable: true },
-      { id: 'v-viewing-status',       key: 'status',        type: 'select', tab: 'viewing', editable: true, options: ['scheduled', 'completed', 'cancelled', 'no_show'] },
-      { id: 'v-viewing-datetime',     key: 'date_time',     type: 'datetime', tab: 'viewing', editable: true },
-      { id: 'v-viewing-agent',       key: 'agent_name',       type: 'text',   tab: 'viewing', editable: false },
-      { id: 'v-viewing-email',        key: 'email',         type: 'text',   tab: 'viewing', editable: true },
-      { id: 'v-viewing-property',      key: 'property_address', type: 'text',   tab: 'viewing', editable: false },
+      {
+        id: "v-viewing-id",
+        key: "_id",
+        type: "text",
+        tab: "viewing",
+        editable: false,
+      },
+      {
+        id: "v-viewing-propertyid",
+        key: "property_id",
+        type: "text",
+        tab: "viewing",
+        editable: false,
+      },
+      {
+        id: "v-viewing-viewer",
+        key: "viewer_name",
+        type: "text",
+        tab: "viewing",
+        editable: true,
+      },
+      {
+        id: "v-viewing-phone",
+        key: "viewer_phone",
+        type: "text",
+        tab: "viewing",
+        editable: true,
+      },
+      {
+        id: "v-viewing-status",
+        key: "status",
+        type: "select",
+        tab: "viewing",
+        editable: true,
+        options: ["scheduled", "completed", "cancelled", "no_show"],
+      },
+      {
+        id: "v-viewing-datetime",
+        key: "date_time",
+        type: "datetime",
+        tab: "viewing",
+        editable: true,
+      },
+      {
+        id: "v-viewing-agent",
+        key: "agent_name",
+        type: "text",
+        tab: "viewing",
+        editable: false,
+      },
+      {
+        id: "v-viewing-email",
+        key: "email",
+        type: "text",
+        tab: "viewing",
+        editable: true,
+      },
+      {
+        id: "v-viewing-property",
+        key: "property_address",
+        type: "text",
+        tab: "viewing",
+        editable: false,
+      },
 
-      { id: 'v-property-landlord',    key: 'landlord',      type: 'text',   tab: 'property', editable: false },
-      { id: 'v-property-type',        key: 'type',          type: 'text',   tab: 'property', editable: false },
-      { id: 'v-property-status',      key: 'property_status', type: 'badge', tab: 'property', editable: false },
-      { id: 'v-property-price',       key: 'price',         type: 'number', tab: 'property', editable: false },
-      { id: 'v-property-tenant',      key: 'tenant',        type: 'text',   tab: 'property', editable: false },
-      { id: 'v-property-rooms',       key: 'rooms',         type: 'number', tab: 'property', editable: false },
-      { id: 'v-property-bathrooms',   key: 'bathrooms',     type: 'number', tab: 'property', editable: false },
-      { id: 'v-property-epc',         key: 'epc',           type: 'text',   tab: 'property', editable: false },
-      { id: 'v-property-pets',        key: 'pets',          type: 'text',   tab: 'property', editable: false },
-      { id: 'v-property-garden',      key: 'garden',        type: 'text',   tab: 'property', editable: false },
-      { id: 'v-property-council',     key: 'council',       type: 'text',   tab: 'property', editable: false },
+      {
+        id: "v-property-landlord",
+        key: "landlord",
+        type: "text",
+        tab: "property",
+        editable: false,
+      },
+      {
+        id: "v-property-type",
+        key: "type",
+        type: "text",
+        tab: "property",
+        editable: false,
+      },
+      {
+        id: "v-property-status",
+        key: "property_status",
+        type: "badge",
+        tab: "property",
+        editable: false,
+      },
+      {
+        id: "v-property-price",
+        key: "price",
+        type: "number",
+        tab: "property",
+        editable: false,
+      },
+      {
+        id: "v-property-tenant",
+        key: "tenant",
+        type: "text",
+        tab: "property",
+        editable: false,
+      },
+      {
+        id: "v-property-rooms",
+        key: "rooms",
+        type: "number",
+        tab: "property",
+        editable: false,
+      },
+      {
+        id: "v-property-bathrooms",
+        key: "bathrooms",
+        type: "number",
+        tab: "property",
+        editable: false,
+      },
+      {
+        id: "v-property-epc",
+        key: "epc",
+        type: "text",
+        tab: "property",
+        editable: false,
+      },
+      {
+        id: "v-property-pets",
+        key: "pets",
+        type: "text",
+        tab: "property",
+        editable: false,
+      },
+      {
+        id: "v-property-garden",
+        key: "garden",
+        type: "text",
+        tab: "property",
+        editable: false,
+      },
+      {
+        id: "v-property-council",
+        key: "council",
+        type: "text",
+        tab: "property",
+        editable: false,
+      },
     ],
 
     user: [
-      { id: 'u-user-username',          key: 'username',            type: 'text',   tab: 'user',  editable: false },
-      { id: 'u-user-name',              key: 'name',                type: 'text',   tab: 'user',  editable: true },
-      { id: 'u-user-phone',             key: 'phone',               type: 'text',   tab: 'user',  editable: true },
-      { id: 'u-user-email',             key: 'email',               type: 'text',   tab: 'user',  editable: true },
-      { id: 'u-user-password',          key: 'password',            type: 'text',   tab: 'user',  editable: true },
-      { id: 'u-user-passwordresetdate', key: 'password_reset_date', type: 'date',   tab: 'user',  editable: false },
-      { id: 'u-user-role',              key: 'role',                type: 'select', tab: 'user',  editable: true, options: ['admin', 'agent', 'read_only'] },
-      { id: 'u-user-archived',          key: 'archived',            type: 'select', tab: 'user',  editable: true, options: ['0', '1'] },
-      { id: 'u-user-datearchived',      key: 'date_archived',       type: 'date',   tab: 'user',  editable: false },
+      {
+        id: "u-user-username",
+        key: "username",
+        type: "text",
+        tab: "user",
+        editable: false,
+      },
+      {
+        id: "u-user-name",
+        key: "name",
+        type: "text",
+        tab: "user",
+        editable: true,
+      },
+      {
+        id: "u-user-phone",
+        key: "phone",
+        type: "text",
+        tab: "user",
+        editable: true,
+      },
+      {
+        id: "u-user-email",
+        key: "email",
+        type: "text",
+        tab: "user",
+        editable: true,
+      },
+      {
+        id: "u-user-password",
+        key: "password",
+        type: "text",
+        tab: "user",
+        editable: true,
+      },
+      {
+        id: "u-user-passwordresetdate",
+        key: "password_reset_date",
+        type: "date",
+        tab: "user",
+        editable: false,
+      },
+      {
+        id: "u-user-role",
+        key: "role",
+        type: "select",
+        tab: "user",
+        editable: true,
+        options: ["admin", "agent", "read_only"],
+      },
+      {
+        id: "u-user-archived",
+        key: "archived",
+        type: "select",
+        tab: "user",
+        editable: true,
+        options: ["0", "1"],
+      },
+      {
+        id: "u-user-datearchived",
+        key: "date_archived",
+        type: "date",
+        tab: "user",
+        editable: false,
+      },
 
-      { id: 'u-user-IdNumber',          key: 'id_number',           type: 'text',   tab: 'files', editable: true },
-      { id: 'u-user-Idexpirydate',      key: 'id_expiry_date',      type: 'date',   tab: 'files', editable: true },
+      {
+        id: "u-user-IdNumber",
+        key: "id_number",
+        type: "text",
+        tab: "files",
+        editable: true,
+      },
+      {
+        id: "u-user-Idexpirydate",
+        key: "id_expiry_date",
+        type: "date",
+        tab: "files",
+        editable: true,
+      },
     ],
 
     importantdate: [
-      { id: 'i-date-landlord-id',    key: 'landlordIdExpiry', type: 'date',    tab: 'dates',     editable: true,  fallback: 'No Record' },
-      { id: 'i-date-tenant-id',      key: 'tenantIdExpiry',   type: 'date',    tab: 'dates',     editable: true,  fallback: 'No Record' },
-      { id: 'i-date-contract-end',   key: 'endDate',          type: 'date',    tab: 'dates',     editable: false, fallback: 'No Record' },
-      { id: 'i-date-gas',            key: 'gasDate',          type: 'date',    tab: 'dates',     editable: true,  fallback: 'No Record' },
-      { id: 'i-date-electric',       key: 'electricDate',     type: 'date',    tab: 'dates',     editable: true,  fallback: 'No Record' },
-      { id: 'i-date-epc',            key: 'epcDate',          type: 'date',    tab: 'dates',     editable: true,  fallback: 'No Record' },
+      {
+        id: "i-date-landlord-id",
+        key: "landlordIdExpiry",
+        type: "date",
+        tab: "dates",
+        editable: true,
+        fallback: "No Record",
+      },
+      {
+        id: "i-date-tenant-id",
+        key: "tenantIdExpiry",
+        type: "date",
+        tab: "dates",
+        editable: true,
+        fallback: "No Record",
+      },
+      {
+        id: "i-date-contract-end",
+        key: "endDate",
+        type: "date",
+        tab: "dates",
+        editable: false,
+        fallback: "No Record",
+      },
+      {
+        id: "i-date-gas",
+        key: "gasDate",
+        type: "date",
+        tab: "dates",
+        editable: true,
+        fallback: "No Record",
+      },
+      {
+        id: "i-date-electric",
+        key: "electricDate",
+        type: "date",
+        tab: "dates",
+        editable: true,
+        fallback: "No Record",
+      },
+      {
+        id: "i-date-epc",
+        key: "epcDate",
+        type: "date",
+        tab: "dates",
+        editable: true,
+        fallback: "No Record",
+      },
 
-      { id: 'i-property-landlord',   key: 'landlord',        type: 'text',     tab: 'property',  editable: true,  fallback: 'No Record'   },
-      { id: 'i-property-status',     key: 'status',          type: 'badge',    tab: 'property',  editable: false,  fallback: 'No Record'  },
-      { id: 'i-property-price',      key: 'price',           type: 'number',   tab: 'property',  editable: true,  prefix: '£', format: 'currency',  fallback: 'No Record'  },
-      { id: 'i-property-type',       key: 'type',            type: 'select',   tab: 'property',  editable: true,  options: ['Flat','House','Apartment','Bungalow'],  fallback: 'No Record'  },
-      { id: 'i-property-tenant',     key: 'tenant',          type: 'text',     tab: 'property',  editable: false, fallback: 'No Tenant' },
-      { id: 'i-property-rooms',      key: 'rooms',           type: 'number',   tab: 'property',  editable: true,  fallback: 'No Record' },
-      { id: 'i-property-bathrooms',  key: 'bathrooms',       type: 'number',   tab: 'property',  editable: true,  fallback: 'No Record' },
-      { id: 'i-property-epc',        key: 'epc',             type: 'text',     tab: 'property',  editable: true,  fallback: 'No Record' },
-      { id: 'i-property-pets',       key: 'pets',            type: 'select',   tab: 'property',  editable: true,  options: ['Yes','No'] },
-      { id: 'i-property-garden',     key: 'garden',          type: 'select',   tab: 'property',  editable: true,  options: ['Yes','No'] },
-      { id: 'i-property-council',    key: 'council',         type: 'text',     tab: 'property',  editable: true,  fallback: 'No Record' },
+      {
+        id: "i-property-landlord",
+        key: "landlord",
+        type: "text",
+        tab: "property",
+        editable: true,
+        fallback: "No Record",
+      },
+      {
+        id: "i-property-status",
+        key: "status",
+        type: "badge",
+        tab: "property",
+        editable: false,
+        fallback: "No Record",
+      },
+      {
+        id: "i-property-price",
+        key: "price",
+        type: "number",
+        tab: "property",
+        editable: true,
+        prefix: "£",
+        format: "currency",
+        fallback: "No Record",
+      },
+      {
+        id: "i-property-type",
+        key: "type",
+        type: "select",
+        tab: "property",
+        editable: true,
+        options: ["Flat", "House", "Apartment", "Bungalow"],
+        fallback: "No Record",
+      },
+      {
+        id: "i-property-tenant",
+        key: "tenant",
+        type: "text",
+        tab: "property",
+        editable: false,
+        fallback: "No Tenant",
+      },
+      {
+        id: "i-property-rooms",
+        key: "rooms",
+        type: "number",
+        tab: "property",
+        editable: true,
+        fallback: "No Record",
+      },
+      {
+        id: "i-property-bathrooms",
+        key: "bathrooms",
+        type: "number",
+        tab: "property",
+        editable: true,
+        fallback: "No Record",
+      },
+      {
+        id: "i-property-epc",
+        key: "epc",
+        type: "text",
+        tab: "property",
+        editable: true,
+        fallback: "No Record",
+      },
+      {
+        id: "i-property-pets",
+        key: "pets",
+        type: "select",
+        tab: "property",
+        editable: true,
+        options: ["Yes", "No"],
+      },
+      {
+        id: "i-property-garden",
+        key: "garden",
+        type: "select",
+        tab: "property",
+        editable: true,
+        options: ["Yes", "No"],
+      },
+      {
+        id: "i-property-council",
+        key: "council",
+        type: "text",
+        tab: "property",
+        editable: true,
+        fallback: "No Record",
+      },
     ],
-   
+
     payment: [
-  { id: 'pay-payment-tenant',   key: 'tenant',   type: 'text',     tab: 'payment', editable: false, fallback: 'No Record' },
-  { id: 'pay-payment-property', key: 'property', type: 'text',     tab: 'payment', editable: false, fallback: 'No Record' },
-  { id: 'pay-payment-amount',   key: 'amount',   type: 'number',   tab: 'payment', editable: true,  prefix: '£', format: 'currency', fallback: 'No Record' },
-  { id: 'pay-payment-datetime', key: 'datetime', type: 'datetime', tab: 'payment', editable: true,  fallback: 'No Record' },
-  { id: 'pay-payment-period',   key: 'period',   type: 'text',     tab: 'payment', editable: true,  fallback: 'No Record' },
-  { id: 'pay-payment-nextdue',  key: 'nextdue',  type: 'date',     tab: 'payment', editable: true,  fallback: 'No Record' },
-  { id: 'pay-payment-status',   key: 'dbStatus', type: 'select',   tab: 'payment', editable: true,  options: ['completed', 'pending', 'not complete'], fallback: 'No Record' },
-],
-
+      {
+        id: "pay-payment-tenant",
+        key: "tenant",
+        type: "text",
+        tab: "payment",
+        editable: false,
+        fallback: "No Record",
+      },
+      {
+        id: "pay-payment-property",
+        key: "property",
+        type: "text",
+        tab: "payment",
+        editable: false,
+        fallback: "No Record",
+      },
+      {
+        id: "pay-payment-amount",
+        key: "amount",
+        type: "number",
+        tab: "payment",
+        editable: true,
+        prefix: "£",
+        format: "currency",
+        fallback: "No Record",
+      },
+      {
+        id: "pay-payment-datetime",
+        key: "datetime",
+        type: "datetime",
+        tab: "payment",
+        editable: true,
+        fallback: "No Record",
+      },
+      {
+        id: "pay-payment-period",
+        key: "period",
+        type: "text",
+        tab: "payment",
+        editable: true,
+        fallback: "No Record",
+      },
+      {
+        id: "pay-payment-nextdue",
+        key: "nextdue",
+        type: "date",
+        tab: "payment",
+        editable: true,
+        fallback: "No Record",
+      },
+      {
+        id: "pay-payment-status",
+        key: "dbStatus",
+        type: "select",
+        tab: "payment",
+        editable: true,
+        options: ["completed", "pending", "not complete"],
+        fallback: "No Record",
+      },
+    ],
   };
-
 
   const SAVE_MAP = {
     property: {
@@ -484,30 +845,29 @@ window.actionbtn = (() => {
     },
 
     viewing: {
-      _id:              'v-viewing-id',
-      property_address:     'v-viewing-property',
-      viewer_name:     'v-viewing-viewer',
-      viewer_phone:    'v-viewing-phone',
-      status:          'v-viewing-status',
-      date_time:       'v-viewing-datetime',
-      agent:         'v-viewing-agent',
-      email:           'v-viewing-email',
+      _id: "v-viewing-id",
+      property_address: "v-viewing-property",
+      viewer_name: "v-viewing-viewer",
+      viewer_phone: "v-viewing-phone",
+      status: "v-viewing-status",
+      date_time: "v-viewing-datetime",
+      agent: "v-viewing-agent",
+      email: "v-viewing-email",
     },
 
     user: {
-      username:         'u-user-username',
-      name:             'u-user-name',
-      phone:            'u-user-phone',
-      email:            'u-user-email',
-      password:         'u-user-password',
-      password_reset_date:'u-user-passwordresetdate',
-      id_number:         'u-user-IdNumber',
-      id_expiry_date:   'u-user-Idexpirydate',
-      role:             'u-user-role',
-      archived:         'u-user-archived',
-      date_archived:     'u-user-datearchived',
+      username: "u-user-username",
+      name: "u-user-name",
+      phone: "u-user-phone",
+      email: "u-user-email",
+      password: "u-user-password",
+      password_reset_date: "u-user-passwordresetdate",
+      id_number: "u-user-IdNumber",
+      id_expiry_date: "u-user-Idexpirydate",
+      role: "u-user-role",
+      archived: "u-user-archived",
+      date_archived: "u-user-datearchived",
     },
-
   };
 
   // Extract Data
@@ -589,73 +949,77 @@ window.actionbtn = (() => {
   }
 
   function extractViewingData(btn) {
-    const row = btn.closest('tr') || btn.closest('.card');
+    const row = btn.closest("tr") || btn.closest(".card");
     return {
-      _id:             row.dataset.bookingid || '',
-      viewer_name:     row.dataset.viewer || '',
-      viewer_phone:    row.dataset.phone || '',
-      status:          row.dataset.status || '',
-      date_time:       row.dataset.datetime || '',
-      email:           row.dataset.email || '',
-      agent_name:       row.dataset.agent || '',
-      property_address: row.dataset.property || '',
+      _id: row.dataset.bookingid || "",
+      viewer_name: row.dataset.viewer || "",
+      viewer_phone: row.dataset.phone || "",
+      status: row.dataset.status || "",
+      date_time: row.dataset.datetime || "",
+      email: row.dataset.email || "",
+      agent_name: row.dataset.agent || "",
+      property_address: row.dataset.property || "",
 
-
-      landlord:        row.dataset.landlord || '',
-      type:            row.dataset.type || '',
-      property_status: row.dataset.propertystatus || '',
-      property_address: row.dataset.property || '',
-      price:           row.dataset.price || '',
-      tenant:          row.dataset.tenant || '',
-      rooms:           row.dataset.rooms || '',
-      bathrooms:       row.dataset.bathrooms || '',
-      epc:             row.dataset.epc || '',
-      pets:            row.dataset.pets === '1' ? 'Yes' : row.dataset.pets === '0' ? 'No' : '',
-      garden:          row.dataset.garden === '1' ? 'Yes' : row.dataset.garden === '0' ? 'No' : '',
-      council:         row.dataset.council || ''
+      landlord: row.dataset.landlord || "",
+      type: row.dataset.type || "",
+      property_status: row.dataset.propertystatus || "",
+      property_address: row.dataset.property || "",
+      price: row.dataset.price || "",
+      tenant: row.dataset.tenant || "",
+      rooms: row.dataset.rooms || "",
+      bathrooms: row.dataset.bathrooms || "",
+      epc: row.dataset.epc || "",
+      pets:
+        row.dataset.pets === "1" ? "Yes" : row.dataset.pets === "0" ? "No" : "",
+      garden:
+        row.dataset.garden === "1"
+          ? "Yes"
+          : row.dataset.garden === "0"
+            ? "No"
+            : "",
+      council: row.dataset.council || "",
     };
   }
 
   function extractUserData(btn) {
-    const row = btn.closest('tr') || btn.closest('.card');
+    const row = btn.closest("tr") || btn.closest(".card");
     return {
-      _id:                 row.dataset.userid || row.dataset.id || '',
-      username:            row.dataset.username || '',
-      name:                row.dataset.name || '',
-      phone:               row.dataset.phone || '',
-      email:               row.dataset.email || '',
-      password:            row.dataset.password || '',
-      password_reset_date: row.dataset.passwordresetdate || '',
-      id_number:           row.dataset.idnumber || '',
-      id_expiry_date:      row.dataset.idexpirydate || '',
-      role:                row.dataset.role || '',
-      archived:            row.dataset.archived || '',
-      date_archived:       row.dataset.datearchived || ''
+      _id: row.dataset.userid || row.dataset.id || "",
+      username: row.dataset.username || "",
+      name: row.dataset.name || "",
+      phone: row.dataset.phone || "",
+      email: row.dataset.email || "",
+      password: row.dataset.password || "",
+      password_reset_date: row.dataset.passwordresetdate || "",
+      id_number: row.dataset.idnumber || "",
+      id_expiry_date: row.dataset.idexpirydate || "",
+      role: row.dataset.role || "",
+      archived: row.dataset.archived || "",
+      date_archived: row.dataset.datearchived || "",
     };
   }
 
   // Render
 
-
   function extractPaymentData(btn) {
-    const row = btn.closest('tr');
-    const id  = row.dataset.id || '';
+    const row = btn.closest("tr");
+    const id = row.dataset.id || "";
 
-   return {
-    _id:       id,
-    id:        id,
-    title:     row.dataset.tenant || 'Payment',
-    tenantId:  row.dataset.tenantId || '',
-    propertyId: row.dataset.propertyId || '',
-    tenant:    row.dataset.tenant || '',
-    property:  row.dataset.property || '',
-    amount:    row.dataset.amount || '',
-    datetime:  row.dataset.datetime || '',
-    period:    row.dataset.period || '',
-    nextdue:   row.dataset.nextdue || '',
-    dbStatus:  row.dataset.dbStatus || ''
-   };
- }
+    return {
+      _id: id,
+      id: id,
+      title: row.dataset.tenant || "Payment",
+      tenantId: row.dataset.tenantId || "",
+      propertyId: row.dataset.propertyId || "",
+      tenant: row.dataset.tenant || "",
+      property: row.dataset.property || "",
+      amount: row.dataset.amount || "",
+      datetime: row.dataset.datetime || "",
+      period: row.dataset.period || "",
+      nextdue: row.dataset.nextdue || "",
+      dbStatus: row.dataset.dbStatus || "",
+    };
+  }
 
   function formatViewValue(field, rawValue) {
     const val = rawValue ?? field.fallback ?? "N/A";
@@ -671,22 +1035,22 @@ window.actionbtn = (() => {
     if (!el) return;
     const raw = data[field.key];
 
-    if (field.type === 'date') {
-  const isEmpty = raw === null || raw === undefined || raw === '';
-  const value = raw ? formatDate(raw) : (field.fallback || 'N/A');
-  el.innerHTML = `<span class="${isEmpty ? 'tenant-vacant' : ''}">${value}</span>`;
-  return;
-}
+    if (field.type === "date") {
+      const isEmpty = raw === null || raw === undefined || raw === "";
+      const value = raw ? formatDate(raw) : field.fallback || "N/A";
+      el.innerHTML = `<span class="${isEmpty ? "tenant-vacant" : ""}">${value}</span>`;
+      return;
+    }
 
-if (field.type === 'datetime') {
-  const isEmpty = raw === null || raw === undefined || raw === '';
-  const value = raw ? formatDateTime(raw) : (field.fallback || 'N/A');
-  el.innerHTML = `<span class="${isEmpty ? 'tenant-vacant' : ''}">${value}</span>`;
-  return;
-}
+    if (field.type === "datetime") {
+      const isEmpty = raw === null || raw === undefined || raw === "";
+      const value = raw ? formatDateTime(raw) : field.fallback || "N/A";
+      el.innerHTML = `<span class="${isEmpty ? "tenant-vacant" : ""}">${value}</span>`;
+      return;
+    }
 
-    if (field.type === 'badge') {
-      const val = raw || '';
+    if (field.type === "badge") {
+      const val = raw || "";
       el.textContent = val.charAt(0).toUpperCase() + val.slice(1);
       el.className = `status-badge-modal status-${val}`;
       return;
@@ -697,7 +1061,6 @@ if (field.type === 'datetime') {
     const value = formatViewValue(field, raw);
     el.innerHTML = `<span class="${isEmpty ? "tenant-vacant" : ""}">${value}</span>`;
   }
-
 
   function renderFieldEdit(field, data) {
     if (!field.editable) return;
@@ -723,16 +1086,16 @@ if (field.type === 'datetime') {
         break;
       }
 
-      case 'date':
+      case "date":
         el.innerHTML = `<input class="date-input" type="date" value="${toDateInputValue(raw)}" data-field-id="${field.id}">`;
         break;
-        
-        case 'datetime':
+
+      case "datetime":
         el.innerHTML = `<input type="datetime-local" value="${toDateTimeInputValue(raw)}" data-field-id="${field.id}">`;
         break;
 
-      case 'number':
-        el.innerHTML = `<input type="number" value="${raw}" placeholder="${isEmpty ? placeholder : ''}" data-field-id="${field.id}">`;
+      case "number":
+        el.innerHTML = `<input type="number" value="${raw}" placeholder="${isEmpty ? placeholder : ""}" data-field-id="${field.id}">`;
         break;
       default:
         el.innerHTML = `<input type="text" value="${raw}" placeholder="${isEmpty ? placeholder : ""}" data-field-id="${field.id}">`;
@@ -871,13 +1234,13 @@ if (field.type === 'datetime') {
   // Modal
 
   const TITLE_MAP = {
-    property: { titleId: 'propertyTitle', titleKey: 'address' },
-    landlord: { titleId: 'landlordName',  titleKey: 'name'    },
-    tenant:   { titleId: 'tenantName',    titleKey: 'name'    },
-    user:     { titleId: 'username',      titleKey: 'name' },
-    viewing:  { titleId: 'viewerName', titleKey: 'viewer_name' },
-    importantdate: { titleId: 'propertyTitle', titleKey: 'address' },
-    payment:  { titleId: 'paymentTitle',  titleKey: 'title'   }
+    property: { titleId: "propertyTitle", titleKey: "address" },
+    landlord: { titleId: "landlordName", titleKey: "name" },
+    tenant: { titleId: "tenantName", titleKey: "name" },
+    user: { titleId: "username", titleKey: "name" },
+    viewing: { titleId: "viewerName", titleKey: "viewer_name" },
+    importantdate: { titleId: "propertyTitle", titleKey: "address" },
+    payment: { titleId: "paymentTitle", titleKey: "title" },
   };
 
   function renderTitle(entityType, data) {
@@ -888,33 +1251,33 @@ if (field.type === 'datetime') {
   }
 
   const MODAL_IDS = {
-    property: 'viewPropertyModal',
-    landlord: 'viewLandlordModal',
-    tenant:   'viewTenantModal',
-    user: 'viewUserModal',
-    viewing: 'viewViewingModal',
-    importantdate: 'viewImportantDatesModal',
-    payment:  'viewPaymentModal',
+    property: "viewPropertyModal",
+    landlord: "viewLandlordModal",
+    tenant: "viewTenantModal",
+    user: "viewUserModal",
+    viewing: "viewViewingModal",
+    importantdate: "viewImportantDatesModal",
+    payment: "viewPaymentModal",
   };
 
   const TAB_PREFIXES = {
-    property: 'p-tab-',
-    landlord: 'l-tab-',
-    tenant:   't-tab-',
-    user: 'u-tab-',
-    viewing: 'v-tab-',
-    importantdate: 'i-tab-',
-    payment:  'pay-tab-',
+    property: "p-tab-",
+    landlord: "l-tab-",
+    tenant: "t-tab-",
+    user: "u-tab-",
+    viewing: "v-tab-",
+    importantdate: "i-tab-",
+    payment: "pay-tab-",
   };
 
   const DEFAULT_TABS = {
-    property: 'property',
-    landlord: 'landlord',
-    tenant:   'tenant',
-    user: 'user',
-    viewing: 'viewing',
-    payment:  'payment',
-    importantdate: 'dates',
+    property: "property",
+    landlord: "landlord",
+    tenant: "tenant",
+    user: "user",
+    viewing: "viewing",
+    payment: "payment",
+    importantdate: "dates",
   };
 
   function openModal(entityType) {
@@ -975,13 +1338,12 @@ if (field.type === 'datetime') {
         if (!list) return;
         list.innerHTML = "";
 
-          if (!notes || notes.length === 0) {
-            
-            list.innerHTML = `
+        if (!notes || notes.length === 0) {
+          list.innerHTML = `
             <div class="no-notes"> Currently there are no notes </div> `;
-            
-            return;
-          }
+
+          return;
+        }
 
         notes.forEach((n) => {
           list.insertAdjacentHTML(
@@ -1024,17 +1386,32 @@ if (field.type === 'datetime') {
     renderTitle(entityType, data);
     renderFields(entityType, data, mode);
 
-    if (entityType === 'property') { computePaymentDue(data); }
-    if (entityType === 'landlord') fetchLandlordProperties(data._id);
-    if (entityType === 'tenant')   fetchTenantHistory(data._id || data.id);
-    if (entityType === 'payment')  fetchPaymentRecords(data.tenantId, data.propertyId);
+    if (entityType === "property") {
+      computePaymentDue(data);
+      fetchPropertyFiles(data._id, mode);
+    }
+    if (entityType === "landlord") {
+      fetchLandlordProperties(data._id);
+      fetchEntityFiles("landlord", data._id, mode);
+    }
+    if (entityType === "tenant") {
+      fetchTenantHistory(data._id || data.id);
+      fetchEntityFiles("tenant", data._id || data.id, mode);
+    }
+    if (entityType === "payment") {
+      fetchPaymentRecords(data.tenantId, data.propertyId);
+      fetchEntityFiles("payment", data._id, mode);
+    }
+    if (entityType === "user") {
+      fetchEntityFiles("user", data._id, mode);
+    }
 
-    const notesType = entityType === 'importantdate' ? 'property' : entityType;
+    const notesType = entityType === "importantdate" ? "property" : entityType;
     fetchNotes(data._id || data.id, notesType);
 
     const notesInput = state.modal.querySelector(".notes-input-section");
     if (notesInput) {
-      notesInput.style.display = (mode === 'edit') ? 'flex' : 'none';
+      notesInput.style.display = mode === "edit" ? "flex" : "none";
     }
 
     if (mode === "edit") showSaveButton();
@@ -1055,8 +1432,11 @@ if (field.type === 'datetime') {
     const prefix = TAB_PREFIXES[state.entityType] || "t-tab-";
     const tabEl = state.modal.querySelector(`#${prefix}${tabId}`);
     if (tabEl) tabEl.classList.add("active");
-    if (event && event.currentTarget)
-      event.currentTarget.classList.add("active");
+    // Mark the clicked button as active — works whether called from click handler or directly
+    if (event) {
+      const btn = event.target ? event.target.closest(".tab-btn") : null;
+      if (btn) btn.classList.add("active");
+    }
   }
 
   // Save
@@ -1134,75 +1514,91 @@ if (field.type === 'datetime') {
       .catch((err) => console.error(err));
   }
 
+  function savePayment() {
+    const payload = {
+      id: state.entity._id || state.entity.id,
+      transaction_amount:
+        document.querySelector("#pay-payment-amount input")?.value || "",
+      date_of_transaction:
+        document.querySelector("#pay-payment-datetime input")?.value || "",
+      payment_period:
+        document.querySelector("#pay-payment-period input")?.value || "",
+      next_due:
+        document.querySelector("#pay-payment-nextdue input")?.value || "",
+      status: document.querySelector("#pay-payment-status select")?.value || "",
+    };
 
+    fetch("update_payment.php", {
+      method: "POST",
+      headers: { "Content-Type": "application/json" },
+      body: JSON.stringify(payload),
+    })
+      .then((r) => r.json())
+      .then(() => location.reload())
+      .catch((err) => console.error(err));
+  }
 
-function savePayment() {
-  const payload = {
-    id:                  state.entity._id || state.entity.id,
-    transaction_amount:  document.querySelector('#pay-payment-amount input')?.value || '',
-    date_of_transaction: document.querySelector('#pay-payment-datetime input')?.value || '',
-    payment_period:      document.querySelector('#pay-payment-period input')?.value || '',
-    next_due:            document.querySelector('#pay-payment-nextdue input')?.value || '',
-    status:              document.querySelector('#pay-payment-status select')?.value || ''
-  };
+  function saveViewing() {
+    const payload = {
+      id: state.entity._id || state.entity.id,
+      viewer_name:
+        document.querySelector("#v-viewing-viewer input")?.value || "",
+      viewer_phone:
+        document.querySelector("#v-viewing-phone input")?.value || "",
+      status: document.querySelector("#v-viewing-status select")?.value || "",
+      date_time:
+        document.querySelector("#v-viewing-datetime input")?.value || "",
+      email: document.querySelector("#v-viewing-email input")?.value || "",
+      agent_name: document.querySelector("#v-viewing-agent input")?.value || "",
+      property_address:
+        document.querySelector("#v-viewing-property input")?.value || "",
+    };
 
-  fetch('update_payment.php', {
-    method:  'POST',
-    headers: { 'Content-Type': 'application/json' },
-    body:    JSON.stringify(payload)
-  })
-    .then(r => r.json())
-    .then(() => location.reload())
-    .catch(err => console.error(err));
-}
+    fetch("update_viewing.php", {
+      method: "POST",
+      headers: { "Content-Type": "application/json" },
+      body: JSON.stringify(payload),
+    })
+      .then((r) => r.json())
+      .then(() => location.reload())
+      .catch((err) => console.error(err));
+  }
 
-function saveViewing() {
-  const payload = {
-    id:             state.entity._id || state.entity.id,
-    viewer_name:           document.querySelector('#v-viewing-viewer input')?.value     || '',
-    viewer_phone:          document.querySelector('#v-viewing-phone input')?.value    || '',
-    status:          document.querySelector('#v-viewing-status select')?.value    || '',
-    date_time:        document.querySelector('#v-viewing-datetime input')?.value   || '',
-    email: document.querySelector('#v-viewing-email input')?.value || '',
-    agent_name: document.querySelector('#v-viewing-agent input')?.value || '',
-    property_address: document.querySelector('#v-viewing-property input')?.value || '',
-  };
+  function saveUser() {
+    const payload = {
+      id: state.entity._id || "",
+      username:
+        document.querySelector("#u-user-username input")?.value ||
+        state.entity.username ||
+        "",
+      name: document.querySelector("#u-user-name input")?.value || "",
+      phone: document.querySelector("#u-user-phone input")?.value || "",
+      email: document.querySelector("#u-user-email input")?.value || "",
+      password: document.querySelector("#u-user-password input")?.value || "",
+      password_reset_date:
+        document.querySelector("#u-user-passwordresetdate input")?.value ||
+        state.entity.password_reset_date ||
+        "",
+      id_number: document.querySelector("#u-user-IdNumber input")?.value || "",
+      id_expiry_date:
+        document.querySelector("#u-user-Idexpirydate input")?.value || "",
+      role: document.querySelector("#u-user-role select")?.value || "",
+      archived: document.querySelector("#u-user-archived select")?.value || "",
+      date_archived:
+        document.querySelector("#u-user-datearchived input")?.value ||
+        state.entity.date_archived ||
+        "",
+    };
 
-  fetch('update_viewing.php', {
-    method:  'POST',
-    headers: { 'Content-Type': 'application/json' },
-    body:    JSON.stringify(payload)
-  })
-  .then(r => r.json())
-  .then(() => location.reload())
-  .catch(err => console.error(err));
-}
-
-function saveUser() {
-  const payload = {
-    id:                  state.entity._id || '',
-    username:            document.querySelector('#u-user-username input')?.value || state.entity.username || '',
-    name:                document.querySelector('#u-user-name input')?.value || '',
-    phone:               document.querySelector('#u-user-phone input')?.value || '',
-    email:               document.querySelector('#u-user-email input')?.value || '',
-    password:            document.querySelector('#u-user-password input')?.value || '',
-    password_reset_date: document.querySelector('#u-user-passwordresetdate input')?.value || state.entity.password_reset_date || '',
-    id_number:           document.querySelector('#u-user-IdNumber input')?.value || '',
-    id_expiry_date:      document.querySelector('#u-user-Idexpirydate input')?.value || '',
-    role:                document.querySelector('#u-user-role select')?.value || '',
-    archived:            document.querySelector('#u-user-archived select')?.value || '',
-    date_archived:       document.querySelector('#u-user-datearchived input')?.value || state.entity.date_archived || '',
-  };
-
-  fetch('update_user.php', {
-    method: 'POST',
-    headers: { 'Content-Type': 'application/json' },
-    body: JSON.stringify(payload)
-  })
-  .then(r => r.json())
-  .then(() => location.reload())
-  .catch(err => console.error(err));
-}
+    fetch("update_user.php", {
+      method: "POST",
+      headers: { "Content-Type": "application/json" },
+      body: JSON.stringify(payload),
+    })
+      .then((r) => r.json())
+      .then(() => location.reload())
+      .catch((err) => console.error(err));
+  }
 
   // Add Note
 
@@ -1214,7 +1610,8 @@ function saveUser() {
 
     const payload = new URLSearchParams({
       note_text: text,
-      entity_type: state.entityType === 'importantdate' ? 'property' : state.entityType,
+      entity_type:
+        state.entityType === "importantdate" ? "property" : state.entityType,
       entity_id: state.entity._id,
     });
 
@@ -1269,12 +1666,11 @@ function saveUser() {
     return isNaN(d) ? dateStr : d.toLocaleDateString("en-GB");
   }
 
-
-function formatDateTime(dateStr) {
-  if (!dateStr) return '-';
-  const d = new Date(String(dateStr).replace(' ', 'T'));
-  return isNaN(d) ? dateStr : d.toLocaleString('en-GB', { hour12: false });
-}
+  function formatDateTime(dateStr) {
+    if (!dateStr) return "-";
+    const d = new Date(String(dateStr).replace(" ", "T"));
+    return isNaN(d) ? dateStr : d.toLocaleString("en-GB", { hour12: false });
+  }
 
   //function openViewingNotes(btn) {
   //  const data = extractViewingData(btn);
@@ -1282,31 +1678,33 @@ function formatDateTime(dateStr) {
 
   //  setTimeout(() => switchTab('notes'), 0);
   //}
-function toDateInputValue(value) {
-  if (!value) return '';
-  return String(value).split('T')[0].split(' ')[0];
-}
+  function toDateInputValue(value) {
+    if (!value) return "";
+    return String(value).split("T")[0].split(" ")[0];
+  }
 
-function toDateTimeInputValue(value) {
-  if (!value) return '';
-  return String(value).replace(' ', 'T').slice(0, 16);
-}
+  function toDateTimeInputValue(value) {
+    if (!value) return "";
+    return String(value).replace(" ", "T").slice(0, 16);
+  }
 
+  // Global Click Handler
 
-  // Global Click Handler 
-
-  document.addEventListener('click', (e) => {
-    const tabBtn = e.target.closest('.tab-btn');
-    if (tabBtn && state.modal) { switchTab(tabBtn.dataset.tab, e); return; }
+  document.addEventListener("click", (e) => {
+    const tabBtn = e.target.closest(".tab-btn");
+    if (tabBtn && state.modal) {
+      switchTab(tabBtn.dataset.tab, e);
+      return;
+    }
 
     const saveBtn = e.target.closest('[data-action="save"]');
     if (saveBtn) {
-      if (state.entityType === 'property') saveProperty();
-      if (state.entityType === 'landlord') saveLandlord();
-      if (state.entityType === 'tenant')   saveTenant();
-      if (state.entityType === 'viewing') saveViewing();
-      if (state.entityType === 'user') saveUser();
-      if (state.entityType === 'payment')  savePayment();
+      if (state.entityType === "property") saveProperty();
+      if (state.entityType === "landlord") saveLandlord();
+      if (state.entityType === "tenant") saveTenant();
+      if (state.entityType === "viewing") saveViewing();
+      if (state.entityType === "user") saveUser();
+      if (state.entityType === "payment") savePayment();
       return;
     }
 
@@ -1329,29 +1727,57 @@ function toDateTimeInputValue(value) {
   });
 
   // Public API
-return {
-    viewProperty(btn)  { openEntityModal('property', extractPropertyData(btn), 'view'); },
-    editProperty(btn)  { openEntityModal('property', extractPropertyData(btn), 'edit'); },
-    viewLandlord(btn)  { openEntityModal('landlord', extractLandlordData(btn), 'view'); },
-    editLandlord(btn)  { openEntityModal('landlord', extractLandlordData(btn), 'edit'); },
-    viewTenant(btn)    { openEntityModal('tenant',   extractTenantData(btn),   'view'); },
-    editTenant(btn) { openEntityModal('tenant', extractTenantData(btn), 'edit'); },
-    viewUser(btn)    { openEntityModal('user',   extractUserData(btn),   'view'); },
-    editUser(btn) { openEntityModal('user', extractUserData(btn), 'edit'); },
-    viewViewing(btn) { openEntityModal('viewing', extractViewingData(btn), 'view'); },
+  return {
+    viewProperty(btn) {
+      openEntityModal("property", extractPropertyData(btn), "view");
+    },
+    editProperty(btn) {
+      openEntityModal("property", extractPropertyData(btn), "edit");
+    },
+    viewLandlord(btn) {
+      openEntityModal("landlord", extractLandlordData(btn), "view");
+    },
+    editLandlord(btn) {
+      openEntityModal("landlord", extractLandlordData(btn), "edit");
+    },
+    viewTenant(btn) {
+      openEntityModal("tenant", extractTenantData(btn), "view");
+    },
+    editTenant(btn) {
+      openEntityModal("tenant", extractTenantData(btn), "edit");
+    },
+    viewUser(btn) {
+      openEntityModal("user", extractUserData(btn), "view");
+    },
+    editUser(btn) {
+      openEntityModal("user", extractUserData(btn), "edit");
+    },
+    viewViewing(btn) {
+      openEntityModal("viewing", extractViewingData(btn), "view");
+    },
     //viewViewingNotes(btn) { openViewingNotes(btn); },
-    editViewing(btn) { openEntityModal('viewing', extractViewingData(btn), 'edit'); },
-    viewImportantDate(btn)    { openEntityModal('importantdate',   extractPropertyData(btn),   'view'); },
-    editImportantDate(btn) { openEntityModal('importantdate', extractPropertyData(btn), 'edit'); },
-    viewPayment(btn)  { openEntityModal('payment', extractPaymentData(btn), 'view'); },
-    editPayment(btn)  { openEntityModal('payment', extractPaymentData(btn), 'edit'); },
+    editViewing(btn) {
+      openEntityModal("viewing", extractViewingData(btn), "edit");
+    },
+    viewImportantDate(btn) {
+      openEntityModal("importantdate", extractPropertyData(btn), "view");
+    },
+    editImportantDate(btn) {
+      openEntityModal("importantdate", extractPropertyData(btn), "edit");
+    },
+    viewPayment(btn) {
+      openEntityModal("payment", extractPaymentData(btn), "view");
+    },
+    editPayment(btn) {
+      openEntityModal("payment", extractPaymentData(btn), "edit");
+    },
     closeModal,
     switchTab,
     addNote,
     saveProperty,
     saveLandlord,
     saveTenant,
-    savePayment
+    savePayment,
   };
 })();
 
@@ -1359,6 +1785,361 @@ function openFile(fileType) {
   alert(`Opening ${fileType.toUpperCase()} file... (Implement PDF later)`);
 }
 
+// property files / global functions
+
+const PROPERTY_FILE_CATEGORY_LABELS = {
+  contract: "Tenancy Contract",
+  gas_cert: "Gas Safety Certificate",
+  electric_cert: "Electrical Certificate",
+  epc: "EPC Certificate",
+  ownership_proof: "Ownership Proof",
+};
+
+function fetchPropertyFiles(propertyId, mode) {
+  const list = document.getElementById("p-files-list");
+  if (!list) return;
+  list.innerHTML =
+    '<div style="color:#a0aec0;padding:16px 0;"><i class="fa-solid fa-spinner fa-spin"></i> Loading...</div>';
+
+  fetch("files.php?property_id=" + propertyId)
+    .then(function (r) {
+      return r.json();
+    })
+    .then(function (files) {
+      list.innerHTML = "";
+
+      var fileMap = {};
+      files.forEach(function (f) {
+        fileMap[f.file_category] = f;
+      });
+
+      var categories = [
+        "contract",
+        "gas_cert",
+        "electric_cert",
+        "epc",
+        "ownership_proof",
+      ];
+
+      categories.forEach(function (cat) {
+        var file = fileMap[cat] || null;
+        var label = PROPERTY_FILE_CATEGORY_LABELS[cat] || cat;
+        var item = document.createElement("div");
+        item.className = "file-item";
+
+        if (file) {
+          var isImage = ["JPG", "JPEG", "PNG"].indexOf(file.file_type) !== -1;
+          var iconClass = isImage ? "fa-file-image" : "fa-file-pdf";
+          var shortName =
+            file.file_name.length > 35
+              ? file.file_name.substring(0, 33) + "…"
+              : file.file_name;
+
+          item.innerHTML =
+            '<i class="fa-solid ' +
+            iconClass +
+            ' file-icon"></i>' +
+            '<span class="file-name">' +
+            "<strong>" +
+            _esc(label) +
+            "</strong>" +
+            '<small style="display:block;color:#718096;font-size:11px;">' +
+            _esc(shortName) +
+            "</small>" +
+            "</span>" +
+            '<div style="display:flex;gap:6px;align-items:center;margin-left:auto;">' +
+            '<button class="file-open-btn" onclick="window.open(\'' +
+            _esc(file.file_path) +
+            "', '_blank')\">" +
+            '<i class="fa-solid fa-arrow-up-right-from-square"></i> Open' +
+            "</button>" +
+            (mode === "edit"
+              ? '<button class="file-delete-btn" onclick="deletePropertyFile(' +
+                file.file_id +
+                ",'" +
+                cat +
+                "'," +
+                propertyId +
+                ')">' +
+                '<i class="fa-solid fa-trash"></i>' +
+                "</button>"
+              : "") +
+            "</div>";
+        } else {
+          item.innerHTML =
+            '<i class="fa-solid fa-file-slash file-icon" style="color:#cbd5e0;"></i>' +
+            '<span class="file-name" style="color:#a0aec0;">' +
+            "<strong>" +
+            _esc(label) +
+            "</strong>" +
+            '<small style="display:block;font-size:11px;">Not uploaded</small>' +
+            "</span>" +
+            (mode === "edit"
+              ? '<div style="margin-left:auto;">' +
+                '<label class="file-upload-inline-btn">' +
+                '<i class="fa-solid fa-upload"></i> Upload' +
+                '<input type="file" accept=".pdf,.jpg,.jpeg,.png" style="display:none;"' +
+                " onchange=\"uploadPropertyFile(this,'" +
+                cat +
+                "'," +
+                propertyId +
+                ')">' +
+                "</label>" +
+                "</div>"
+              : "");
+        }
+
+        list.appendChild(item);
+      });
+    })
+    .catch(function (err) {
+      console.error("fetchPropertyFiles error:", err);
+      if (list)
+        list.innerHTML =
+          '<div style="color:#e53e3e;padding:12px 0;">Failed to load files.</div>';
+    });
+}
+
+function deletePropertyFile(fileId, category, propertyId) {
+  if (!confirm("Are you sure you want to delete this file?")) return;
+  fetch("files.php", {
+    method: "POST",
+    headers: { "Content-Type": "application/json" },
+    body: JSON.stringify({ action: "delete", file_id: fileId }),
+  })
+    .then(function (r) {
+      return r.json();
+    })
+    .then(function () {
+      fetchPropertyFiles(propertyId, "edit");
+    })
+    .catch(function (err) {
+      console.error("deletePropertyFile error:", err);
+    });
+}
+
+function uploadPropertyFile(input, category, propertyId) {
+  if (!input.files || !input.files.length) return;
+  var fd = new FormData();
+  fd.append("file", input.files[0]);
+  fd.append("file_category", category);
+  fd.append("property_id", propertyId);
+  fd.append("redirect", "");
+  fetch("upload.php", { method: "POST", body: fd })
+    .then(function (r) {
+      return r.json();
+    })
+    .then(function (res) {
+      if (res.success) {
+        fetchPropertyFiles(propertyId, "edit");
+      } else {
+        alert("Upload failed");
+      }
+    })
+    .catch(function (err) {
+      console.error("uploadPropertyFile error:", err);
+    });
+}
+
+// to generalise the above for landlords, tenants, payments, users
+
+const ENTITY_FILE_LABELS = {
+  landlord: { id_document: "Copy of ID / Passport" },
+  tenant: {
+    contract: "Tenancy Contract",
+    id_document: "Copy of ID / Passport",
+  },
+  payment: { payment_receipt: "Payment Receipt", invoice: "Invoice" },
+  user: { id_document: "Copy of ID / Passport" },
+};
+
+const ENTITY_FILE_ICONS = {
+  id_document: "fa-id-card",
+  contract: "fa-file-contract",
+  payment_receipt: "fa-receipt",
+  invoice: "fa-file-invoice",
+  ownership_proof: "fa-file-shield",
+};
+
+const ENTITY_ID_PARAM = {
+  landlord: "landlord_id",
+  tenant: "tenant_id",
+  payment: "payment_id",
+  user: "user_id",
+};
+
+const ENTITY_FILES_LIST_ID = {
+  landlord: "l-files-list",
+  tenant: "t-files-list",
+  payment: "pay-files-list",
+  user: "u-files-list",
+};
+
+const ENTITY_UPLOAD_FOLDER = {
+  landlord: "landlords",
+  tenant: "tenants",
+  payment: "payments",
+  user: "users",
+};
+
+function fetchEntityFiles(entityType, entityId, mode) {
+  var listId = ENTITY_FILES_LIST_ID[entityType];
+  var list = document.getElementById(listId);
+  if (!list) return;
+
+  list.innerHTML =
+    '<div style="color:#a0aec0;padding:16px 0;"><i class="fa-solid fa-spinner fa-spin"></i> Loading...</div>';
+
+  var param = ENTITY_ID_PARAM[entityType];
+  fetch("files.php?" + param + "=" + entityId)
+    .then(function (r) {
+      return r.json();
+    })
+    .then(function (files) {
+      list.innerHTML = "";
+
+      var fileMap = {};
+      files.forEach(function (f) {
+        fileMap[f.file_category] = f;
+      });
+
+      var categories = Object.keys(ENTITY_FILE_LABELS[entityType] || {});
+
+      categories.forEach(function (cat) {
+        var file = fileMap[cat] || null;
+        var label = ENTITY_FILE_LABELS[entityType][cat] || cat;
+        var icon = ENTITY_FILE_ICONS[cat] || "fa-file";
+        var item = document.createElement("div");
+        item.className = "file-item";
+
+        if (file) {
+          var isImage = ["JPG", "JPEG", "PNG"].indexOf(file.file_type) !== -1;
+          var iconClass = isImage ? "fa-file-image" : "fa-file-pdf";
+          var shortName =
+            file.file_name.length > 35
+              ? file.file_name.substring(0, 33) + "…"
+              : file.file_name;
+
+          item.innerHTML =
+            '<i class="fa-solid ' +
+            iconClass +
+            ' file-icon"></i>' +
+            '<span class="file-name">' +
+            "<strong>" +
+            _esc(label) +
+            "</strong>" +
+            '<small style="display:block;color:#718096;font-size:11px;">' +
+            _esc(shortName) +
+            "</small>" +
+            "</span>" +
+            '<div style="display:flex;gap:6px;align-items:center;margin-left:auto;">' +
+            '<button class="file-open-btn" onclick="window.open(\'' +
+            _esc(file.file_path) +
+            "', '_blank')\">" +
+            '<i class="fa-solid fa-arrow-up-right-from-square"></i> Open' +
+            "</button>" +
+            (mode === "edit"
+              ? '<button class="file-delete-btn" onclick="deleteEntityFile(' +
+                file.file_id +
+                ",'" +
+                cat +
+                "','" +
+                entityType +
+                "'," +
+                entityId +
+                ')">' +
+                '<i class="fa-solid fa-trash"></i>' +
+                "</button>"
+              : "") +
+            "</div>";
+        } else {
+          item.innerHTML =
+            '<i class="fa-solid ' +
+            icon +
+            ' file-icon" style="color:#cbd5e0;"></i>' +
+            '<span class="file-name" style="color:#a0aec0;">' +
+            "<strong>" +
+            _esc(label) +
+            "</strong>" +
+            '<small style="display:block;font-size:11px;">Not uploaded</small>' +
+            "</span>" +
+            (mode === "edit"
+              ? '<div style="margin-left:auto;">' +
+                '<label class="file-upload-inline-btn">' +
+                '<i class="fa-solid fa-upload"></i> Upload' +
+                '<input type="file" accept=".pdf,.jpg,.jpeg,.png" style="display:none;"' +
+                " onchange=\"uploadEntityFile(this,'" +
+                cat +
+                "','" +
+                entityType +
+                "'," +
+                entityId +
+                ')">' +
+                "</label>" +
+                "</div>"
+              : "");
+        }
+
+        list.appendChild(item);
+      });
+    })
+    .catch(function (err) {
+      console.error("fetchEntityFiles error:", err);
+      if (list)
+        list.innerHTML =
+          '<div style="color:#e53e3e;padding:12px 0;">Failed to load files.</div>';
+    });
+}
+
+function deleteEntityFile(fileId, category, entityType, entityId) {
+  if (!confirm("Are you sure you want to delete this file?")) return;
+  fetch("files.php", {
+    method: "POST",
+    headers: { "Content-Type": "application/json" },
+    body: JSON.stringify({ action: "delete", file_id: fileId }),
+  })
+    .then(function (r) {
+      return r.json();
+    })
+    .then(function () {
+      fetchEntityFiles(entityType, entityId, "edit");
+    })
+    .catch(function (err) {
+      console.error("deleteEntityFile error:", err);
+    });
+}
+
+function uploadEntityFile(input, category, entityType, entityId) {
+  if (!input.files || !input.files.length) return;
+  var fd = new FormData();
+  fd.append("file", input.files[0]);
+  fd.append("file_category", category);
+  fd.append(ENTITY_ID_PARAM[entityType], entityId);
+  fd.append("redirect", "");
+  fetch("upload.php", { method: "POST", body: fd })
+    .then(function (r) {
+      return r.json();
+    })
+    .then(function (res) {
+      if (res.success) {
+        fetchEntityFiles(entityType, entityId, "edit");
+      } else {
+        alert("Upload failed");
+      }
+    })
+    .catch(function (err) {
+      console.error("uploadEntityFile error:", err);
+    });
+}
+
+function _esc(s) {
+  return String(s || "")
+    .replace(/&/g, "&amp;")
+    .replace(/</g, "&lt;")
+    .replace(/>/g, "&gt;")
+    .replace(/"/g, "&quot;")
+    .replace(/'/g, "&#39;");
+}
 
 function fetchTenantHistory(tenantId) {
   const container = document.querySelector(".contant-row-t");
@@ -1426,14 +2207,12 @@ function fetchTenantHistory(tenantId) {
           <div class="cell">
             <span class="status-badge ${statusClass}">${statusLabel}</span>
           </div>`;
-          container.appendChild(row);
-      } );
-  
-
+        container.appendChild(row);
+      });
     })
     .catch(() => {
-      const header = container.querySelector('.data-row.header');
-      container.innerHTML = '';
+      const header = container.querySelector(".data-row.header");
+      container.innerHTML = "";
       if (header) container.appendChild(header);
 
       container.innerHTML += `<div class="data-row">
@@ -1441,39 +2220,41 @@ function fetchTenantHistory(tenantId) {
       </div>`;
     });
 }
-  
- function fetchPaymentRecords(tenantId, propertyId) {
-   const container = document.querySelector('.contant-row-pay');
-   if (!container) return;
 
-   const header = container.querySelector('.data-row.header');
-  container.innerHTML = '';
+function fetchPaymentRecords(tenantId, propertyId) {
+  const container = document.querySelector(".contant-row-pay");
+  if (!container) return;
+
+  const header = container.querySelector(".data-row.header");
+  container.innerHTML = "";
   if (header) container.appendChild(header);
 
-   const loading = document.createElement('div');
-  loading.className = 'data-row';
+  const loading = document.createElement("div");
+  loading.className = "data-row";
   loading.innerHTML = `<div class="cell" style="grid-column:1/-1;">
     <i class="fa-solid fa-spinner fa-spin"></i> Loading...
   </div>`;
   container.appendChild(loading);
 
-   const safe = (s) => String(s || '')
-    .replace(/&/g, '&amp;')
-    .replace(/</g, '&lt;')
-    .replace(/>/g, '&gt;');
+  const safe = (s) =>
+    String(s || "")
+      .replace(/&/g, "&amp;")
+      .replace(/</g, "&lt;")
+      .replace(/>/g, "&gt;");
 
   const fmtDT = (d) => {
-    if (!d) return '-';
-    const dt = new Date(String(d).replace(' ', 'T'));
-    return isNaN(dt) ? d : dt.toLocaleString('en-GB', { hour12: false });
+    if (!d) return "-";
+    const dt = new Date(String(d).replace(" ", "T"));
+    return isNaN(dt) ? d : dt.toLocaleString("en-GB", { hour12: false });
   };
 
-
-  fetch(`get_payment_records.php?tenant_id=${tenantId}&property_id=${propertyId}`)
-    .then(r => r.json())
-    .then(records => {
-      const header = container.querySelector('.data-row.header');
-      container.innerHTML = '';
+  fetch(
+    `get_payment_records.php?tenant_id=${tenantId}&property_id=${propertyId}`,
+  )
+    .then((r) => r.json())
+    .then((records) => {
+      const header = container.querySelector(".data-row.header");
+      container.innerHTML = "";
       if (header) container.appendChild(header);
 
       if (!records.length) {
@@ -1484,27 +2265,27 @@ function fetchTenantHistory(tenantId) {
         return;
       }
 
-      records.forEach(rec => {
-        const row = document.createElement('div');
-        row.className = 'data-row';
+      records.forEach((rec) => {
+        const row = document.createElement("div");
+        row.className = "data-row";
 
-        let statusClass = 'status-due';
-        let statusLabel = rec.status || 'Pending';
+        let statusClass = "status-due";
+        let statusLabel = rec.status || "Pending";
 
-        if (rec.status === 'completed') {
-          statusClass = 'status-paid';
-          statusLabel = 'Completed';
-        } else if (rec.status === 'not complete') {
-          statusClass = 'status-overdue';
-          statusLabel = 'Not Complete';
+        if (rec.status === "completed") {
+          statusClass = "status-paid";
+          statusLabel = "Completed";
+        } else if (rec.status === "not complete") {
+          statusClass = "status-overdue";
+          statusLabel = "Not Complete";
         } else {
-          statusClass = 'status-due';
-          statusLabel = 'Pending';
+          statusClass = "status-due";
+          statusLabel = "Pending";
         }
 
-       row.innerHTML = `
+        row.innerHTML = `
        <div class="cell">£${Number(rec.transaction_amount).toLocaleString()}</div>
-       <div class="cell">${safe(rec.payment_period || '-')}</div>
+       <div class="cell">${safe(rec.payment_period || "-")}</div>
        <div class="cell">${fmtDT(rec.date_of_transaction)}</div>
        <div class="cell"><span class="status-badge ${statusClass}">${statusLabel}</span></div>
      `;
@@ -1513,8 +2294,8 @@ function fetchTenantHistory(tenantId) {
       });
     })
     .catch(() => {
-      const header = container.querySelector('.data-row.header');
-      container.innerHTML = '';
+      const header = container.querySelector(".data-row.header");
+      container.innerHTML = "";
       if (header) container.appendChild(header);
 
       container.innerHTML += `
@@ -1522,7 +2303,4 @@ function fetchTenantHistory(tenantId) {
           <div class="cell" style="grid-column:1/-1; color:red;">Failed to load payment records</div>
         </div>`;
     });
-  }
-    
-  
-  
+}

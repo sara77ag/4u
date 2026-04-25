@@ -325,12 +325,7 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST' && isset($_POST['reset_password_id']))
                         <i class="fa-solid fa-folder"></i>
                         <span>Files</span>
                     </div>
-                    <div class="files-list">
-                        <div class="file-item">
-                            <i class="fa-solid fa-file-pdf file-icon"></i>
-                            <span class="file-name">Copy of ID / Passport</span>
-                            <button class="file-open-btn">Open</button>
-                        </div>
+                    <div class="files-list" id="u-files-list">
                     </div>
                 </div>
             </div>

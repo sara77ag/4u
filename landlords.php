@@ -276,22 +276,7 @@ $landlords = $stmt->fetchAll(PDO::FETCH_ASSOC);
                         <i class="fa-solid fa-folder"></i>
                         <span>Files</span>
                     </div>
-                    <div class="files-list">
-                        <div class="file-item">
-                            <i class="fa-solid fa-file-pdf file-icon"></i>
-                            <span class="file-name">Tenancy Contract</span>
-                            <button class="file-open-btn" onclick="openFile('tenancy')">Open</button>
-                        </div>
-                        <div class="file-item">
-                            <i class="fa-solid fa-file-pdf file-icon"></i>
-                            <span class="file-name">Copy of ID / Passport</span>
-                            <button class="file-open-btn" onclick="openFile('id')">Open</button>
-                        </div>
-                        <div class="file-item">
-                            <i class="fa-solid fa-file-pdf file-icon"></i>
-                            <span class="file-name">Ownership Proof</span>
-                            <button class="file-open-btn" onclick="openFile('ownership')">Open</button>
-                        </div>
+                    <div class="files-list" id="l-files-list">
                     </div>
                 </div>
 

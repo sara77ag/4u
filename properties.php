@@ -48,6 +48,7 @@ $stmt = $pdo->query("
     FROM properties p
     LEFT JOIN landlords l ON p.landlord_id = l.landlord_id
     LEFT JOIN contracts c ON c.property_id = p.property_id
+    AND c.archived = 0
     AND date('now') BETWEEN c.contract_start AND c.contract_end    
     LEFT JOIN tenants t ON t.tenant_id = c.tenant_id
     WHERE p.archived = 0
@@ -235,9 +236,7 @@ $properties = $stmt->fetchAll(PDO::FETCH_ASSOC);
                                 <td class="td-address"><?= htmlspecialchars($p['property_address']) ?></td>
                                 <td><span class="td-type"><?= htmlspecialchars($p['property_type']) ?></span></td>
                                 <td class="td-landlord"><?= htmlspecialchars($landlord_name) ?></td>
-                                <td class="rent">
-                                    <?= $price ? '£' . number_format($price, 0) : '-' ?>
-                                </td>
+                                <td class="rent"><?= $price ? '£' . number_format($price, 0) : '-' ?></td>
                                 <td><?php if ($tenant_name): ?>
                                     <span class="td-tenant"><?= htmlspecialchars($tenant_name) ?></span>
                                     <?php else: ?>
@@ -468,27 +467,7 @@ $properties = $stmt->fetchAll(PDO::FETCH_ASSOC);
                         <i class="fa-solid fa-folder"></i>
                         <span>Files</span>
                     </div>
-                    <div class="files-list">
-                        <div class="file-item">
-                            <i class="fa-solid fa-file-pdf file-icon"></i>
-                            <span class="file-name">Tenancy Contract</span>
-                            <button class="file-open-btn">Open</button>
-                        </div>
-                        <div class="file-item">
-                            <i class="fa-solid fa-file-pdf file-icon"></i>
-                            <span class="file-name">Gas Safety Certificate</span>
-                            <button class="file-open-btn">Open</button>
-                        </div>
-                        <div class="file-item">
-                            <i class="fa-solid fa-file-pdf file-icon"></i>
-                            <span class="file-name">Electrical Installation Certificate</span>
-                            <button class="file-open-btn">Open</button>
-                        </div>
-                        <div class="file-item">
-                            <i class="fa-solid fa-file-pdf file-icon"></i>
-                            <span class="file-name">EPC Certificate</span>
-                            <button class="file-open-btn">Open</button>
-                        </div>
+                    <div class="files-list" id="p-files-list">
                     </div>
                 </div>
 

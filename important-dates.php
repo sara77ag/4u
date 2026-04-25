@@ -217,7 +217,7 @@ function formatDateValue($date) {
                                 data-landlord-id-expiry="<?= htmlspecialchars($row['landlord_id_expiry'] ?? '') ?>"
                                 data-tenant-id-expiry="<?= htmlspecialchars($row['tenant_id_expiry'] ?? '') ?>"
                                 data-contract="<?= htmlspecialchars($row['contract_end'] ?? '') ?>">
-                                <td class="property-name"><?= htmlspecialchars($row['property_address'] ?? 'N/A') ?>
+                                <td class="td-address"><?= htmlspecialchars($row['property_address'] ?? '') ?>
                                 </td>
                                 <td class="gas-date">
                                     <?= htmlspecialchars(formatDateValue($row['gas_cert_due'] ?? null)) ?></td>
@@ -527,7 +527,10 @@ function formatDateValue($date) {
             if (icon) icon.classList.remove('asc', 'desc');
         });
 
-        currentSort = { column: null, direction: 'asc'};
+        currentSort = {
+            column: null,
+            direction: 'asc'
+        };
     }
 
     function showImportantDatesInfo() {

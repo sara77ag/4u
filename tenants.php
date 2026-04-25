@@ -384,17 +384,7 @@ $tenants = $pdo->query($query)->fetchAll(PDO::FETCH_ASSOC);
                         <i class="fa-solid fa-folder"></i>
                         <span>Files</span>
                     </div>
-                    <div class="files-list">
-                        <div class="file-item">
-                            <i class="fa-solid fa-file-pdf file-icon"></i>
-                            <span class="file-name">Tenancy Contract</span>
-                            <button class="file-open-btn" onclick="openFile('tenancy')">Open</button>
-                        </div>
-                        <div class="file-item">
-                            <i class="fa-solid fa-file-pdf file-icon"></i>
-                            <span class="file-name">Copy of ID / Passport</span>
-                            <button class="file-open-btn" onclick="openFile('gas')">Open</button>
-                        </div>
+                    <div class="files-list" id="t-files-list">
                     </div>
                 </div>
 
