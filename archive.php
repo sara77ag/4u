@@ -61,8 +61,8 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST' && isset($_POST['delete_id'], $_POST['
 }
 
 // Fetch archived records from each table
-
 $archived = [];
+$fiveYearsAgo = date('Y-m-d', strtotime('-5 years'));
 
 // Properties
 $rows = $pdo->query("
@@ -99,10 +99,6 @@ foreach ($rows as $r) {
     $archived[] = ['type' => 'tenants', 'id' => $r['id'], 'label' => $r['label'],
                    'sub' => $r['sub'], 'related' => $r['related'], 'date' => $r['date_archived']];
 }
-
-// Contracts — skipped: table does not have archived/date_archived columns yet.
-// To enable: ALTER TABLE contracts ADD COLUMN archived INTEGER NOT NULL DEFAULT 0;
-//            ALTER TABLE contracts ADD COLUMN date_archived TEXT;
 
 // Transactions
 $rows = $pdo->query("
@@ -161,16 +157,22 @@ usort($archived, function($a, $b) {
     return strcmp($b['date'] ?? '', $a['date'] ?? '');
 });
 
+// Count overdue records
+$overdueCount = 0;
+foreach ($archived as $item) {
+    if ($item['date'] && $item['date'] < $fiveYearsAgo) $overdueCount++;
+}
+
 // Type display config
 $typeConfig = [
-    'properties'       => ['label' => 'Property',        'icon' => 'fa-house',         'class' => 'type-property'],
-    'landlords'        => ['label' => 'Landlord',        'icon' => 'fa-user-tie',      'class' => 'type-landlord'],
-    'tenants'          => ['label' => 'Tenant',          'icon' => 'fa-user',          'class' => 'type-tenant'],
-    'contracts'        => ['label' => 'Contract',        'icon' => 'fa-file-contract', 'class' => 'type-contract'],
-    'transactions'     => ['label' => 'Transaction',     'icon' => 'fa-credit-card',   'class' => 'type-transaction'],
-    'viewing_bookings' => ['label' => 'Viewing',         'icon' => 'fa-street-view',   'class' => 'type-viewing'],
-    'users'            => ['label' => 'User',            'icon' => 'fa-users',         'class' => 'type-user'],
-    'notes'            => ['label' => 'Note',            'icon' => 'fa-sticky-note',   'class' => 'type-note'],
+    'properties'       => ['label' => 'Property',    'icon' => 'fa-house',         'class' => 'type-property'],
+    'landlords'        => ['label' => 'Landlord',    'icon' => 'fa-user-tie',      'class' => 'type-landlord'],
+    'tenants'          => ['label' => 'Tenant',      'icon' => 'fa-user',          'class' => 'type-tenant'],
+    'contracts'        => ['label' => 'Contract',    'icon' => 'fa-file-contract', 'class' => 'type-contract'],
+    'transactions'     => ['label' => 'Transaction', 'icon' => 'fa-credit-card',   'class' => 'type-transaction'],
+    'viewing_bookings' => ['label' => 'Viewing',     'icon' => 'fa-street-view',   'class' => 'type-viewing'],
+    'users'            => ['label' => 'User',        'icon' => 'fa-users',         'class' => 'type-user'],
+    'notes'            => ['label' => 'Note',        'icon' => 'fa-sticky-note',   'class' => 'type-note'],
 ];
 ?>
 <!DOCTYPE html>
@@ -185,7 +187,6 @@ $typeConfig = [
     <link rel="stylesheet" href="tables.css">
     <script src="navbar.js"></script>
     <style>
-    /* ── Type badge colours ─────────────────────────────── */
     .type-badge {
         display: inline-flex;
         align-items: center;
@@ -197,93 +198,76 @@ $typeConfig = [
         white-space: nowrap;
     }
 
-    .type-property {
-        background: #e8f4fd;
-        color: #1a73e8;
-    }
+    .type-property    { background: #e8f4fd; color: #1a73e8; }
+    .type-landlord    { background: #fdf3e8; color: #e67e22; }
+    .type-tenant      { background: #e8fdf3; color: #27ae60; }
+    .type-contract    { background: #f3e8fd; color: #8e44ad; }
+    .type-transaction { background: #e8fdf8; color: #16a085; }
+    .type-viewing     { background: #fde8e8; color: #c0392b; }
+    .type-user        { background: #fdf8e8; color: #d4a017; }
+    .type-note        { background: #f0f0f0; color: #555;    }
 
-    .type-landlord {
-        background: #fdf3e8;
-        color: #e67e22;
-    }
-
-    .type-tenant {
-        background: #e8fdf3;
-        color: #27ae60;
-    }
-
-    .type-contract {
-        background: #f3e8fd;
-        color: #8e44ad;
-    }
-
-    .type-transaction {
-        background: #e8fdf8;
-        color: #16a085;
-    }
-
-    .type-viewing {
-        background: #fde8e8;
-        color: #c0392b;
-    }
-
-    .type-user {
-        background: #fdf8e8;
-        color: #d4a017;
-    }
-
-    .type-note {
-        background: #f0f0f0;
-        color: #555;
-    }
-
-    /* ── Archive-specific empty state ───────────────────── */
     .archive-empty {
         text-align: center;
         padding: 60px 20px;
         color: #aaa;
     }
-
     .archive-empty i {
         font-size: 3rem;
         margin-bottom: 12px;
         display: block;
     }
 
-    /* ── Label column ───────────────────────────────────── */
-    .col-label {
-        width: 24%;
+    .col-label   { width: 22%; }
+    .col-detail  { width: 16%; }
+    .col-related { width: 16%; }
+    .col-type    { width: 12%; }
+    .col-date    { width: 14%; }
+    .col-action  { width: 20%; text-align: center; }
+
+    .label-cell { font-weight: 500; }
+    .sub-cell   { color: #777; font-size: 0.88rem; }
+
+    /* Overdue row highlight */
+    tr.overdue-row {
+        background-color: #fff5f5;
+    }
+    tr.overdue-row td {
+        border-left: 3px solid #e74c3c;
+    }
+    tr.overdue-row td:not(:first-child) {
+        border-left: none;
     }
 
-    .col-detail {
-        width: 18%;
+    .overdue-badge {
+        display: inline-flex;
+        align-items: center;
+        gap: 5px;
+        background: #fdecea;
+        color: #c0392b;
+        border: 1px solid #f5c6cb;
+        border-radius: 12px;
+        padding: 2px 8px;
+        font-size: 0.75rem;
+        font-weight: 600;
+        margin-left: 6px;
+        white-space: nowrap;
     }
 
-    .col-related {
-        width: 18%;
+    /* Overdue banner */
+    .overdue-banner {
+        background: #fdecea;
+        color: #721c24;
+        border: 1px solid #f5c6cb;
+        border-radius: 8px;
+        padding: 12px 20px;
+        margin-bottom: 16px;
+        display: flex;
+        align-items: center;
+        gap: 10px;
+        font-size: 0.95rem;
     }
-
-    .col-type {
-        width: 12%;
-    }
-
-    .col-date {
-        width: 12%;
-    }
-
-    .col-action {
-        width: 16%;
-        text-align: center;
-    }
-
-    .label-cell {
-        font-weight: 500;
-    }
-
-    .sub-cell {
-        color: #777;
-        font-size: 0.88rem;
-    }
+    .overdue-banner i { font-size: 1.1rem; }
     </style>
 </head>
 
@@ -293,8 +277,17 @@ $typeConfig = [
     <main class="main-content">
         <h1 class="page-title">Archive</h1>
 
+        <?php if ($overdueCount > 0): ?>
+        <div class="overdue-banner">
+            <i class="fa-solid fa-triangle-exclamation"></i>
+            <span>
+                <strong><?= $overdueCount ?> record<?= $overdueCount !== 1 ? 's' : '' ?></strong>
+                <?= $overdueCount !== 1 ? 'have' : 'has' ?> been archived for over 5 years and should be reviewed for permanent deletion.
+            </span>
+        </div>
+        <?php endif; ?>
+
         <div class="main-container">
-            <!-- Controls row -->
             <div class="controls-row">
                 <button class="btn-filter-toggle" id="filterToggle" onclick="toggleFilter()">
                     <i class="fa-solid fa-filter"></i> Filter
@@ -327,6 +320,13 @@ $typeConfig = [
                         <label>Archived To</label>
                         <input type="date" id="filterTo" onchange="applyFilters()">
                     </div>
+                    <div class="filter-group">
+                        <label>Show</label>
+                        <select id="filterOverdue" onchange="applyFilters()">
+                            <option value="">All Records</option>
+                            <option value="overdue">Overdue Only (5+ years)</option>
+                        </select>
+                    </div>
                     <button class="filter-btn-reset" onclick="resetFilters()" title="Reset filters">
                         <i class="fa-solid fa-rotate-left"></i>
                     </button>
@@ -338,7 +338,6 @@ $typeConfig = [
                     style="color:#888;font-size:.9rem;align-self:center;"></span>
             </div>
 
-            <!-- Table -->
             <div class="table-container">
                 <div class="table-wrapper">
                     <?php if (empty($archived)): ?>
@@ -366,12 +365,15 @@ $typeConfig = [
                         </thead>
                         <tbody id="archiveBody">
                             <?php foreach ($archived as $item):
-                            $cfg   = $typeConfig[$item['type']] ?? ['label' => $item['type'], 'icon' => 'fa-box', 'class' => ''];
-                            $dateF = $item['date'] ? date('d/m/Y', strtotime($item['date'])) : '-';
-                        ?>
+                                $cfg     = $typeConfig[$item['type']] ?? ['label' => $item['type'], 'icon' => 'fa-box', 'class' => ''];
+                                $dateF   = $item['date'] ? date('d/m/Y', strtotime($item['date'])) : '-';
+                                $overdue = $item['date'] && $item['date'] < $fiveYearsAgo;
+                            ?>
                             <tr data-type="<?= htmlspecialchars($item['type']) ?>"
                                 data-label="<?= htmlspecialchars(strtolower($item['label'] ?? '')) ?>"
-                                data-date="<?= $item['date'] ?? '' ?>">
+                                data-date="<?= $item['date'] ?? '' ?>"
+                                data-overdue="<?= $overdue ? '1' : '0' ?>"
+                                <?= $overdue ? 'class="overdue-row"' : '' ?>>
 
                                 <td class="label-cell"><?= htmlspecialchars($item['label'] ?? '-') ?></td>
                                 <td class="sub-cell"><?= htmlspecialchars($item['sub'] ?? '-') ?></td>
@@ -382,7 +384,14 @@ $typeConfig = [
                                         <?= $cfg['label'] ?>
                                     </span>
                                 </td>
-                                <td><?= $dateF ?></td>
+                                <td>
+                                    <?= $dateF ?>
+                                    <?php if ($overdue): ?>
+                                    <span class="overdue-badge">
+                                        <i class="fa-solid fa-triangle-exclamation"></i> 5+ yrs
+                                    </span>
+                                    <?php endif; ?>
+                                </td>
                                 <td>
                                     <div class="action-buttons">
                                         <form method="POST" style="display:inline;">
@@ -396,7 +405,7 @@ $typeConfig = [
                                             <input type="hidden" name="delete_id" value="<?= $item['id'] ?>">
                                             <input type="hidden" name="delete_type" value="<?= $item['type'] ?>">
                                             <button type="submit" class="action-btn action-btn-delete"
-                                                title="Delete permanently"
+                                                title="<?= $overdue ? 'Overdue for deletion — permanently delete' : 'Delete permanently' ?>"
                                                 onclick="return confirm('Permanently delete this <?= $cfg['label'] ?>?\nThis cannot be undone.')">
                                                 <i class="fa-solid fa-trash"></i>
                                             </button>
@@ -414,70 +423,60 @@ $typeConfig = [
     </main>
 
     <script>
-    let currentSort = {
-        column: null,
-        direction: 'asc'
-    };
+    let currentSort = { column: null, direction: 'asc' };
 
-    // Update visible row count
     function updateCount() {
         const visible = document.querySelectorAll('#archiveBody tr:not([style*="display: none"])').length;
-        const total = document.querySelectorAll('#archiveBody tr').length;
-        const el = document.getElementById('recordCount');
-        if (el) el.textContent = visible === total ? `${total} record${total !== 1 ? 's' : ''}` :
-            `${visible} of ${total} records`;
+        const total   = document.querySelectorAll('#archiveBody tr').length;
+        const el      = document.getElementById('recordCount');
+        if (el) el.textContent = visible === total
+            ? `${total} record${total !== 1 ? 's' : ''}`
+            : `${visible} of ${total} records`;
     }
 
-    // Run on load
     document.addEventListener('DOMContentLoaded', updateCount);
 
-    // Filter toggle
     function toggleFilter() {
         const dd = document.getElementById('filterDropdowns');
         dd.style.display = dd.style.display === 'none' ? 'flex' : 'none';
     }
 
-    // Apply all filters
     function applyFilters() {
-        const typeVal = document.getElementById('filterType').value;
-        const searchVal = document.getElementById('filterSearch').value.toLowerCase();
-        const fromVal = document.getElementById('filterFrom').value;
-        const toVal = document.getElementById('filterTo').value;
+        const typeVal    = document.getElementById('filterType').value;
+        const searchVal  = document.getElementById('filterSearch').value.toLowerCase();
+        const fromVal    = document.getElementById('filterFrom').value;
+        const toVal      = document.getElementById('filterTo').value;
+        const overdueVal = document.getElementById('filterOverdue').value;
 
         document.querySelectorAll('#archiveBody tr').forEach(row => {
             let show = true;
-
-            if (typeVal && row.dataset.type !== typeVal) show = false;
-            if (searchVal && !row.dataset.label.includes(searchVal)) show = false;
-            if (fromVal && row.dataset.date && row.dataset.date < fromVal) show = false;
-            if (toVal && row.dataset.date && row.dataset.date > toVal) show = false;
-
+            if (typeVal    && row.dataset.type !== typeVal)             show = false;
+            if (searchVal  && !row.dataset.label.includes(searchVal))  show = false;
+            if (fromVal    && row.dataset.date && row.dataset.date < fromVal) show = false;
+            if (toVal      && row.dataset.date && row.dataset.date > toVal)   show = false;
+            if (overdueVal === 'overdue' && row.dataset.overdue !== '1') show = false;
             row.style.display = show ? '' : 'none';
         });
 
         updateCount();
     }
 
-    // Reset all filters
     function resetFilters() {
-        document.getElementById('filterType').value = '';
-        document.getElementById('filterSearch').value = '';
-        document.getElementById('filterFrom').value = '';
-        document.getElementById('filterTo').value = '';
+        document.getElementById('filterType').value    = '';
+        document.getElementById('filterSearch').value  = '';
+        document.getElementById('filterFrom').value    = '';
+        document.getElementById('filterTo').value      = '';
+        document.getElementById('filterOverdue').value = '';
         document.querySelectorAll('#archiveBody tr').forEach(r => r.style.display = '');
         document.querySelectorAll('#archiveTable th').forEach(th => {
             th.classList.remove('sorted');
             const ic = th.querySelector('.sort-icon');
             if (ic) ic.classList.remove('asc', 'desc');
         });
-        currentSort = {
-            column: null,
-            direction: 'asc'
-        };
+        currentSort = { column: null, direction: 'asc' };
         updateCount();
     }
 
-    // Sort
     function sortTable(column, headerEl) {
         const tbody = document.getElementById('archiveBody');
         if (!tbody) return;
@@ -486,7 +485,7 @@ $typeConfig = [
         if (currentSort.column === column) {
             currentSort.direction = currentSort.direction === 'asc' ? 'desc' : 'asc';
         } else {
-            currentSort.column = column;
+            currentSort.column    = column;
             currentSort.direction = 'asc';
         }
 
@@ -502,20 +501,10 @@ $typeConfig = [
         rows.sort((a, b) => {
             let aVal, bVal;
             switch (column) {
-                case 'label':
-                    aVal = a.dataset.label;
-                    bVal = b.dataset.label;
-                    break;
-                case 'type':
-                    aVal = a.dataset.type;
-                    bVal = b.dataset.type;
-                    break;
-                case 'date':
-                    aVal = a.dataset.date || '';
-                    bVal = b.dataset.date || '';
-                    break;
-                default:
-                    return 0;
+                case 'label': aVal = a.dataset.label; bVal = b.dataset.label; break;
+                case 'type':  aVal = a.dataset.type;  bVal = b.dataset.type;  break;
+                case 'date':  aVal = a.dataset.date || ''; bVal = b.dataset.date || ''; break;
+                default: return 0;
             }
             if (aVal < bVal) return currentSort.direction === 'asc' ? -1 : 1;
             if (aVal > bVal) return currentSort.direction === 'asc' ? 1 : -1;
