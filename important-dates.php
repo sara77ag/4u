@@ -140,6 +140,10 @@ function formatDateValue($date) {
                         <input type="text" id="filterProperty" onchange="filterImportantDates()"
                             placeholder="Enter Property Name">
                     </div>
+                    <div class="filter-group">
+                        <label>Date</label>
+                        <input type="date" id="filterDate" onchange="filterImportantDates()">
+                    </div>
                     <button class="filter-btn-reset" onclick="resetFilters()">
                         <i class="fa-solid fa-rotate-left"></i>
                     </button>
@@ -481,6 +485,7 @@ function formatDateValue($date) {
 
     function filterImportantDates() {
         const propertyFilter = document.getElementById('filterProperty').value.toLowerCase();
+        const dateFilter = document.getElementById('filterDate').value;
         const rows = document.querySelectorAll('#tableBody tr');
 
         rows.forEach(row => {
@@ -490,12 +495,28 @@ function formatDateValue($date) {
                 show = false;
             }
 
+            if (dateFilter) {
+                const dates = [
+                    row.dataset.gas,
+                    row.dataset.electric,
+                    row.dataset.epcDate,
+                    row.dataset.landlordIdExpiry,
+                    row.dataset.tenantIdExpiry,
+                    row.dataset.contract
+                ];
+
+                if (!dates.includes(dateFilter)) {
+                    show = false;
+                }
+            }
+
             row.style.display = show ? '' : 'none';
         });
     }
 
     function resetFilters() {
         document.getElementById('filterProperty').value = '';
+        document.getElementById('filterDate').value = '';
 
         const rows = document.querySelectorAll('#tableBody tr');
         rows.forEach(row => row.style.display = '');
@@ -505,6 +526,8 @@ function formatDateValue($date) {
             const icon = th.querySelector('.sort-icon');
             if (icon) icon.classList.remove('asc', 'desc');
         });
+
+        currentSort = { column: null, direction: 'asc'};
     }
 
     function showImportantDatesInfo() {

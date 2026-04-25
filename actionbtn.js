@@ -1029,7 +1029,8 @@ if (field.type === 'datetime') {
     if (entityType === 'tenant')   fetchTenantHistory(data._id || data.id);
     if (entityType === 'payment')  fetchPaymentRecords(data.tenantId, data.propertyId);
 
-    fetchNotes(data._id || data.id, entityType);
+    const notesType = entityType === 'importantdate' ? 'property' : entityType;
+    fetchNotes(data._id || data.id, notesType);
 
     const notesInput = state.modal.querySelector(".notes-input-section");
     if (notesInput) {
@@ -1213,7 +1214,7 @@ function saveUser() {
 
     const payload = new URLSearchParams({
       note_text: text,
-      entity_type: state.entityType,
+      entity_type: state.entityType === 'importantdate' ? 'property' : state.entityType,
       entity_id: state.entity._id,
     });
 
