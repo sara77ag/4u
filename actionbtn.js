@@ -974,6 +974,15 @@ if (field.type === 'datetime') {
         const list = state.modal?.querySelector("[data-notes-list]");
         if (!list) return;
         list.innerHTML = "";
+
+          if (!notes || notes.length === 0) {
+            
+            list.innerHTML = `
+            <div class="no-notes"> Currently there are no notes </div> `;
+            
+            return;
+          }
+
         notes.forEach((n) => {
           list.insertAdjacentHTML(
             "beforeend",

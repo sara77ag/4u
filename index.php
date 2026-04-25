@@ -22,7 +22,7 @@ if ($_SERVER["REQUEST_METHOD"] == "POST" && isset($_POST['login'])) {
     $stmt->execute([$username]);
     $user = $stmt->fetch(PDO::FETCH_ASSOC);
 
-    // if ($user && $password === $user['password']){  if you are not using password hashing
+     //if ($user && $password === $user['password']){  //if you are not using password hashing
     if ($user && password_verify($password, $user['password'])) { //if you are using password hashing
         $_SESSION['user_id'] = $user['user_id'];
         $_SESSION['name']    = $user['name'];

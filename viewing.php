@@ -107,6 +107,7 @@ $viewings = $stmt->fetchAll(PDO::FETCH_ASSOC);
     .col-action {
         width: 10%;
         text-align: center;
+        padding-right: 25px;
     }
     </style>
 </head>
