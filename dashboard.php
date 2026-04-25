@@ -126,17 +126,19 @@ $todos = $pdo->query("SELECT note_id, note_text, completed FROM notes WHERE arch
                         <p class="quick-card-desc">Check upcoming deadlines</p>
                     </div>
 
-
+                    <?php if ($_SESSION['role'] === 'admin'): ?>
                     <div class="quick-card" onclick="window.location.href='export.php'">
                         <div class="quick-card-icon"><i class="fa-solid fa-chart-line"></i></div>
                         <h4 class="quick-card-title">Export Report</h4>
                         <p class="quick-card-desc">Export monthly summary</p>
                     </div>
-                    <div class="quick-card" onclick="window.open('https://web.whatsapp.com', '_blank')">
+                    <?php endif; ?>
+
+                    <d iv class="quick-card" onclick="window.open('https://web.whatsapp.com', '_blank')">
                         <div class="quick-card-icon"><i class="fa-brands fa-whatsapp"></i></div>
                         <h4 class="quick-card-title">Open WhatsApp</h4>
                         <p class="quick-card-desc">Send a quick message via WhatsApp</p>
-                    </div>
+                    </d>
                     <div class="quick-card" onclick="openComplaintModal()">
                         <div class="quick-card-icon"><i class="fa-solid fa-wrench"></i></div>
                         <h4 class="quick-card-title">Report an Issue</h4>
