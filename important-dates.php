@@ -36,6 +36,7 @@ $stmt = $pdo->query("
         p.electric_cert_due,
         p.epc_due_date,
         p.landlord_id_expiry_date AS landlord_id_expiry,
+        t.tenant_id,
         t.id_expiry_date AS tenant_id_expiry,
         t.name AS tenant_name,
         l.name AS landlord_name,
@@ -215,6 +216,7 @@ function formatDateValue($date) {
                                 data-electric="<?= htmlspecialchars($row['electric_cert_due'] ?? '') ?>"
                                 data-epc-date="<?= htmlspecialchars($row['epc_due_date'] ?? '') ?>"
                                 data-landlord-id-expiry="<?= htmlspecialchars($row['landlord_id_expiry'] ?? '') ?>"
+                                data-tenant-id="<?= htmlspecialchars($row['tenant_id'] ?? '') ?>"
                                 data-tenant-id-expiry="<?= htmlspecialchars($row['tenant_id_expiry'] ?? '') ?>"
                                 data-contract="<?= htmlspecialchars($row['contract_end'] ?? '') ?>">
                                 <td class="property-name"><?= htmlspecialchars($row['property_address'] ?? 'N/A') ?>
