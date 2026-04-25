@@ -832,6 +832,23 @@ window.actionbtn = (() => {
       epcDate: "p-date-epc",
     },
 
+    importantdate: {
+      id: "_id",
+      type: "i-property-type",
+      price: "i-property-price",
+      rooms: "i-property-rooms",
+      bathrooms: "i-property-bathrooms",
+      epc: "i-property-epc",
+      pets: "i-property-pets",
+      garden: "i-property-garden",
+      council: "i-property-council",
+      gas: "i-date-gas",
+      electric: "i-date-electric",
+      epcDate: "i-date-epc",
+      landlordId: "i-date-landlord-id",
+      tenantExpiry: "i-date-tenant-id",
+    },
+
     landlord: {
       id: "landlord_id",
       name: "l-landlord-name",
@@ -907,6 +924,7 @@ window.actionbtn = (() => {
       epcDate: row.dataset.epcDate || "",
       landlordIdExpiry: row.dataset.landlordIdExpiry || "",
       tenantIdExpiry: row.dataset.tenantIdExpiry || "",
+      tenantRecordId: row.dataset.tenantId || "",
     };
   }
 
@@ -1461,6 +1479,32 @@ window.actionbtn = (() => {
       .then(() => location.reload());
   }
 
+  function saveImportantDate() {
+    const map = SAVE_MAP.importantdate;
+    const payload = {
+      id: state.entity._id,
+      tenantRecordId: state.entity.tenantRecordId || "",
+    };
+
+    Object.entries(map).forEach(([payloadKey, fieldId]) => {
+      if (fieldId === "_id") return;
+      payload[payloadKey] =
+        state.formState[fieldId] ??
+        document.getElementById(fieldId)?.querySelector("input, select")
+          ?.value ??
+        "";
+    });
+
+    fetch("update_property.php", {
+      method: "POST",
+      headers: { "Content-Type": "application/json" },
+      body: JSON.stringify(payload),
+    })
+      .then((r) => r.json())
+      .then(() => location.reload())
+      .catch((err) => console.error(err));
+  }
+
   function saveLandlord() {
     const payload = {
       id: state.entity._id,
@@ -1699,12 +1743,13 @@ window.actionbtn = (() => {
 
     const saveBtn = e.target.closest('[data-action="save"]');
     if (saveBtn) {
-      if (state.entityType === "property") saveProperty();
-      if (state.entityType === "landlord") saveLandlord();
-      if (state.entityType === "tenant") saveTenant();
-      if (state.entityType === "viewing") saveViewing();
-      if (state.entityType === "user") saveUser();
-      if (state.entityType === "payment") savePayment();
+      if (state.entityType === 'property') saveProperty();
+      if (state.entityType === 'importantdate') saveImportantDate();
+      if (state.entityType === 'landlord') saveLandlord();
+      if (state.entityType === 'tenant')   saveTenant();
+      if (state.entityType === 'viewing') saveViewing();
+      if (state.entityType === 'user') saveUser();
+      if (state.entityType === 'payment')  savePayment();
       return;
     }
 
@@ -1775,6 +1820,7 @@ window.actionbtn = (() => {
     switchTab,
     addNote,
     saveProperty,
+    saveImportantDate,
     saveLandlord,
     saveTenant,
     savePayment,

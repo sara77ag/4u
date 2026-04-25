@@ -183,6 +183,8 @@ $confirmedViewings = count(array_filter($viewings, fn($v) => strtolower($v['stat
             cursor: pointer;
             font-size: 9.5pt;
             font-weight: bold;
+            text-decoration: none;
+            display: inline-block;
         }
         .btn-primary   { background: #1a3c5e; color: #fff; }
         .btn-secondary { background: #fff; color: #1a3c5e; border: 1px solid #1a3c5e; }
@@ -343,6 +345,7 @@ $confirmedViewings = count(array_filter($viewings, fn($v) => strtolower($v['stat
 
         <button type="submit" class="btn btn-primary">View Report</button>
         <button type="button" class="btn btn-secondary" onclick="window.print()">Print / Save as PDF</button>
+        <a href="dashboard.php" class="btn btn-secondary">&#8592; Back to Dashboard</a>
     </form>
 
     <div class="report-header">

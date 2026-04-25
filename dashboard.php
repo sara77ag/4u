@@ -36,7 +36,10 @@ $deadlines = $pdo->query("
     (SELECT COUNT(*) FROM tenants    WHERE id_expiry_date    BETWEEN date('now') AND date('now', '+30 days') AND archived = 0) +
     (SELECT COUNT(*) FROM contracts  WHERE contract_end      BETWEEN date('now') AND date('now', '+30 days') AND archived = 0)
 ")->fetchColumn();
-$todos = $pdo->query("SELECT note_id, note_text, completed FROM notes WHERE archived = 0 AND type = 'todo' ORDER BY created_at ASC")->fetchAll(PDO::FETCH_ASSOC);
+
+$stmt = $pdo->prepare("SELECT note_id, note_text, completed FROM notes WHERE archived = 0 AND type = 'todo' AND created_by = ? ORDER BY created_at ASC");
+$stmt->execute([$_SESSION['user_id']]);
+$todos = $stmt->fetchAll(PDO::FETCH_ASSOC);
 ?>
 
 <!DOCTYPE html>
@@ -101,8 +104,6 @@ $todos = $pdo->query("SELECT note_id, note_text, completed FROM notes WHERE arch
                     </div>
                     <?php endif; ?>
 
-
-
                     <div class="quick-card" onclick="openAddContractModal()">
                         <div class="quick-card-icon"><i class="fa-solid fa-file-contract"></i></div>
                         <h4 class="quick-card-title">New Contract</h4>
@@ -126,19 +127,16 @@ $todos = $pdo->query("SELECT note_id, note_text, completed FROM notes WHERE arch
                         <p class="quick-card-desc">Check upcoming deadlines</p>
                     </div>
 
-                    <?php if ($_SESSION['role'] === 'admin'): ?>
                     <div class="quick-card" onclick="window.location.href='export.php'">
                         <div class="quick-card-icon"><i class="fa-solid fa-chart-line"></i></div>
                         <h4 class="quick-card-title">Export Report</h4>
                         <p class="quick-card-desc">Export monthly summary</p>
                     </div>
-                    <?php endif; ?>
-
-                    <d iv class="quick-card" onclick="window.open('https://web.whatsapp.com', '_blank')">
+                    <div class="quick-card" onclick="window.open('https://web.whatsapp.com', '_blank')">
                         <div class="quick-card-icon"><i class="fa-brands fa-whatsapp"></i></div>
                         <h4 class="quick-card-title">Open WhatsApp</h4>
                         <p class="quick-card-desc">Send a quick message via WhatsApp</p>
-                    </d>
+                    </div>
                     <div class="quick-card" onclick="openComplaintModal()">
                         <div class="quick-card-icon"><i class="fa-solid fa-wrench"></i></div>
                         <h4 class="quick-card-title">Report an Issue</h4>

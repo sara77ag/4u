@@ -1,4 +1,10 @@
 <?php
+session_start();
+if(!isset($_SESSION['user_id'])) {
+    header("Location: index.php");
+    exit();
+}
+
 $pdo = null;
 
 if ($_SERVER['REQUEST_METHOD'] === 'POST') {
@@ -14,9 +20,9 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
     if (isset($_POST['todo_text'])) {
         $stmt = $pdo->prepare("
             INSERT INTO notes (note_text, created_at, created_by, type, property_id, landlord_id, tenant_id, payment_id, viewing_id, date_id, user_id, archived)
-            VALUES (?, datetime('now'), 'system', 'todo', NULL, NULL, NULL, NULL, NULL, NULL, NULL, 0)
+            VALUES (?, datetime('now'), ?, 'todo', NULL, NULL, NULL, NULL, NULL, NULL, NULL, 0)
         ");
-        $stmt->execute([trim($_POST['todo_text'])]);
+        $stmt->execute([trim($_POST['todo_text']), $_SESSION['user_id']]);
         header('Location: dashboard.php');
         exit();
     }
@@ -24,17 +30,17 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
     // TODO: Delete
     if (isset($_POST['delete_todo_id'])) {
         $stmt = $pdo->prepare("
-            UPDATE notes SET archived = 1, date_archived = date('now') WHERE note_id = ?
+            UPDATE notes SET archived = 1, date_archived = date('now') WHERE note_id = ? AND created_by = ?
         ");
-        $stmt->execute([(int)$_POST['delete_todo_id']]);
+        $stmt->execute([(int)$_POST['delete_todo_id'], $_SESSION['user_id']]);
         header('Location: dashboard.php');
         exit();
     }
 
     // TODO: Toggle complete
     if (isset($_POST['toggle_todo_id'])) {
-        $stmt = $pdo->prepare("UPDATE notes SET completed = ? WHERE note_id = ?");
-        $stmt->execute([(int)$_POST['toggle_todo_completed'], (int)$_POST['toggle_todo_id']]);
+        $stmt = $pdo->prepare("UPDATE notes SET completed = ? WHERE note_id = ? AND created_by = ?");
+        $stmt->execute([(int)$_POST['toggle_todo_completed'], (int)$_POST['toggle_todo_id'], $_SESSION['user_id']]);
         header('Location: dashboard.php');
         exit();
     }
@@ -151,8 +157,8 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
         try {
             $stmt = $pdo->prepare("
                 INSERT INTO landlords (name, phone, address, email, id_type, id_number,
-                       id_expiry_date, archived)
-                       VALUES (?, ?, ?, ?, ?, ?, ?, 0)
+                                       id_expiry_date, number_of_properties, archived)
+                VALUES (?, ?, ?, ?, ?, ?, ?, 0, 0)
             ");
             $stmt->execute([
                 trim($_POST['landlord_name']),
