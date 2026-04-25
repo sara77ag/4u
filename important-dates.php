@@ -147,14 +147,14 @@ function formatDateValue($date) {
 
                 <div class="controls-spacer"></div>
 
-                <?php if (in_array($_SESSION['role'], ['admin', 'agent'])): ?>
-                <button class="btn-add green" onclick="openAddContractModal()">
+                <!--<?php if (in_array($_SESSION['role'], ['admin', 'agent'])): ?> <button class="btn-add green"
+                    onclick="openAddContractModal()">
                     <i class="fa-solid fa-plus"></i>Contract
-                </button>
-                <button class="btn-add blue" onclick="openAddPropertyModal()">
-                    <i class="fa-solid fa-plus"></i>Property
-                </button>
-                <?php endif; ?>
+                    </button>
+                    <button class="btn-add blue" onclick="openAddPropertyModal()">
+                        <i class="fa-solid fa-plus"></i>Property
+                    </button>
+                    <?php endif; ?> -->
             </div>
 
 
@@ -176,10 +176,10 @@ function formatDateValue($date) {
                                     EPC <i class="fa-solid fa-sort sort-icon"></i>
                                 </th>
                                 <th class="sortable col-idlandlord" onclick="sortTable('idlandlord', this)">
-                                    Landlord Id <br>Verification <i class="fa-solid fa-sort sort-icon"></i>
+                                    Landlord Id Expiry <i class="fa-solid fa-sort sort-icon"></i>
                                 </th>
                                 <th class="sortable col-idtenant" onclick="sortTable('idtenant', this)">
-                                    Tenant Id <br>Verification <i class="fa-solid fa-sort sort-icon"></i>
+                                    Tenant Id Expiry <i class="fa-solid fa-sort sort-icon"></i>
                                 </th>
                                 <th class="sortable col-contract" onclick="sortTable('contract', this)">
                                     Contract <i class="fa-solid fa-sort sort-icon"></i>
@@ -188,65 +188,72 @@ function formatDateValue($date) {
                             </tr>
                         </thead>
                         <tbody id="tableBody">
-                        <?php foreach ($importantDates as $row): 
+                            <?php foreach ($importantDates as $row): 
                             $status = !empty($row['contract_start']) ? 'occupied' : 'available';
                         ?>
-                        <tr
-                            data-id="<?= $row['property_id'] ?>"
-                            data-address="<?= htmlspecialchars($row['property_address'] ?? '') ?>"
-                            data-property="<?= strtolower(htmlspecialchars($row['property_address'] ?? '')) ?>"
-                            data-type="<?= htmlspecialchars($row['property_type'] ?? '') ?>"
-                            data-status="<?= $status ?>"
-                            data-price="<?= htmlspecialchars($row['monthly_rent'] ?? '') ?>"
-                            data-landlord="<?= htmlspecialchars($row['landlord_name'] ?? '') ?>"
-                            data-tenant="<?= htmlspecialchars($row['tenant_name'] ?? '') ?>"
-                            data-contract-start="<?= htmlspecialchars($row['contract_start'] ?? '') ?>"
-                            data-contract-end="<?= htmlspecialchars($row['contract_end'] ?? '') ?>"
-                            data-rooms="<?= htmlspecialchars($row['room_count'] ?? '') ?>"
-                            data-bathrooms="<?= htmlspecialchars($row['bathroom_count'] ?? '') ?>"
-                            data-epc="<?= htmlspecialchars($row['epc_rating'] ?? '') ?>"
-                            data-pets="<?= isset($row['allowed_pets']) ? $row['allowed_pets'] : '' ?>"
-                            data-garden="<?= isset($row['has_garden']) ? $row['has_garden'] : '' ?>"
-                            data-council="<?= htmlspecialchars($row['council_band'] ?? '') ?>"
-                            data-gas="<?= htmlspecialchars($row['gas_cert_due'] ?? '') ?>"
-                            data-electric="<?= htmlspecialchars($row['electric_cert_due'] ?? '') ?>"
-                            data-epc-date="<?= htmlspecialchars($row['epc_due_date'] ?? '') ?>"
-                            data-landlord-id-expiry="<?= htmlspecialchars($row['landlord_id_expiry'] ?? '') ?>"
-                            data-tenant-id-expiry="<?= htmlspecialchars($row['tenant_id_expiry'] ?? '') ?>"
-                            data-contract="<?= htmlspecialchars($row['contract_end'] ?? '') ?>"
-                        >
-                                <td class="property-name"><?= htmlspecialchars($row['property_address'] ?? 'N/A') ?></td>
-                                <td class="gas-date"><?= htmlspecialchars(formatDateValue($row['gas_cert_due'] ?? null)) ?></td>
-                                <td class="electric-date"><?= htmlspecialchars(formatDateValue($row['electric_cert_due'] ?? null)) ?></td>
-                                <td class="epc-date"><?= htmlspecialchars(formatDateValue($row['epc_due_date'] ?? null)) ?></td>
-                                <td class="landlord-id-ver"><?= htmlspecialchars(formatDateValue($row['landlord_id_expiry'] ?? null)) ?></td>
-                                <td class="tenant-id-ver"><?= htmlspecialchars(formatDateValue($row['tenant_id_expiry'] ?? null)) ?></td>
-                                <td class="contract-enddate"><?= htmlspecialchars(formatDateValue($row['contract_end'] ?? null)) ?></td>
+                            <tr data-id="<?= $row['property_id'] ?>"
+                                data-address="<?= htmlspecialchars($row['property_address'] ?? '') ?>"
+                                data-property="<?= strtolower(htmlspecialchars($row['property_address'] ?? '')) ?>"
+                                data-type="<?= htmlspecialchars($row['property_type'] ?? '') ?>"
+                                data-status="<?= $status ?>"
+                                data-price="<?= htmlspecialchars($row['monthly_rent'] ?? '') ?>"
+                                data-landlord="<?= htmlspecialchars($row['landlord_name'] ?? '') ?>"
+                                data-tenant="<?= htmlspecialchars($row['tenant_name'] ?? '') ?>"
+                                data-contract-start="<?= htmlspecialchars($row['contract_start'] ?? '') ?>"
+                                data-contract-end="<?= htmlspecialchars($row['contract_end'] ?? '') ?>"
+                                data-rooms="<?= htmlspecialchars($row['room_count'] ?? '') ?>"
+                                data-bathrooms="<?= htmlspecialchars($row['bathroom_count'] ?? '') ?>"
+                                data-epc="<?= htmlspecialchars($row['epc_rating'] ?? '') ?>"
+                                data-pets="<?= isset($row['allowed_pets']) ? $row['allowed_pets'] : '' ?>"
+                                data-garden="<?= isset($row['has_garden']) ? $row['has_garden'] : '' ?>"
+                                data-council="<?= htmlspecialchars($row['council_band'] ?? '') ?>"
+                                data-gas="<?= htmlspecialchars($row['gas_cert_due'] ?? '') ?>"
+                                data-electric="<?= htmlspecialchars($row['electric_cert_due'] ?? '') ?>"
+                                data-epc-date="<?= htmlspecialchars($row['epc_due_date'] ?? '') ?>"
+                                data-landlord-id-expiry="<?= htmlspecialchars($row['landlord_id_expiry'] ?? '') ?>"
+                                data-tenant-id-expiry="<?= htmlspecialchars($row['tenant_id_expiry'] ?? '') ?>"
+                                data-contract="<?= htmlspecialchars($row['contract_end'] ?? '') ?>">
+                                <td class="property-name"><?= htmlspecialchars($row['property_address'] ?? 'N/A') ?>
+                                </td>
+                                <td class="gas-date">
+                                    <?= htmlspecialchars(formatDateValue($row['gas_cert_due'] ?? null)) ?></td>
+                                <td class="electric-date">
+                                    <?= htmlspecialchars(formatDateValue($row['electric_cert_due'] ?? null)) ?></td>
+                                <td class="epc-date">
+                                    <?= htmlspecialchars(formatDateValue($row['epc_due_date'] ?? null)) ?></td>
+                                <td class="landlord-id-ver">
+                                    <?= htmlspecialchars(formatDateValue($row['landlord_id_expiry'] ?? null)) ?></td>
+                                <td class="tenant-id-ver">
+                                    <?= htmlspecialchars(formatDateValue($row['tenant_id_expiry'] ?? null)) ?></td>
+                                <td class="contract-enddate">
+                                    <?= htmlspecialchars(formatDateValue($row['contract_end'] ?? null)) ?></td>
                                 <td>
                                     <div class="action-buttons">
-                                        <button class="action-btn action-btn-view" title="View" onclick="actionbtn.viewImportantDate(this)">
+                                        <button class="action-btn action-btn-view" title="View"
+                                            onclick="actionbtn.viewImportantDate(this)">
                                             <i class="fa-solid fa-eye"></i>
                                         </button>
-                                        
-                                        <!--<?php if (in_array($_SESSION['role'], ['admin', 'agent'])): ?>
-                                        <button class="action-btn action-btn-edit" title="Edit" onclick="actionbtn.editImportantDate(this)">
+
+                                        <?php if (in_array($_SESSION['role'], ['admin', 'agent'])): ?>
+                                        <button class="action-btn action-btn-edit" title="Edit"
+                                            onclick="actionbtn.editImportantDate(this)">
                                             <i class="fa-solid fa-pen"></i>
                                         </button>
                                         <?php endif; ?>
-                                        
-                                        <?php if ($_SESSION['role'] === 'admin'): ?>
-                                        <form method="POST" style="display:inline;">
+
+                                        <!-- <?php if ($_SESSION['role'] === 'admin'): ?> <form method="POST"
+                                            style="display:inline;">
                                             <input type="hidden" name="archive_id" value="<?= $row['property_id'] ?>">
                                             <button type="submit" class="action-btn action-btn-delete" title="Archive"
                                                 onclick="return confirm('Archive this property?\n<?= htmlspecialchars($row['property_address']) ?>')">
                                                 <i class="fa-solid fa-trash"></i>
                                             </button>
-                                        </form>
-                                        <?php endif; ?>-->
+                                            </form>
+                                            <?php endif; ?> -->
                                     </div>
                                 </td>
                             </tr>
-<?php endforeach; ?>
+                            <?php endforeach; ?>
                         </tbody>
                     </table>
                 </div>
@@ -298,11 +305,11 @@ function formatDateValue($date) {
                     <div class="dates-list">
                         <div class="date-item">
                             <span class="date-label">Landlord's ID Expiry:</span>
-                            <span  id="i-date-landlord-id" class="date-value">-</span>
+                            <span id="i-date-landlord-id" class="date-value">-</span>
                         </div>
                         <div class="date-item">
                             <span class="date-label">Tenant's ID Expiry:</span>
-                            <span  id="i-date-tenant-id" class="date-value">-</span>
+                            <span id="i-date-tenant-id" class="date-value">-</span>
                         </div>
                         <div class="date-item">
                             <span class="date-label ">Contract End:</span>
@@ -384,16 +391,17 @@ function formatDateValue($date) {
                         <span>Notes</span>
                     </div>
                     <div class="notes-input-section">
-                        <textarea id="i-noteTextarea" class="note-textarea" placeholder="Write your note here..."></textarea>
+                        <textarea id="i-noteTextarea" class="note-textarea"
+                            placeholder="Write your note here..."></textarea>
                         <button id="i-addNoteBtn" class="add-note-btn" onclick="window.actionbtn.addNote()">
                             <i class="fa-solid fa-plus"></i> Add Note
                         </button>
                     </div>
                     <div id="i-notesList" class="notes-list" data-notes-list></div>
-                    </div>
                 </div>
             </div>
         </div>
+    </div>
     </div>
 
     <script>
@@ -497,11 +505,11 @@ function formatDateValue($date) {
             const icon = th.querySelector('.sort-icon');
             if (icon) icon.classList.remove('asc', 'desc');
         });
-                }
+    }
 
-        function showImportantDatesInfo() {
-            alert('Important dates are managed through Property, Landlord, and Tenant records.');
-        }
+    function showImportantDatesInfo() {
+        alert('Important dates are managed through Property, Landlord, and Tenant records.');
+    }
     </script>
 
 </body>

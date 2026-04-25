@@ -229,6 +229,19 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST' && isset($_POST['reset_password_id']))
 
     <div id="modals-container"></div>
 
+    <!-- ============================================ -->
+    <!-- Action Buttons: View User -->
+    <!-- ============================================ -->
+    <div id="viewUserModal" class="action-modal-overlay">
+        <div class="action-modal-container">
+            <!-- Header -->
+            <div class="action-modal-header">
+                <div class="action-header-left">
+                    <div class="action-modal-header-icon">
+                        <i class="fa-solid fa-user-tie"></i>
+                    </div>
+                    <h2 id="username">Landlord Name</h2>
+                </div>
     <?php // Action Buttons: View User ?>
     <div id="viewUserModal" class="action-modal-overlay">
         <div class="action-modal-container">
@@ -245,6 +258,15 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST' && isset($_POST['reset_password_id']))
                 </button>
             </div>
 
+                <!-- Tabs Navigation -->
+                <div class="action-tabs-nav">
+                    <button class="tab-btn active" data-tab="user">
+                        <i class="fa-solid fa-house"></i> User Details
+                    </button>
+                    <button class="tab-btn" data-tab="files">
+                        <i class="fa-solid fa-folder"></i> Files
+                    </button>
+                </div>
             <div class="action-tabs-nav">
                 <button class="tab-btn active" data-tab="user">
                     <i class="fa-solid fa-user"></i> User Details
@@ -254,6 +276,46 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST' && isset($_POST['reset_password_id']))
                 </button>
             </div>
 
+                <!-- Tab Content -->
+                <div class="action-tabs-content">
+                    <!-- User Tab -->
+                    <div id="u-tab-user" class="tab-content active">
+                        <div class="tab-header">
+                            <i class="fa-solid fa-user"></i>
+                            <span>User Details</span>
+                        </div>
+                        <div class="details-grid">
+                            <div class="detail-row">
+                                <span class="detail-label">Username:</span>
+                                <span id="u-user-username" class="detail-value">-</span>
+                            </div>
+                            <div class="detail-row">
+                                <span class="detail-label">Name:</span>
+                                <span id="u-user-name" class="detail-value">-</span>
+                            </div>
+                            <div class="detail-row">
+                                <span class="detail-label">Phone Number:</span>
+                                <span id="u-user-phone" class="detail-value">-</span>
+                            </div>
+                            <div class="detail-row">
+                                <span class="detail-label">Email:</span>
+                                <span id="u-user-email" class="detail-value">-</span>
+                            </div>
+                            <div class="detail-row">
+                                <span class="detail-label">Role:</span>
+                                <span id="u-user-role" class="detail-value">-</span>
+                            </div>
+                            <div class="detail-row">
+                                <span class="detail-label">Archived:</span>
+                                <span id="u-user-archived" class="detail-value">-</span>
+                            </div>
+                            <div class="detail-row">
+                                <span class="detail-label">Date Archived:</span>
+                                <span id="u-user-datearchived" class="detail-value">-</span>
+                            </div>
+                        </div>
+                    </div>
+                </div>
             <div class="action-tabs-content">
                 <div id="u-tab-user" class="tab-content active">
                     <div class="tab-header">
@@ -293,6 +355,24 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST' && isset($_POST['reset_password_id']))
                     </div>
                 </div>
 
+                <div id="u-tab-files" class="tab-content">
+                    <div class="tab-header">
+                        <i class="fa-solid fa-folder"></i>
+                        <span>Files</span>
+                    </div>
+                    <div class="details-grid">
+                        <div class="detail-row">
+                            <span class="detail-label">ID Number:</span>
+                            <span id="u-user-IdNumber" class="detail-value">-</span>
+                        </div>
+                        <div class="detail-row">
+                            <span class="detail-label">ID Expiry Date:</span>
+                            <span id="u-user-Idexpirydate" class="detail-value">-</span>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
                 <div id="u-tab-files" class="tab-content">
                     <div class="tab-header">
                         <i class="fa-solid fa-folder"></i>

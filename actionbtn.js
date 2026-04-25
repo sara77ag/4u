@@ -381,10 +381,9 @@ window.actionbtn = (() => {
       { id: 'v-viewing-phone',        key: 'viewer_phone',  type: 'text',   tab: 'viewing', editable: true },
       { id: 'v-viewing-status',       key: 'status',        type: 'select', tab: 'viewing', editable: true, options: ['scheduled', 'completed', 'cancelled', 'no_show'] },
       { id: 'v-viewing-datetime',     key: 'date_time',     type: 'datetime', tab: 'viewing', editable: true },
-      { id: 'v-viewing-userid',       key: 'user_id',       type: 'text',   tab: 'viewing', editable: false },
+      { id: 'v-viewing-agent',       key: 'agent_name',       type: 'text',   tab: 'viewing', editable: false },
       { id: 'v-viewing-email',        key: 'email',         type: 'text',   tab: 'viewing', editable: true },
-      { id: 'v-viewing-archived',     key: 'archived',      type: 'select', tab: 'viewing', editable: true, options: ['0', '1'] },
-      { id: 'v-viewing-datearchived', key: 'date_archived', type: 'date',   tab: 'viewing', editable: false },
+      { id: 'v-viewing-property',      key: 'property_address', type: 'text',   tab: 'viewing', editable: false },
 
       { id: 'v-property-landlord',    key: 'landlord',      type: 'text',   tab: 'property', editable: false },
       { id: 'v-property-type',        key: 'type',          type: 'text',   tab: 'property', editable: false },
@@ -447,6 +446,7 @@ window.actionbtn = (() => {
 
   };
 
+
   const SAVE_MAP = {
     property: {
       id: "_id",
@@ -485,15 +485,13 @@ window.actionbtn = (() => {
 
     viewing: {
       _id:              'v-viewing-id',
-      property_id:     'v-viewing-propertyid',
+      property_address:     'v-viewing-property',
       viewer_name:     'v-viewing-viewer',
       viewer_phone:    'v-viewing-phone',
       status:          'v-viewing-status',
       date_time:       'v-viewing-datetime',
-      user_id:         'v-viewing-userid',
+      agent:         'v-viewing-agent',
       email:           'v-viewing-email',
-      archived:        'v-viewing-archived',
-      date_archived:    'v-viewing-datearchived',
     },
 
     user: {
@@ -594,19 +592,19 @@ window.actionbtn = (() => {
     const row = btn.closest('tr') || btn.closest('.card');
     return {
       _id:             row.dataset.bookingid || '',
-      property_id:     row.dataset.propertyid || '',
       viewer_name:     row.dataset.viewer || '',
       viewer_phone:    row.dataset.phone || '',
       status:          row.dataset.status || '',
       date_time:       row.dataset.datetime || '',
-      user_id:         row.dataset.userid || '',
       email:           row.dataset.email || '',
-      archived:        row.dataset.archived || '',
-      date_archived:   row.dataset.datearchived || '',
+      agent_name:       row.dataset.agent || '',
+      property_address: row.dataset.property || '',
+
 
       landlord:        row.dataset.landlord || '',
       type:            row.dataset.type || '',
       property_status: row.dataset.propertystatus || '',
+      property_address: row.dataset.property || '',
       price:           row.dataset.price || '',
       tenant:          row.dataset.tenant || '',
       rooms:           row.dataset.rooms || '',
@@ -1155,10 +1153,9 @@ function saveViewing() {
     viewer_phone:          document.querySelector('#v-viewing-phone input')?.value    || '',
     status:          document.querySelector('#v-viewing-status select')?.value    || '',
     date_time:        document.querySelector('#v-viewing-datetime input')?.value   || '',
-    user_id:      document.querySelector('#v-viewing-userid input')?.value || '',
     email: document.querySelector('#v-viewing-email input')?.value || '',
-    archived: document.querySelector('#v-viewing-archived select')?.value || '',
-    date_archived: document.querySelector('#v-viewing-datearchived input')?.value || '',
+    agent_name: document.querySelector('#v-viewing-agent input')?.value || '',
+    property_address: document.querySelector('#v-viewing-property input')?.value || '',
   };
 
   fetch('update_viewing.php', {
@@ -1322,9 +1319,7 @@ function toDateTimeInputValue(value) {
   });
 
   // Public API
-
- 
-  return {
+return {
     viewProperty(btn)  { openEntityModal('property', extractPropertyData(btn), 'view'); },
     editProperty(btn)  { openEntityModal('property', extractPropertyData(btn), 'edit'); },
     viewLandlord(btn)  { openEntityModal('landlord', extractLandlordData(btn), 'view'); },
@@ -1517,4 +1512,7 @@ function fetchTenantHistory(tenantId) {
           <div class="cell" style="grid-column:1/-1; color:red;">Failed to load payment records</div>
         </div>`;
     });
-}
+  }
+    
+  
+  

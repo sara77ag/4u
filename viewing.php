@@ -201,18 +201,12 @@ $viewings = $stmt->fetchAll(PDO::FETCH_ASSOC);
                             <?php
                                 $propertyStatus = !empty($v['tenant_name']) ? 'occupied' : 'available';
                             ?>
-                            <tr
-                                data-bookingid="<?= $v['booking_id'] ?>"
-                                data-propertyid="<?= $v['property_id'] ?>"
+                            <tr data-bookingid="<?= $v['booking_id'] ?>" data-propertyid="<?= $v['property_id'] ?>"
                                 data-viewer="<?= htmlspecialchars($v['viewer_name']) ?>"
                                 data-phone="<?= htmlspecialchars($v['viewer_phone']) ?>"
                                 data-status="<?= htmlspecialchars($v['status']) ?>"
                                 data-datetime="<?= htmlspecialchars($v['date_time']) ?>"
-                                data-userid="<?= htmlspecialchars($v['user_id']) ?>"
                                 data-email="<?= htmlspecialchars($v['email']) ?>"
-                                data-archived="<?= htmlspecialchars($v['archived']) ?>"
-                                data-datearchived="<?= htmlspecialchars($v['date_archived']) ?>"
-
                                 data-landlord="<?= htmlspecialchars($v['landlord_name'] ?? '') ?>"
                                 data-type="<?= htmlspecialchars($v['property_type'] ?? '') ?>"
                                 data-propertystatus="<?= $propertyStatus ?>"
@@ -224,11 +218,12 @@ $viewings = $stmt->fetchAll(PDO::FETCH_ASSOC);
                                 data-pets="<?= isset($v['allowed_pets']) ? $v['allowed_pets'] : '' ?>"
                                 data-garden="<?= isset($v['has_garden']) ? $v['has_garden'] : '' ?>"
                                 data-council="<?= htmlspecialchars($v['council_band'] ?? '') ?>"
-                            >
+                                data-agent="<?= htmlspecialchars($v['agent_name'] ?? '') ?>"
+                                data-property="<?= htmlspecialchars($v['property_address'] ?? '') ?>">
                                 <td class="viewer-name"><?= htmlspecialchars($v['viewer_name']) ?></td>
                                 <td><?= htmlspecialchars($v['viewer_phone']) ?></td>
                                 <td class="viewer-email"><?= htmlspecialchars($v['email']) ?></td>
-                                <td class="viewing-property"><?= htmlspecialchars($v['property_address'] ?? 'N/A') ?>
+                                <td class="viewing-property"><?= htmlspecialchars($v['property_address'] ?? '') ?>
                                 </td>
                                 <td class="viewing-datetime"><?= htmlspecialchars($v['date_time']) ?></td>
                                 <td class="agent"><?= htmlspecialchars($v['agent_name'] ?? 'N/A') ?></td>
@@ -243,9 +238,10 @@ $viewings = $stmt->fetchAll(PDO::FETCH_ASSOC);
                                         <!--<button class="action-btn action-btn-notes" title="Notes" onclick="actionbtn.viewViewingNotes(this)">
                                             <i class="far fa-sticky-note"></i>
                                         </button> -->
-                                        
+
                                         <?php if (in_array($_SESSION['role'], ['admin', 'agent'])): ?>
-                                        <button class="action-btn action-btn-edit" title="Edit" onclick="actionbtn.editViewing(this)">
+                                        <button class="action-btn action-btn-edit" title="Edit"
+                                            onclick="actionbtn.editViewing(this)">
                                             <i class="fa-solid fa-pen"></i>
                                         </button>
                                         <?php endif; ?>
@@ -316,36 +312,32 @@ $viewings = $stmt->fetchAll(PDO::FETCH_ASSOC);
                     </div>
                     <div class="details-grid">
                         <div class="detail-row">
-                            <span class="detail-label">Viewer Name</span>
+                            <span class="detail-label"> Name</span>
                             <span id="v-viewing-viewer" class="detail-value">-</span>
                         </div>
                         <div class="detail-row">
-                            <span class="detail-label">Viewer Phone Number</span>
+                            <span class="detail-label"> Phone Number</span>
                             <span id="v-viewing-phone" class="detail-value">-</span>
                         </div>
                         <div class="detail-row">
-                            <span class="detail-label">Viewing Status</span>
-                            <span id="v-viewing-status" class="detail-value">-</span>
-                        </div>
-                        <div class="detail-row">
-                            <span class="detail-label">Viewer Date/Time</span>
-                            <span id="v-viewing-datetime" class="detail-value">-</span>
-                        </div>
-                        <div class="detail-row">
-                            <span class="detail-label">Staff ID</span>
-                            <span id="v-viewing-userid" class="detail-value">-</span>
-                        </div>
-                        <div class="detail-row">
-                            <span class="detail-label">Viewer Email</span>
+                            <span class="detail-label"> Email</span>
                             <span id="v-viewing-email" class="detail-value">-</span>
                         </div>
                         <div class="detail-row">
-                            <span class="detail-label">Archived</span>
-                            <span id="v-viewing-archived" class="detail-value">-</span>
+                            <span class="detail-label">Property</span>
+                            <span id="v-viewing-property" class="detail-value">-</span>
                         </div>
                         <div class="detail-row">
-                            <span class="detail-label">Date Archived</span>
-                            <span id="v-viewing-datearchived" class="detail-value">-</span>
+                            <span class="detail-label">Date/Time</span>
+                            <span id="v-viewing-datetime" class="detail-value">-</span>
+                        </div>
+                        <div class="detail-row">
+                            <span class="detail-label">Status</span>
+                            <span id="v-viewing-status" class="detail-value">-</span>
+                        </div>
+                        <div class="detail-row">
+                            <span class="detail-label">Agent</span>
+                            <span id="v-viewing-agent" class="detail-value">-</span>
                         </div>
                     </div>
                 </div>
@@ -416,11 +408,11 @@ $viewings = $stmt->fetchAll(PDO::FETCH_ASSOC);
                             <i class="fa-solid fa-plus"></i> Add Note
                         </button>
                     </div>
-                    <div id="v-notesList" class="notes-list" date-notes-list> </div>
-                    </div>
+                    <div id="v-notesList" class="notes-list" data-notes-list> </div>
                 </div>
             </div>
         </div>
+    </div>
     </div>
 
     <div id="archiveModal" class="action-modal-overlay">
@@ -455,7 +447,6 @@ $viewings = $stmt->fetchAll(PDO::FETCH_ASSOC);
     </div>
 
     <script>
-
     function toggleFilter() {
         const filterToggle = document.getElementById('filterToggle');
         const filterDropdowns = document.getElementById('filterDropdowns');
@@ -566,13 +557,16 @@ $viewings = $stmt->fetchAll(PDO::FETCH_ASSOC);
         document.getElementById('filterDateTime').value = '';
         document.getElementById('filterAgent').value = '';
 
-            document.querySelectorAll('table th').forEach(th => {
-                th.classList.remove('sorted');
-                const icon = th.querySelector('.sort-icon');
-                if (icon) icon.classList.remove('asc', 'desc');
-            });
-            currentSort = { column: null, direction: 'asc' };
-        }
+        document.querySelectorAll('table th').forEach(th => {
+            th.classList.remove('sorted');
+            const icon = th.querySelector('.sort-icon');
+            if (icon) icon.classList.remove('asc', 'desc');
+        });
+        currentSort = {
+            column: null,
+            direction: 'asc'
+        };
+    }
 
     let selectedViewingId = null;
 
