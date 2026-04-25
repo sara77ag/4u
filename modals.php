@@ -376,6 +376,17 @@ try {
                     <label>EPC Due Date <span class="required">*</span></label>
                     <input type="date" name="epc_due_date" class="form-control" required>
                 </div>
+                <div class="form-group">
+                    <label>Upload Files</label>
+                    <input type="file" id="propertyFileInput" name="property_files[]" class="file-input" multiple
+                        accept=".pdf,.jpg,.jpeg,.png">
+                    <div class="file-upload-group" onclick="document.getElementById('propertyFileInput').click()">
+                        <i class="fa-solid fa-cloud-arrow-up"></i>
+                        <p>Upload Property Files</p>
+                    </div>
+                    <div id="propertyFileCount" class="file-count"></div>
+                    <div id="propertyFileList"></div>
+                </div>
             </div>
             <div class="modal-footer">
                 <button type="button" class="modal-btn modal-btn-reset" onclick="resetAddPropertyForm()">
@@ -440,6 +451,17 @@ try {
                 <div class="form-group">
                     <label>ID Expiry Date <span class="required">*</span></label>
                     <input type="date" name="landlord_id_expiry" class="form-control" required>
+                </div>
+                <div class="form-group">
+                    <label>Upload Files</label>
+                    <input type="file" id="landlordFileInput" name="landlord_files[]" class="file-input" multiple
+                        accept=".pdf,.jpg,.jpeg,.png">
+                    <div class="file-upload-group" onclick="document.getElementById('landlordFileInput').click()">
+                        <i class="fa-solid fa-cloud-arrow-up"></i>
+                        <p>Upload landlord Files</p>
+                    </div>
+                    <div id="landlordFileCount" class="file-count"></div>
+                    <div id="landlordFileList"></div>
                 </div>
             </div>
             <div class="modal-footer">
@@ -534,6 +556,17 @@ try {
                         <option value="fortnightly">Fortnightly</option>
                         <option value="monthly">Monthly</option>
                     </select>
+                </div>
+                <div class="form-group">
+                    <label>Upload Files</label>
+                    <input type="file" id="tenantFileInput" name="tenant_files[]" class="file-input" multiple
+                        accept=".pdf,.jpg,.jpeg,.png">
+                    <div class="file-upload-group" onclick="document.getElementById('tenantFileInput').click()">
+                        <i class="fa-solid fa-cloud-arrow-up"></i>
+                        <p>Upload tenant Files</p>
+                    </div>
+                    <div id="tenantFileCount" class="file-count"></div>
+                    <div id="tenantFileList"></div>
                 </div>
             </div>
             <div class="modal-footer">
@@ -922,6 +955,17 @@ try {
                     <label>Password <span class="required">*</span></label>
                     <input type="password" name="user_password" class="form-control" placeholder="Enter Password"
                         required>
+                </div>
+                <div class="form-group">
+                    <label>Upload Files</label>
+                    <input type="file" id="userFileInput" name="user_files[]" class="file-input" multiple
+                        accept=".pdf,.jpg,.jpeg,.png">
+                    <div class="file-upload-group" onclick="document.getElementById('userFileInput').click()">
+                        <i class="fa-solid fa-cloud-arrow-up"></i>
+                        <p>Upload user Files</p>
+                    </div>
+                    <div id="userFileCount" class="file-count"></div>
+                    <div id="userFileList"></div>
                 </div>
             </div>
             <div class="modal-footer">
