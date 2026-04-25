@@ -45,6 +45,9 @@ if (!$entity_type || !$entity_id || !$text) {
         case 'date':
             $date_id = $entity_id;
             break;
+        case 'importantdate':
+            $date_id = $entity_id;
+            break;
         case 'user':
             $user_note_id = $entity_id;
             break;
@@ -108,6 +111,10 @@ if ($_SERVER['REQUEST_METHOD'] === 'GET') {
             $params[] = $entity_id;
             break;
         case 'date':
+            $where[] = "date_id = ?";
+            $params[] = $entity_id;
+            break;
+        case 'importantdate':
             $where[] = "date_id = ?";
             $params[] = $entity_id;
             break;
