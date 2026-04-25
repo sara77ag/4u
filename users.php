@@ -155,8 +155,7 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST' && isset($_POST['reset_password_id']))
                     <?php foreach ($users as $user): 
                         $roleDisplay = ucfirst(str_replace('_', ' ', $user['role']));
                     ?>
-                    <div class="card"
-                        data-userid="<?= $user['user_id'] ?>"
+                    <div class="card" data-userid="<?= $user['user_id'] ?>"
                         data-username="<?= htmlspecialchars($user['username']) ?>"
                         data-name="<?= htmlspecialchars($user['name']) ?>"
                         data-phone="<?= htmlspecialchars($user['phone']) ?>"
@@ -189,7 +188,8 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST' && isset($_POST['reset_password_id']))
                             <span class="blue-badge"><?= htmlspecialchars($roleDisplay) ?></span>
                             <form method="POST" style="display:inline;">
                                 <input type="hidden" name="reset_password_id" value="<?= $user['user_id'] ?>">
-                                <button type="submit" class="reset-password-link" style="border:none;background:none;color:#007bff;cursor:pointer;text-decoration:underline;"
+                                <button type="submit" class="reset-password-link"
+                                    style="border:none;background:none;color:#007bff;cursor:pointer;text-decoration:underline;"
                                     onclick="return confirm('Reset password for <?= htmlspecialchars($user['name']) ?>?')">
                                     Reset Password
                                 </button>
@@ -210,8 +210,7 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST' && isset($_POST['reset_password_id']))
                             <?php if ($_SESSION['role'] === 'admin'): ?>
                             <form method="POST" style="display:inline;">
                                 <input type="hidden" name="archive_id" value="<?= $user['user_id'] ?>">
-                                <button type="submit" class="action-btn action-btn-delete" title="Archive"
-                                    onclick="openArchiveModal(
+                                <button type="submit" class="action-btn action-btn-delete" title="Archive" onclick="openArchiveModal(
                                     <?= (int)$user['user_id'] ?>,
                                     '<?= htmlspecialchars($user['name'], ENT_QUOTES) ?>'
                                 ); return false;">
@@ -234,17 +233,6 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST' && isset($_POST['reset_password_id']))
     <!-- ============================================ -->
     <div id="viewUserModal" class="action-modal-overlay">
         <div class="action-modal-container">
-            <!-- Header -->
-            <div class="action-modal-header">
-                <div class="action-header-left">
-                    <div class="action-modal-header-icon">
-                        <i class="fa-solid fa-user-tie"></i>
-                    </div>
-                    <h2 id="username">Landlord Name</h2>
-                </div>
-    <?php // Action Buttons: View User ?>
-    <div id="viewUserModal" class="action-modal-overlay">
-        <div class="action-modal-container">
             <div class="action-modal-header">
                 <div class="action-header-left">
                     <div class="action-modal-header-icon">
@@ -258,15 +246,8 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST' && isset($_POST['reset_password_id']))
                 </button>
             </div>
 
-                <!-- Tabs Navigation -->
-                <div class="action-tabs-nav">
-                    <button class="tab-btn active" data-tab="user">
-                        <i class="fa-solid fa-house"></i> User Details
-                    </button>
-                    <button class="tab-btn" data-tab="files">
-                        <i class="fa-solid fa-folder"></i> Files
-                    </button>
-                </div>
+            <!-- Tabs Navigation -->
+
             <div class="action-tabs-nav">
                 <button class="tab-btn active" data-tab="user">
                     <i class="fa-solid fa-user"></i> User Details
@@ -274,55 +255,17 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST' && isset($_POST['reset_password_id']))
                 <button class="tab-btn" data-tab="files">
                     <i class="fa-solid fa-folder"></i> Files
                 </button>
+
             </div>
 
-                <!-- Tab Content -->
-                <div class="action-tabs-content">
-                    <!-- User Tab -->
-                    <div id="u-tab-user" class="tab-content active">
-                        <div class="tab-header">
-                            <i class="fa-solid fa-user"></i>
-                            <span>User Details</span>
-                        </div>
-                        <div class="details-grid">
-                            <div class="detail-row">
-                                <span class="detail-label">Username:</span>
-                                <span id="u-user-username" class="detail-value">-</span>
-                            </div>
-                            <div class="detail-row">
-                                <span class="detail-label">Name:</span>
-                                <span id="u-user-name" class="detail-value">-</span>
-                            </div>
-                            <div class="detail-row">
-                                <span class="detail-label">Phone Number:</span>
-                                <span id="u-user-phone" class="detail-value">-</span>
-                            </div>
-                            <div class="detail-row">
-                                <span class="detail-label">Email:</span>
-                                <span id="u-user-email" class="detail-value">-</span>
-                            </div>
-                            <div class="detail-row">
-                                <span class="detail-label">Role:</span>
-                                <span id="u-user-role" class="detail-value">-</span>
-                            </div>
-                            <div class="detail-row">
-                                <span class="detail-label">Archived:</span>
-                                <span id="u-user-archived" class="detail-value">-</span>
-                            </div>
-                            <div class="detail-row">
-                                <span class="detail-label">Date Archived:</span>
-                                <span id="u-user-datearchived" class="detail-value">-</span>
-                            </div>
-                        </div>
-                    </div>
-                </div>
+            <!-- Tab Content -->
             <div class="action-tabs-content">
+                <!-- User Tab -->
                 <div id="u-tab-user" class="tab-content active">
                     <div class="tab-header">
                         <i class="fa-solid fa-user"></i>
                         <span>User Details</span>
                     </div>
-
                     <div class="details-grid">
                         <div class="detail-row">
                             <span class="detail-label">Username:</span>
@@ -344,14 +287,6 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST' && isset($_POST['reset_password_id']))
                             <span class="detail-label">Role:</span>
                             <span id="u-user-role" class="detail-value">-</span>
                         </div>
-                        <div class="detail-row">
-                            <span class="detail-label">Archived:</span>
-                            <span id="u-user-archived" class="detail-value">-</span>
-                        </div>
-                        <div class="detail-row">
-                            <span class="detail-label">Date Archived:</span>
-                            <span id="u-user-datearchived" class="detail-value">-</span>
-                        </div>
                     </div>
                 </div>
 
@@ -360,128 +295,105 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST' && isset($_POST['reset_password_id']))
                         <i class="fa-solid fa-folder"></i>
                         <span>Files</span>
                     </div>
-                    <div class="details-grid">
-                        <div class="detail-row">
-                            <span class="detail-label">ID Number:</span>
-                            <span id="u-user-IdNumber" class="detail-value">-</span>
-                        </div>
-                        <div class="detail-row">
-                            <span class="detail-label">ID Expiry Date:</span>
-                            <span id="u-user-Idexpirydate" class="detail-value">-</span>
+                    <div class="files-list">
+                        <div class="file-item">
+                            <i class="fa-solid fa-file-pdf file-icon"></i>
+                            <span class="file-name">Copy of ID / Passport</span>
+                            <button class="file-open-btn">Open</button>
                         </div>
                     </div>
                 </div>
             </div>
-        </div>
-                <div id="u-tab-files" class="tab-content">
-                    <div class="tab-header">
-                        <i class="fa-solid fa-folder"></i>
-                        <span>Files</span>
-                    </div>
 
-                    <div class="details-grid">
-                        <div class="detail-row">
-                            <span class="detail-label">ID Number:</span>
-                            <span id="u-user-IdNumber" class="detail-value">-</span>
+
+            <div id="archiveModal" class="action-modal-overlay">
+                <div class="action-modal-container" style="max-width: 480px;">
+                    <div class="action-modal-header">
+                        <div class="action-header-left">
+                            <div class="action-modal-header-icon">
+                                <i class="fa-solid fa-user-tie"></i>
+                            </div>
+                            <h3>Archive User</h3>
                         </div>
-                        <div class="detail-row">
-                            <span class="detail-label">ID Expiry Date:</span>
-                            <span id="u-user-Idexpirydate" class="detail-value">-</span>
+                        <button class="modal-close-btn" onclick="closeArchiveModal()">
+                            <i class="fa-solid fa-xmark"></i>
+                        </button>
+                    </div>
+
+                    <div class="delete-body">
+                        <p class="p-text">Are you sure you want to archive this user?</p>
+                        <p id="archiveUserName" class="delete-entity"></p>
+
+                        <div class="modal-footer">
+                            <button class="modal-btn modal-btn-delete" onclick="confirmArchive()">
+                                Yes, Archive
+                            </button>
                         </div>
+
+                        <form id="archiveForm" method="POST" style="display:none;">
+                            <input type="hidden" name="archive_id" id="archive_id">
+                        </form>
                     </div>
                 </div>
             </div>
-        </div>
-    </div>
 
-    <div id="archiveModal" class="action-modal-overlay">
-        <div class="action-modal-container" style="max-width: 480px;">
-            <div class="action-modal-header">
-                <div class="action-header-left">
-                    <div class="action-modal-header-icon">
-                        <i class="fa-solid fa-user-tie"></i>
-                    </div>
-                    <h3>Archive User</h3>
-                </div>
-                <button class="modal-close-btn" onclick="closeArchiveModal()">
-                    <i class="fa-solid fa-xmark"></i>
-                </button>
-            </div>
+            <script>
+            function toggleFilter() {
+                const filterToggle = document.getElementById('filterToggle');
+                const filterDropdowns = document.getElementById('filterDropdowns');
+                filterDropdowns.style.display = filterDropdowns.style.display === 'none' ? 'flex' : 'none';
+                filterToggle.classList.toggle('active');
+            }
 
-            <div class="delete-body">
-                <p class="p-text">Are you sure you want to archive this user?</p>
-                <p id="archiveUserName" class="delete-entity"></p>
+            function filterUsers() {
+                const roleFilter = document.getElementById('filterRole').value;
+                document.querySelectorAll('.card').forEach(card => {
+                    card.style.display = (!roleFilter || card.dataset.role === roleFilter) ? '' : 'none';
+                });
+            }
 
-                <div class="modal-footer">
-                    <button class="modal-btn modal-btn-delete" onclick="confirmArchive()">
-                        Yes, Archive
-                    </button>
-                </div>
+            function sortUsers() {
+                const sortValue = document.getElementById('sortBy').value;
+                const [column, direction] = sortValue.split('-');
+                const cards = Array.from(document.querySelectorAll('.card'));
 
-                <form id="archiveForm" method="POST" style="display:none;">
-                    <input type="hidden" name="archive_id" id="archive_id">
-                </form>
-            </div>
-        </div>
-    </div>
+                cards.sort((a, b) => {
+                    let aVal = column === 'name' ? a.dataset.name.toLowerCase() : a.dataset.role.toLowerCase();
+                    let bVal = column === 'name' ? b.dataset.name.toLowerCase() : b.dataset.role.toLowerCase();
+                    if (aVal < bVal) return direction === 'asc' ? -1 : 1;
+                    if (aVal > bVal) return direction === 'asc' ? 1 : -1;
+                    return 0;
+                });
 
-    <script>
-    function toggleFilter() {
-        const filterToggle = document.getElementById('filterToggle');
-        const filterDropdowns = document.getElementById('filterDropdowns');
-        filterDropdowns.style.display = filterDropdowns.style.display === 'none' ? 'flex' : 'none';
-        filterToggle.classList.toggle('active');
-    }
+                const grid = document.getElementById('usersGrid');
+                cards.forEach(card => grid.appendChild(card));
+            }
 
-    function filterUsers() {
-        const roleFilter = document.getElementById('filterRole').value;
-        document.querySelectorAll('.card').forEach(card => {
-            card.style.display = (!roleFilter || card.dataset.role === roleFilter) ? '' : 'none';
-        });
-    }
+            function resetFilters() {
+                document.getElementById('filterRole').value = '';
+                document.getElementById('sortBy').value = 'name-asc';
+                document.querySelectorAll('.card').forEach(card => card.style.display = '');
+                sortUsers();
+            }
 
-    function sortUsers() {
-        const sortValue = document.getElementById('sortBy').value;
-        const [column, direction] = sortValue.split('-');
-        const cards = Array.from(document.querySelectorAll('.card'));
+            let selectedUserId = null;
 
-        cards.sort((a, b) => {
-            let aVal = column === 'name' ? a.dataset.name.toLowerCase() : a.dataset.role.toLowerCase();
-            let bVal = column === 'name' ? b.dataset.name.toLowerCase() : b.dataset.role.toLowerCase();
-            if (aVal < bVal) return direction === 'asc' ? -1 : 1;
-            if (aVal > bVal) return direction === 'asc' ? 1 : -1;
-            return 0;
-        });
+            function openArchiveModal(id, userName) {
+                selectedUserId = id;
+                document.getElementById('archiveUserName').innerText = userName;
+                document.getElementById('archiveModal').style.display = 'flex';
+            }
 
-        const grid = document.getElementById('usersGrid');
-        cards.forEach(card => grid.appendChild(card));
-    }
+            function closeArchiveModal() {
+                document.getElementById('archiveModal').style.display = 'none';
+                selectedUserId = null;
+            }
 
-    function resetFilters() {
-        document.getElementById('filterRole').value = '';
-        document.getElementById('sortBy').value = 'name-asc';
-        document.querySelectorAll('.card').forEach(card => card.style.display = '');
-        sortUsers();
-    }
-
-    let selectedUserId = null;
-
-    function openArchiveModal(id, userName) {
-        selectedUserId = id;
-        document.getElementById('archiveUserName').innerText = userName;
-        document.getElementById('archiveModal').style.display = 'flex';
-    }
-
-    function closeArchiveModal() {
-        document.getElementById('archiveModal').style.display = 'none';
-        selectedUserId = null;
-    }
-
-    function confirmArchive() {
-        document.getElementById('archive_id').value = selectedUserId;
-        document.getElementById('archiveForm').submit();
-    }
-    </script>
+            function confirmArchive() {
+                document.getElementById('archive_id').value = selectedUserId;
+                document.getElementById('archiveForm').submit();
+            }
+            </script>
 </body>
 
 </html>

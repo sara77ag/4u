@@ -22,19 +22,21 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST' && isset($_POST['archive_id'])) {
 
 $stmt = $pdo->query("
     SELECT 
-        landlord_id,
-        name,
-        phone,
-        email,
-        address,
-        id_type,
-        id_number,
-        id_expiry_date,
-        contact_method,
-        number_of_properties
-    FROM landlords
-    WHERE archived = 0
-    ORDER BY name
+        l.landlord_id,
+        l.name,
+        l.phone,
+        l.email,
+        l.address,
+        l.id_type,
+        l.id_number,
+        l.id_expiry_date,
+        l.contact_method,
+        COUNT(p.property_id) AS number_of_properties
+    FROM landlords l
+    LEFT JOIN properties p ON p.landlord_id = l.landlord_id AND p.archived = 0
+    WHERE l.archived = 0
+    GROUP BY l.landlord_id
+    ORDER BY l.name
 ");
 
 $landlords = $stmt->fetchAll(PDO::FETCH_ASSOC);

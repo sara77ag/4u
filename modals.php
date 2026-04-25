@@ -96,8 +96,8 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
         try {
             $stmt = $pdo->prepare("
                 INSERT INTO landlords (name, phone, address, email, id_type, id_number,
-                                       id_expiry_date, number_of_properties, archived)
-                VALUES (?, ?, ?, ?, ?, ?, ?, 0, 0)
+                       id_expiry_date, archived)
+                       VALUES (?, ?, ?, ?, ?, ?, ?, 0)
             ");
             $stmt->execute([
                 trim($_POST['landlord_name']),
@@ -440,11 +440,6 @@ try {
                 <div class="form-group">
                     <label>ID Expiry Date <span class="required">*</span></label>
                     <input type="date" name="landlord_id_expiry" class="form-control" required>
-                </div>
-                <div class="form-group">
-                    <label>Number of Properties</label>
-                    <input type="number" name="landlord_number_of_properties" class="form-control" placeholder="0"
-                        min="0" value="0">
                 </div>
             </div>
             <div class="modal-footer">
