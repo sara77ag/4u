@@ -1611,26 +1611,29 @@ window.actionbtn = (() => {
   function saveUser() {
     const payload = {
       id: state.entity._id || "",
-      username:
-        document.querySelector("#u-user-username input")?.value ||
-        state.entity.username ||
+      name:
+        document.querySelector("#u-user-name input")?.value ||
+        state.entity.name ||
         "",
-      name: document.querySelector("#u-user-name input")?.value || "",
-      phone: document.querySelector("#u-user-phone input")?.value || "",
-      email: document.querySelector("#u-user-email input")?.value || "",
-      password: document.querySelector("#u-user-password input")?.value || "",
-      password_reset_date:
-        document.querySelector("#u-user-passwordresetdate input")?.value ||
-        state.entity.password_reset_date ||
+      phone:
+        document.querySelector("#u-user-phone input")?.value ||
+        state.entity.phone ||
         "",
-      id_number: document.querySelector("#u-user-IdNumber input")?.value || "",
+      email:
+        document.querySelector("#u-user-email input")?.value ||
+        state.entity.email ||
+        "",
+      id_number:
+        document.querySelector("#u-user-IdNumber input")?.value ||
+        state.entity.id_number ||
+        "",
       id_expiry_date:
-        document.querySelector("#u-user-Idexpirydate input")?.value || "",
-      role: document.querySelector("#u-user-role select")?.value || "",
-      archived: document.querySelector("#u-user-archived select")?.value || "",
-      date_archived:
-        document.querySelector("#u-user-datearchived input")?.value ||
-        state.entity.date_archived ||
+        document.querySelector("#u-user-Idexpirydate input")?.value ||
+        state.entity.id_expiry_date ||
+        "",
+      role:
+        document.querySelector("#u-user-role select")?.value ||
+        state.entity.role ||
         "",
     };
 

@@ -25,7 +25,7 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST' && isset($_POST['archive_id'])) {
 $stmt = $pdo->query("
     SELECT 
         user_id, username, name, email, phone, role, password,
-        password_reset_date, id_number, id_expiry_date
+        password_reset_date, id_number, id_expiry_date, archived, date_archived
     FROM users
     WHERE archived = 0
     ORDER BY name
@@ -190,7 +190,9 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST' && isset($_POST['reset_password_id']))
                         data-passwordresetdate="<?= htmlspecialchars($user['password_reset_date']) ?>"
                         data-idnumber="<?= htmlspecialchars($user['id_number']) ?>"
                         data-idexpirydate="<?= htmlspecialchars($user['id_expiry_date']) ?>"
-                        data-role="<?= htmlspecialchars($user['role']) ?>">
+                        data-role="<?= htmlspecialchars($user['role']) ?>"
+                        data-archived="<?= htmlspecialchars($user['archived']) ?>"
+                        data-datearchived="<?= htmlspecialchars($user['date_archived']) ?>">
 
                         <div class="card-header">
                             <div class="card-name"><?= htmlspecialchars($user['name']) ?></div>
@@ -285,6 +287,9 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST' && isset($_POST['reset_password_id']))
                 <button class="tab-btn" data-tab="files">
                     <i class="fa-solid fa-folder"></i> Files
                 </button>
+                <button class="tab-btn" data-tab="notes">
+                    <i class="fa-solid fa-sticky-note"></i> Notes
+                </button>
 
             </div>
 
@@ -317,6 +322,10 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST' && isset($_POST['reset_password_id']))
                             <span class="detail-label">Role:</span>
                             <span id="u-user-role" class="detail-value">-</span>
                         </div>
+                        <div class="detail-row">
+                            <span class="detail-label">Password Reset Date:</span>
+                            <span id="u-user-passwordresetdate" class="detail-value">-</span>
+                        </div>
                     </div>
                 </div>
 
@@ -326,7 +335,32 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST' && isset($_POST['reset_password_id']))
                         <span>Files</span>
                     </div>
                     <div class="files-list" id="u-files-list">
+                        <div class="details-grid">
+                            <div class="detail-row">
+                                <span class="detail-label">ID Number:</span>
+                                <span id="u-user-IdNumber" class="detail-value">-</span>
+                            </div>
+                            <div class="detail-row">
+                                <span class="detail-label">ID Expiry Date:</span>
+                                <span id="u-user-Idexpirydate" class="detail-value">-</span>
+                            </div>
+                        </div>
                     </div>
+                </div>
+
+                <div id="u-tab-notes" class="tab-content">
+                    <div class="tab-header">
+                        <i class="fa-solid fa-sticky-note"></i>
+                        <span>Notes</span>
+                    </div>
+                    <div class="notes-input-section">
+                        <textarea id="u-noteTextarea" class="note-textarea"
+                            placeholder="Write your note here..."></textarea>
+                        <button id="u-addNoteBtn" class="add-note-btn" onclick="actionbtn.addNote()">
+                            <i class="fa-solid fa-plus"></i> Add Note
+                        </button>
+                    </div>
+                    <div id="u-notesList" class="notes-list" data-notes-list></div>
                 </div>
             </div>
         </div>
