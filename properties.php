@@ -1,4 +1,9 @@
 <?php
+session_start();
+if(!isset($_SESSION['user_id'])) {
+    header("Location: index.php");
+    exit();
+}
 $dbPath = __DIR__ . '/database.db';
 
 try {
@@ -43,6 +48,7 @@ $stmt = $pdo->query("
     FROM properties p
     LEFT JOIN landlords l ON p.landlord_id = l.landlord_id
     LEFT JOIN contracts c ON c.property_id = p.property_id
+    AND c.archived = 0
     AND date('now') BETWEEN c.contract_start AND c.contract_end    
     LEFT JOIN tenants t ON t.tenant_id = c.tenant_id
     WHERE p.archived = 0
@@ -53,6 +59,7 @@ $properties = $stmt->fetchAll(PDO::FETCH_ASSOC);
 ?>
 <!DOCTYPE html>
 <html lang="en">
+
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
@@ -60,24 +67,59 @@ $properties = $stmt->fetchAll(PDO::FETCH_ASSOC);
     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.1/css/all.min.css">
     <link rel="stylesheet" href="style.css">
     <link rel="stylesheet" href="tables.css">
-    <script src="navbar.js" ></script>
-    <script src="modals.js" ></script>
-    <script src="actionbtn.js" ></script>
+    <script src="navbar.js"></script>
+    <script src="modals.js"></script>
+    <script src="actionbtn.js"></script>
     <style>
-        .col-address { width: 18%; }
-        .col-type { width: 8%; }
-        .col-landlord { width: 13%; }
-        .col-price { width: 9%; }
-        .col-tenant { width: 13%; }
-        .col-status { width: 11%; }
-        .col-contract { width: 14%; }
-        .col-action { width: 14%; text-align: center; }
+    .col-address {
+        width: 18%;
+    }
+
+    .col-type {
+        width: 8%;
+    }
+
+    .col-landlord {
+        width: 13%;
+    }
+
+    .col-price {
+        width: 9%;
+    }
+
+    .col-tenant {
+        width: 13%;
+    }
+
+    .col-status {
+        width: 11%;
+    }
+
+    .col-contract {
+        width: 14%;
+    }
+
+    .col-action {
+        width: 14%;
+        text-align: center;
+    }
     </style>
 </head>
+
 <body onload="CallNavbar(); loadModals();">
     <div id="navbar-container"></div>
 
     <main class="main-content">
+        <?php if (isset($_GET['error']) && $_GET['error'] === 'duplicate'): ?>
+        <div class="flash-error" style="
+            background:#f8d7da; color:#721c24; border:1px solid #f5c6cb;
+            border-radius:8px; padding:12px 20px; margin-bottom:16px;
+            display:flex; align-items:center; gap:10px;">
+            <i class="fa-solid fa-circle-xmark"></i>
+            A property with that address already exists.
+        </div>
+        <?php endif; ?>
+
         <h1 class="page-title">Properties</h1>
 
         <div class="main-container">
@@ -120,12 +162,14 @@ $properties = $stmt->fetchAll(PDO::FETCH_ASSOC);
 
                 <div class="controls-spacer"></div>
 
+                <?php if (in_array($_SESSION['role'], ['admin', 'agent'])): ?>
                 <button class="btn-add green" onclick="openAddContractModal()">
                     <i class="fa-solid fa-plus"></i>Contract
                 </button>
                 <button class="btn-add blue" onclick="openAddPropertyModal()">
                     <i class="fa-solid fa-plus"></i>Property
                 </button>
+                <?php endif; ?>
             </div>
 
             <div class="table-container">
@@ -158,12 +202,11 @@ $properties = $stmt->fetchAll(PDO::FETCH_ASSOC);
                             </tr>
                         </thead>
                         <tbody id="tableBody">
-                <?php foreach ($properties as $p):
+                            <?php foreach ($properties as $p):
                     $status = $p['contract_start'] ? 'occupied' : 'available';
-                    $contract = $p['contract_start'] ? $p['contract_start'] . ' to ' . $p['contract_end'] : '-';
-                    $tenant_name = $p['tenant_name'] ?? '';
+                    $contract = $p['contract_start'] ? date('d/m/Y', strtotime($p['contract_start'])) . ' to ' . date('d/m/Y', strtotime($p['contract_end'])) : '';                    $tenant_name = $p['tenant_name'] ?? '';
                     $landlord_name = $p['landlord_name'] ?? '';
-                    $type = strtolower($p['property_type'])?? '';
+                    $type = $p['property_type'] ?? '';
                     $price = $p['monthly_rent'];
                     $contract_rent = $p['contract_rent'] ?? null;
                     $rooms = $p['room_count'] ?? 0;
@@ -174,71 +217,78 @@ $properties = $stmt->fetchAll(PDO::FETCH_ASSOC);
                     $council = $p['council_band'] ?? '';
                     $frequency = $p['frequency'] ?? '';
                 ?>
-            <tr 
-             data-id="<?= $p['property_id'] ?>"
-             data-type="<?= htmlspecialchars($type) ?>"
-             data-status="<?= $status ?>"
-             data-price="<?= $price ?>"
-             data-contract-rent="<?= htmlspecialchars($contract_rent ?? '') ?>"
-             data-landlord="<?= htmlspecialchars($landlord_name) ?>"
-             data-tenant="<?= htmlspecialchars($tenant_name) ?>"
-             data-contract-start="<?= $p['contract_start'] ?>"
-             data-contract-end="<?= $p['contract_end'] ?>"
-             data-frequency="<?= htmlspecialchars($p['frequency'] ?? '') ?>"
-             data-rooms="<?= $p['room_count'] ?>"
-             data-bathrooms="<?= $p['bathroom_count'] ?>"
-             data-epc="<?= htmlspecialchars($p['epc_rating']) ?>"
-             data-pets="<?= $p['allowed_pets'] ?>"
-             data-garden="<?= $p['has_garden'] ?>"
-             data-council="<?= htmlspecialchars($p['council_band']) ?>"
-             data-gas="<?= $p['gas_cert_due'] ?>"
-             data-electric="<?= $p['electric_cert_due'] ?>"
-             data-epc-date="<?= $p['epc_due_date'] ?>"
-             data-landlord-id-expiry="<?= $p['landlord_id_expiry_date'] ?>"
-             data-tenant-id-expiry="<?= $p['id_expiry_date'] ?? '' ?>"
-            >
-        <td class="td-address"><?= htmlspecialchars($p['property_address']) ?></td>
-        <td><span class="td-type"><?= htmlspecialchars($p['property_type']) ?></span></td>
-        <td class="td-landlord"><?= htmlspecialchars($landlord_name) ?></td>
-        <td class="rent">
-            <?= $price ? '£' . number_format($price, 0) : '-' ?>
-        </td>        
-        <td><?php if ($tenant_name): ?>
-            <span class="td-tenant"><?= htmlspecialchars($tenant_name) ?></span>
-        <?php else: ?>
-            <span class="tenant-vacant">Vacant</span>
-        <?php endif; ?></td>
-        <td>
-            <?php if ($status === 'occupied'): ?>
-                <span class="status-badge status-occupied">
-                    <i class="fa-solid fa-user"></i> Occupied
-                </span>
-            <?php else: ?>
-                <span class="status-badge status-available">
-                    <i class="fa-solid fa-check-circle"></i> Available
-                </span>
-            <?php endif; ?>
-        </td>
-        <td class="contract-info"><?= htmlspecialchars($contract) ?></td>
-        <td>
-            <div class="action-buttons">
-                <button class="action-btn action-btn-view" title="View" onclick="actionbtn.viewProperty(this)">
-                    <i class="fa-solid fa-eye"></i>
-                </button>
-                <button class="action-btn action-btn-edit" title="Edit" onclick="editProperty(this)">
-                    <i class="fa-solid fa-pen"></i>
-                </button>
-                <form method="POST" style="display:inline;">
-                    <input type="hidden" name="archive_id" value="<?= $p['property_id'] ?>">
-                    <button type="submit" class="action-btn action-btn-delete" title="Archive"
-                        onclick="return confirm('Archive this property?\n<?= htmlspecialchars($p['property_address']) ?>')">
-                        <i class="fa-solid fa-trash"></i>
-                    </button>
-                </form>
-            </div>
-        </td>
-    </tr>
-<?php endforeach; ?>
+                            <tr data-id="<?= $p['property_id'] ?>" data-type="<?= htmlspecialchars($type) ?>"
+                                data-status="<?= $status ?>" data-price="<?= $price ?>"
+                                data-contract-rent="<?= htmlspecialchars($contract_rent ?? '') ?>"
+                                data-landlord="<?= htmlspecialchars($landlord_name) ?>"
+                                data-tenant="<?= htmlspecialchars($tenant_name) ?>"
+                                data-contract-start="<?= $p['contract_start'] ?>"
+                                data-contract-end="<?= $p['contract_end'] ?>"
+                                data-frequency="<?= htmlspecialchars($p['frequency'] ?? '') ?>"
+                                data-rooms="<?= $p['room_count'] ?>" data-bathrooms="<?= $p['bathroom_count'] ?>"
+                                data-epc="<?= htmlspecialchars($p['epc_rating']) ?>"
+                                data-pets="<?= $p['allowed_pets'] ?>" data-garden="<?= $p['has_garden'] ?>"
+                                data-council="<?= htmlspecialchars($p['council_band']) ?>"
+                                data-gas="<?= $p['gas_cert_due'] ?>" data-electric="<?= $p['electric_cert_due'] ?>"
+                                data-epc-date="<?= $p['epc_due_date'] ?>"
+                                data-landlord-id-expiry="<?= $p['landlord_id_expiry_date'] ?>"
+                                data-tenant-id-expiry="<?= $p['id_expiry_date'] ?? '' ?>">
+                                <td class="td-address"><?= htmlspecialchars($p['property_address']) ?></td>
+                                <td><span class="td-type"><?= htmlspecialchars($p['property_type']) ?></span></td>
+                                <td class="td-landlord"><?= htmlspecialchars($landlord_name) ?></td>
+                                <td class="rent"><?= $price ? '£' . number_format($price, 0) : '-' ?></td>
+                                <td><?php if ($tenant_name): ?>
+                                    <span class="td-tenant"><?= htmlspecialchars($tenant_name) ?></span>
+                                    <?php else: ?>
+                                    <span class="tenant-vacant">Vacant</span>
+                                    <?php endif; ?>
+                                </td>
+                                <td>
+                                    <?php if ($status === 'occupied'): ?>
+                                    <span class="status-badge status-occupied">
+                                        <i class="fa-solid fa-user"></i> Occupied
+                                    </span>
+                                    <?php else: ?>
+                                    <span class="status-badge status-available">
+                                        <i class="fa-solid fa-check-circle"></i> Available
+                                    </span>
+                                    <?php endif; ?>
+                                </td>
+                                <td class="contract-info">
+                                    <?php if ($p['contract_start']): ?>
+                                    <span><?= htmlspecialchars($contract) ?></span>
+                                    <?php else: ?>
+                                    <span class="tenant-vacant">No contract</span>
+                                    <?php endif; ?>
+                                </td>
+                                <td>
+
+                                    <div class="action-buttons">
+                                        <button class="action-btn action-btn-view" title="View"
+                                            onclick="actionbtn.viewProperty(this)">
+                                            <i class="fa-solid fa-eye"></i>
+                                        </button>
+
+                                        <?php if (in_array($_SESSION['role'], ['admin', 'agent'])): ?>
+                                        <button class="action-btn action-btn-edit" title="Edit"
+                                            onclick="actionbtn.editProperty(this)">
+                                            <i class="fa-solid fa-pen"></i>
+                                        </button>
+                                        <?php endif; ?>
+
+                                        <?php if ($_SESSION['role'] === 'admin'): ?>
+                                        <form method="POST" style="display:inline;">
+                                            <input type="hidden" name="archive_id" value="<?= $p['property_id'] ?>">
+                                            <button type="submit" class="action-btn action-btn-delete" title="Archive"
+                                                onclick="openArchiveModal(<?= $p['property_id'] ?>, '<?= htmlspecialchars($p['property_address']) ?>'); return false;">
+                                                <i class="fa-solid fa-trash"></i>
+                                            </button>
+                                        </form>
+                                        <?php endif; ?>
+                                    </div>
+                                </td>
+                            </tr>
+                            <?php endforeach; ?>
                         </tbody>
                     </table>
                 </div>
@@ -248,345 +298,396 @@ $properties = $stmt->fetchAll(PDO::FETCH_ASSOC);
 
     <div id="modals-container"></div>
 
-<!-- ============================================ -->
-<!-- Action Buttons: View Property -->
-<!-- ============================================ -->
-<div id="viewPropertyModal" class="action-modal-overlay">
-    <div class="action-modal-container">
-        <!-- Header -->
-        <div class="action-modal-header">
-            <div class="action-header-left">
-                <div class="action-modal-header-icon">
-                    <i class="fa-solid fa-house"></i>
+    <!-- Action Buttons: View Property -->
+    <div id="viewPropertyModal" class="action-modal-overlay">
+        <div class="action-modal-container">
+            <!-- Header -->
+            <div class="action-modal-header">
+                <div class="action-header-left">
+                    <div class="action-modal-header-icon">
+                        <i class="fa-solid fa-house"></i>
+                    </div>
+                    <h2 id="propertyTitle">-</h2>
                 </div>
-                <h2 id="propertyTitle">-</h2>
-            </div>
-            <button class="action-modal-close" onclick="actionbtn.closeModal()">
-                <i class="fa-solid fa-xmark"></i>
-            </button>
-        </div>
-
-        <!-- Tabs Navigation -->
-        <div class="action-tabs-nav">
-            <button class="tab-btn active" data-tab="property">
-                <i class="fa-solid fa-house"></i> Property Details
-            </button>
-            <button class="tab-btn" data-tab="contract">
-                <i class="fa-solid fa-file-contract"></i> Contract Agreement
-            </button>
-            <button class="tab-btn" data-tab="dates">
-                <i class="fa-solid fa-calendar"></i> Important Dates
-            </button>
-            <button class="tab-btn" data-tab="files">
-                <i class="fa-solid fa-folder"></i> Files
-            </button>
-            <button class="tab-btn" data-tab="notes">
-                <i class="fa-solid fa-sticky-note"></i> Notes
-            </button>
-        </div>
-
-        <!-- Tab Content -->
-        <div class="action-tabs-content">
-            <!-- Property Tab -->
-            <div id="p-tab-property" class="tab-content active">
-                <div class="tab-header">
-                    <i class="fa-solid fa-house"></i>
-                    <span>Property Details</span>
-                </div>
-              <div class="details-grid">
-                    <div class="detail-row">
-                        <span class="detail-label">Landlord Name:</span>
-                        <span id="p-property-landlord" class="detail-value">-</span>
-                    </div>
-                    <div class="detail-row">
-                        <span class="detail-label">Property Type:</span>
-                        <span id="p-property-type" class="detail-value">-</span>
-                    </div>
-                    <div class="detail-row">
-                        <span class="detail-label">Property Status:</span>
-                        <span id="p-property-status" class="status-badge status-available">-</span>
-                    </div>
-                    <div class="detail-row">
-                        <span class="detail-label">Property Price:</span>
-                        <span id="p-property-price" class="detail-value">-</span>
-                    </div>
-                    <div class="detail-row">
-                        <span class="detail-label">Tenant Name:</span>
-                        <span id="p-property-tenant" class="detail-value">-</span>
-                    </div>
-                    <div class="detail-row">
-                        <span class="detail-label">Number of Rooms:</span>
-                        <span id="p-property-rooms" class="detail-value">-</span>
-                    </div>
-                    <div class="detail-row">
-                        <span class="detail-label">Number of Bathrooms:</span>
-                        <span id="p-property-bathrooms" class="detail-value">-</span>
-                    </div>
-                    <div class="detail-row">
-                        <span class="detail-label">EPC Rating:</span>
-                        <span id="p-property-epc" class="detail-value">-</span>
-                    </div>
-                    <div class="detail-row">
-                        <span class="detail-label">Pets Allowed:</span>
-                        <span id="p-property-pets" class="detail-value">-</span>
-                    </div>
-                    <div class="detail-row">
-                        <span class="detail-label">Garden:</span>
-                        <span id="p-property-garden" class="detail-value">-</span>
-                    </div>
-                    <div class="detail-row">
-                        <span class="detail-label">Council Band:</span>
-                        <span id="p-property-council" class="detail-value">-</span>
-                    </div>
-                </div>
+                <button class="modal-close-btn" onclick="actionbtn.closeModal()">
+                    <i class="fa-solid fa-xmark"></i>
+                </button>
             </div>
 
-            <!-- Contract Tab -->
-            <div id="p-tab-contract" class="tab-content">
-                <div class="tab-header">
-                    <i class="fa-solid fa-file-contract"></i>
-                    <span>Contract Agreement</span>
-                </div>
-                <div class="details-grid">
-                    <div class="detail-row">
-                        <span class="detail-label">Landlord Name:</span>
-                        <span id="p-contract-landlord" class="detail-value">-</span>
-                    </div>
-                    <div class="detail-row">
-                        <span class="detail-label">Tenant Name:</span>
-                        <span id="p-contract-tenant" class="detail-value">-</span>
-                    </div>
-                    <div class="detail-row">
-                        <span class="detail-label">Rent Amount:</span>
-                        <span id="p-contract-rent" class="detail-value">-</span>
-                    </div>
-                    <div class="detail-row">
-                        <span class="detail-label">Payment Frequency:</span>
-                        <span id="p-contract-frequency" class="detail-value">-</span>
-                    </div>
-                    <div class="detail-row">
-                        <span class="detail-label">Payment Due Date:</span>
-                        <span id="p-contract-duedate" class="detail-value">-</span>
-                    </div>
-                    <div class="detail-row">
-                        <span class="detail-label">Contract Start:</span>
-                        <span id="p-contract-start" class="detail-value">-</span>
-                    </div>
-                    <div class="detail-row">
-                        <span class="detail-label">Contract End:</span>
-                        <span id="p-contract-end" class="detail-value">-</span>
-                    </div>
-                </div>
+            <!-- Tabs Navigation -->
+            <div class="action-tabs-nav">
+                <button class="tab-btn active" data-tab="property">
+                    <i class="fa-solid fa-house"></i> Property Details
+                </button>
+                <button class="tab-btn" data-tab="contract">
+                    <i class="fa-solid fa-file-contract"></i> Contract Agreement
+                </button>
+                <button class="tab-btn" data-tab="dates">
+                    <i class="fa-solid fa-calendar"></i> Important Dates
+                </button>
+                <button class="tab-btn" data-tab="files">
+                    <i class="fa-solid fa-folder"></i> Files
+                </button>
+                <button class="tab-btn" data-tab="notes">
+                    <i class="fa-solid fa-sticky-note"></i> Notes
+                </button>
             </div>
 
-            <!-- Important Dates Tab -->
-            <div id="p-tab-dates" class="tab-content">
-                <div class="tab-header">
-                    <i class="fa-solid fa-calendar"></i>
-                    <span>Important Dates</span>
+            <!-- Tab Content -->
+            <div class="action-tabs-content">
+                <!-- Property Tab -->
+                <div id="p-tab-property" class="tab-content active">
+                    <div class="tab-header">
+                        <i class="fa-solid fa-house"></i>
+                        <span>Property Details</span>
+                    </div>
+                    <div class="details-grid">
+                        <div class="detail-row">
+                            <span class="detail-label">Landlord Name:</span>
+                            <span id="p-property-landlord" class="detail-value"></span>
+                        </div>
+                        <div class="detail-row">
+                            <span class="detail-label">Property Type:</span>
+                            <span id="p-property-type" class="detail-value"></span>
+                        </div>
+                        <div class="detail-row">
+                            <span class="detail-label">Property Status:</span>
+                            <span id="p-property-status" class="status-badge-modal status-available"></span>
+                        </div>
+                        <div class="detail-row">
+                            <span class="detail-label">Property Price:</span>
+                            <span id="p-property-price" class="detail-value"></span>
+                        </div>
+                        <div class="detail-row">
+                            <span class="detail-label">Tenant Name:</span>
+                            <span id="p-property-tenant" class="detail-value"></span>
+                        </div>
+                        <div class="detail-row">
+                            <span class="detail-label">Number of Rooms:</span>
+                            <span id="p-property-rooms" class="detail-value"></span>
+                        </div>
+                        <div class="detail-row">
+                            <span class="detail-label">Number of Bathrooms:</span>
+                            <span id="p-property-bathrooms" class="detail-value"></span>
+                        </div>
+                        <div class="detail-row">
+                            <span class="detail-label">EPC Rating:</span>
+                            <span id="p-property-epc" class="detail-value"></span>
+                        </div>
+                        <div class="detail-row">
+                            <span class="detail-label">Pets Allowed:</span>
+                            <span id="p-property-pets" class="detail-value"></span>
+                        </div>
+                        <div class="detail-row">
+                            <span class="detail-label">Garden:</span>
+                            <span id="p-property-garden" class="detail-value"></span>
+                        </div>
+                        <div class="detail-row">
+                            <span class="detail-label">Council Band:</span>
+                            <span id="p-property-council" class="detail-value"></span>
+                        </div>
+                    </div>
                 </div>
-                <div class="dates-list">
-                    <div class="date-item">
-                        <span class="date-label">Landlord's ID Expiry:</span>
-                        <span  id="p-date-landlord-id" class="date-value">-</span>
-                    </div>
-                    <div class="date-item">
-                        <span class="date-label">Tenant's ID Expiry:</span>
-                        <span  id="p-date-tenant-id" class="date-value">-</span>
-                    </div>
-                    <div class="date-item">
-                        <span class="date-label">Contract End:</span>
-                        <span id="p-date-contract-end" class="date-value">-</span>
-                    </div>
-                    <div class="date-item">
-                        <span class="date-label">Gas Certificate Due Date:</span>
-                        <span id="p-date-gas" class="date-value">-</span>
-                    </div>
-                    <div class="date-item">
-                        <span class="date-label">Electric Certificate Due Date:</span>
-                        <span id="p-date-electric" class="date-value">-</span>
-                    </div>
-                    <div class="date-item">
-                        <span class="date-label">EPC Due Date:</span>
-                        <span id="p-date-epc" class="date-value">-</span>
-                    </div>
-                </div>
-            </div>
 
-            <!-- Files Tab -->
-            <div id="p-tab-files" class="tab-content">
-                <div class="tab-header">
-                    <i class="fa-solid fa-folder"></i>
-                    <span>Files</span>
+                <!-- Contract Tab -->
+                <div id="p-tab-contract" class="tab-content">
+                    <div class="tab-header">
+                        <i class="fa-solid fa-file-contract"></i>
+                        <span>Contract Agreement</span>
+                    </div>
+                    <div class="details-grid">
+                        <div class="detail-row">
+                            <span class="detail-label">Landlord Name:</span>
+                            <span id="p-contract-landlord" class="detail-value"></span>
+                        </div>
+                        <div class="detail-row">
+                            <span class="detail-label">Tenant Name:</span>
+                            <span id="p-contract-tenant" class="detail-value"></span>
+                        </div>
+                        <div class="detail-row">
+                            <span class="detail-label">Rent Amount:</span>
+                            <span id="p-contract-rent" class="detail-value"></span>
+                        </div>
+                        <div class="detail-row">
+                            <span class="detail-label">Payment Frequency:</span>
+                            <span id="p-contract-frequency" class="detail-value"></span>
+                        </div>
+                        <div class="detail-row">
+                            <span class="detail-label">Payment Due Date:</span>
+                            <span id="p-contract-duedate" class="detail-value"></span>
+                        </div>
+                        <div class="detail-row">
+                            <span class="detail-label">Contract Start:</span>
+                            <span id="p-contract-start" class="detail-value"></span>
+                        </div>
+                        <div class="detail-row">
+                            <span class="detail-label">Contract End:</span>
+                            <span id="p-contract-end" class="detail-value"></span>
+                        </div>
+                    </div>
                 </div>
-                <div class="files-list">
-                    <div class="file-item">
-                        <i class="fa-solid fa-file-pdf file-icon"></i>
-                        <span class="file-name">Tenancy Contract</span>
-                        <button class="file-open-btn" onclick="openFile('tenancy')">Open</button>
-                    </div>
-                    <div class="file-item">
-                        <i class="fa-solid fa-file-pdf file-icon"></i>
-                        <span class="file-name">Gas Safety Certificate</span>
-                        <button class="file-open-btn" onclick="openFile('gas')">Open</button>
-                    </div>
-                    <div class="file-item">
-                        <i class="fa-solid fa-file-pdf file-icon"></i>
-                        <span class="file-name">Electrical Installation Certificate</span>
-                        <button class="file-open-btn" onclick="openFile('electrical')">Open</button>
-                    </div>
-                    <div class="file-item">
-                        <i class="fa-solid fa-file-pdf file-icon"></i>
-                        <span class="file-name">EPC Certificate</span>
-                        <button class="file-open-btn" onclick="openFile('epc')">Open</button>
-                    </div>
-                </div>
-            </div>
 
-            <!-- Notes Tab -->
-            <div id="p-tab-notes" class="tab-content">
-                <div class="tab-header">
-                    <i class="fa-solid fa-sticky-note"></i>
-                    <span>Notes</span>
+                <!-- Important Dates Tab -->
+                <div id="p-tab-dates" class="tab-content">
+                    <div class="tab-header">
+                        <i class="fa-solid fa-calendar"></i>
+                        <span>Important Dates</span>
+                    </div>
+                    <div class="dates-list">
+                        <div class="date-item">
+                            <span class="date-label">Landlord's ID Expiry:</span>
+                            <span id="p-date-landlord-id" class="date-value"></span>
+                        </div>
+                        <div class="date-item">
+                            <span class="date-label">Tenant's ID Expiry:</span>
+                            <span id="p-date-tenant-id" class="date-value"></span>
+                        </div>
+                        <div class="date-item">
+                            <span class="date-label">Contract End:</span>
+                            <span id="p-date-contract-end" class="date-value"></span>
+                        </div>
+                        <div class="date-item">
+                            <span class="date-label">Gas Certificate Due Date:</span>
+                            <span id="p-date-gas" class="date-value"></span>
+                        </div>
+                        <div class="date-item">
+                            <span class="date-label">Electric Certificate Due Date:</span>
+                            <span id="p-date-electric" class="date-value"></span>
+                        </div>
+                        <div class="date-item">
+                            <span class="date-label">EPC Due Date:</span>
+                            <span id="p-date-epc" class="date-value"></span>
+                        </div>
+                    </div>
                 </div>
-                <div class="notes-input-section">
-                    <textarea id="p-noteTextarea" class="note-textarea" placeholder="Write your note here..."></textarea>
-                    <button id="p-addNoteBtn" class="add-note-btn" onclick="window.actionbtn.addNote()">
-                        <i class="fa-solid fa-plus"></i> Add Note
-                    </button>
+
+                <!-- Files Tab -->
+                <div id="p-tab-files" class="tab-content">
+                    <div class="tab-header">
+                        <i class="fa-solid fa-folder"></i>
+                        <span>Files</span>
+                    </div>
+                    <div class="files-list" id="p-files-list">
+                    </div>
                 </div>
-                <div id="p-notesList" class="notes-list">
+
+                <!-- Notes Tab -->
+                <div id="p-tab-notes" class="tab-content">
+                    <div class="tab-header">
+                        <i class="fa-solid fa-sticky-note"></i>
+                        <span>Notes</span>
+                    </div>
+                    <?php if (in_array($_SESSION['role'], ['admin', 'agent'])): ?>
+                    <div class="notes-input-section">
+                        <textarea id="p-noteTextarea" class="note-textarea"
+                            placeholder="Write your note here..."></textarea>
+                        <button id="p-addNoteBtn" class="add-note-btn" onclick="window.actionbtn.addNote()">
+                            <i class="fa-solid fa-plus"></i> Add Note
+                        </button>
+                    </div>
+                    <?php endif; ?>
+                    <div data-notes-list class="notes-list">
+                    </div>
                 </div>
             </div>
         </div>
     </div>
-</div>
+
+    <!-- Archive Confirm Modal -->
+    <div id="archiveModal" class="action-modal-overlay">
+        <div class="action-modal-container" style="max-width: 480px;">
+
+            <div class="action-modal-header">
+                <div class="action-header-left">
+                    <div class="action-modal-header-icon">
+                        <i class="fa-solid fa-house"></i>
+                    </div>
+                    <h3>Archive Property</h3>
+                </div>
+
+                <button class="modal-close-btn" onclick="closeArchiveModal()">
+                    <i class="fa-solid fa-xmark"></i>
+                </button>
+            </div>
+
+            <div class="delete-body">
+
+                <p class="p-text"> Are you sure you want to archive this property? </p>
+                <p id="archivePropertyName" class="delete-entity"></p>
+
+                <div class="modal-footer">
+                    <button class="modal-btn modal-btn-delete" onclick="confirmArchive()">
+                        Yes, Archive
+                    </button>
+                </div>
+
+                <form id="archiveForm" method="POST" style="display:none;">
+                    <input type="hidden" name="archive_id" id="archive_id">
+                </form>
+            </div>
+        </div>
+    </div>
 
     <script>
+    const url = new URLSearchParams(window.location.search);
+    if (url.get('contract') === 'conflict') {
+        alert('This property already has a contract in this period.');
+    }
 
-        function toggleFilter() {
-            const dropdown = document.getElementById('filterDropdowns');
-            dropdown.style.display = dropdown.style.display === 'none' ? 'flex' : 'none';
+
+    function toggleFilter() {
+        const dropdown = document.getElementById('filterDropdowns');
+        dropdown.style.display = dropdown.style.display === 'none' ? 'flex' : 'none';
+    }
+
+    function sortTable(column, headerElement) {
+        const tbody = document.getElementById('tableBody');
+        const rows = Array.from(tbody.querySelectorAll('tr'));
+
+        if (currentSort.column === column) {
+            currentSort.direction = currentSort.direction === 'asc' ? 'desc' : 'asc';
+        } else {
+            currentSort.column = column;
+            currentSort.direction = 'asc';
         }
 
-        function sortTable(column, headerElement) {
-            const tbody = document.getElementById('tableBody');
-            const rows = Array.from(tbody.querySelectorAll('tr'));
+        document.querySelectorAll('table th').forEach(th => {
+            th.classList.remove('sorted');
+            const icon = th.querySelector('.sort-icon');
+            if (icon) icon.classList.remove('asc', 'desc');
+        });
 
-            if (currentSort.column === column) {
-                currentSort.direction = currentSort.direction === 'asc' ? 'desc' : 'asc';
-            } else {
-                currentSort.column = column;
-                currentSort.direction = 'asc';
+        headerElement.classList.add('sorted');
+        const icon = headerElement.querySelector('.sort-icon');
+        if (icon) icon.classList.add(currentSort.direction);
+
+        rows.sort((a, b) => {
+            let aVal, bVal;
+            switch (column) {
+                case 'address':
+                    aVal = a.querySelector('.td-address').textContent.toLowerCase();
+                    bVal = b.querySelector('.td-address').textContent.toLowerCase();
+                    break;
+                case 'type':
+                    aVal = a.dataset.type;
+                    bVal = b.dataset.type;
+                    break;
+                case 'landlord':
+                    aVal = a.dataset.landlord.toLowerCase();
+                    bVal = b.dataset.landlord.toLowerCase();
+                    break;
+                case 'price':
+                    aVal = parseInt(a.dataset.price);
+                    bVal = parseInt(b.dataset.price);
+                    break;
+                case 'tenant':
+                    aVal = a.dataset.tenant.toLowerCase();
+                    bVal = b.dataset.tenant.toLowerCase();
+                    break;
+                case 'status':
+                    aVal = a.dataset.status;
+                    bVal = b.dataset.status;
+                    break;
+                case 'contract':
+                    aVal = a.dataset.contractStart || '';
+                    bVal = b.dataset.contractStart || '';
+                    break;
+                default:
+                    return 0;
+            }
+            if (aVal < bVal) return currentSort.direction === 'asc' ? -1 : 1;
+            if (aVal > bVal) return currentSort.direction === 'asc' ? 1 : -1;
+            return 0;
+        });
+
+        rows.forEach(row => tbody.appendChild(row));
+    }
+
+    function filterProperties() {
+        const typeFilter = document.getElementById('filterType').value;
+        const statusFilter = document.getElementById('filterStatus').value;
+        const startFilter = document.getElementById('filterStart').value;
+        const endFilter = document.getElementById('filterEnd').value;
+
+        document.querySelectorAll('#tableBody tr').forEach(row => {
+            let show = true;
+            if (typeFilter && row.dataset.type !== typeFilter) show = false;
+            if (statusFilter && row.dataset.status !== statusFilter) show = false;
+            if (startFilter) {
+                const contractCell = row.querySelector('.contract-info');
+                if (contractCell && contractCell.textContent !== '-') {
+                    const contractStart = contractCell.textContent.split(' to ')[0];
+                    if (contractStart && new Date(contractStart) < new Date(startFilter)) show = false;
+                }
+            }
+            if (endFilter) {
+                const contractCell = row.querySelector('.contract-info');
+                if (contractCell && contractCell.textContent !== '-') {
+                    const contractEnd = contractCell.textContent.split(' to ')[1];
+                    if (contractEnd && new Date(contractEnd) > new Date(endFilter)) show = false;
+                }
+            }
+            row.style.display = show ? '' : 'none';
+        });
+    }
+
+    function resetFilters() {
+        document.getElementById('filterType').value = '';
+        document.getElementById('filterStatus').value = '';
+        document.getElementById('filterStart').value = '';
+        document.getElementById('filterEnd').value = '';
+        document.querySelectorAll('#tableBody tr').forEach(row => row.style.display = '');
+        document.querySelectorAll('table th').forEach(th => {
+            th.classList.remove('sorted');
+            const icon = th.querySelector('.sort-icon');
+            if (icon) icon.classList.remove('asc', 'desc');
+        });
+        currentSort = {
+            column: null,
+            direction: 'asc'
+        };
+    }
+
+    let selectedPropertyId = null;
+
+    function openArchiveModal(id, address) {
+        selectedPropertyId = id;
+        document.getElementById('archivePropertyName').innerText = address;
+        document.getElementById('archiveModal').style.display = 'flex';
+    }
+
+    function closeArchiveModal() {
+        document.getElementById('archiveModal').style.display = 'none';
+        selectedPropertyId = null;
+    }
+
+    function confirmArchive() {
+        document.getElementById('archive_id').value = selectedPropertyId;
+        document.getElementById('archiveForm').submit();
+    }
+
+    // to open the view modal directly from search results
+    document.addEventListener('DOMContentLoaded', () => {
+
+        const params = new URLSearchParams(window.location.search);
+        const propertyId = params.get('id');
+        const shouldOpen = params.get('open');
+
+        if (propertyId && shouldOpen === '1') {
+            const row = document.querySelector(`tr[data-id="${propertyId}"]`);
+
+            if (row) {
+                const btn = row.querySelector('.action-btn-view');
+                if (btn) {
+                    actionbtn.viewProperty(btn);
+                }
             }
 
-            document.querySelectorAll('table th').forEach(th => {
-                th.classList.remove('sorted');
-                const icon = th.querySelector('.sort-icon');
-                if (icon) icon.classList.remove('asc', 'desc');
-            });
-
-            headerElement.classList.add('sorted');
-            const icon = headerElement.querySelector('.sort-icon');
-            if (icon) icon.classList.add(currentSort.direction);
-
-            rows.sort((a, b) => {
-                let aVal, bVal;
-                switch (column) {
-                    case 'address':
-                        aVal = a.querySelector('.td-address').textContent.toLowerCase();
-                        bVal = b.querySelector('.td-address').textContent.toLowerCase();
-                        break;
-                    case 'type':
-                        aVal = a.dataset.type;
-                        bVal = b.dataset.type;
-                        break;
-                    case 'landlord':
-                        aVal = a.dataset.landlord.toLowerCase();
-                        bVal = b.dataset.landlord.toLowerCase();
-                        break;
-                    case 'price':
-                        aVal = parseInt(a.dataset.price);
-                        bVal = parseInt(b.dataset.price);
-                        break;
-                    case 'tenant':
-                        aVal = a.dataset.tenant.toLowerCase();
-                        bVal = b.dataset.tenant.toLowerCase();
-                        break;
-                    case 'status':
-                        aVal = a.dataset.status;
-                        bVal = b.dataset.status;
-                        break;
-                    case 'contract':
-                        aVal = a.dataset.contract || '';
-                        bVal = b.dataset.contract || '';
-                        break;
-                    default:
-                        return 0;
-                }
-                if (aVal < bVal) return currentSort.direction === 'asc' ? -1 : 1;
-                if (aVal > bVal) return currentSort.direction === 'asc' ? 1 : -1;
-                return 0;
-            });
-
-            rows.forEach(row => tbody.appendChild(row));
+            const newUrl = window.location.pathname;
+            window.history.replaceState({}, document.title, newUrl);
         }
-
-        function filterProperties() {
-            const typeFilter = document.getElementById('filterType').value;
-            const statusFilter = document.getElementById('filterStatus').value;
-            const startFilter = document.getElementById('filterStart').value;
-            const endFilter = document.getElementById('filterEnd').value;
-
-            document.querySelectorAll('#tableBody tr').forEach(row => {
-                let show = true;
-                if (typeFilter && row.dataset.type !== typeFilter) show = false;
-                if (statusFilter && row.dataset.status !== statusFilter) show = false;
-                if (startFilter) {
-                    const contractCell = row.querySelector('.contract-info');
-                    if (contractCell && contractCell.textContent !== '-') {
-                        const contractStart = contractCell.textContent.split(' to ')[0];
-                        if (contractStart && new Date(contractStart) < new Date(startFilter)) show = false;
-                    }
-                }
-                if (endFilter) {
-                    const contractCell = row.querySelector('.contract-info');
-                    if (contractCell && contractCell.textContent !== '-') {
-                        const contractEnd = contractCell.textContent.split(' to ')[1];
-                        if (contractEnd && new Date(contractEnd) > new Date(endFilter)) show = false;
-                    }
-                }
-                row.style.display = show ? '' : 'none';
-            });
-        }
-
-        function resetFilters() {
-            document.getElementById('filterType').value = '';
-            document.getElementById('filterStatus').value = '';
-            document.getElementById('filterStart').value = '';
-            document.getElementById('filterEnd').value = '';
-            document.querySelectorAll('#tableBody tr').forEach(row => row.style.display = '');
-            document.querySelectorAll('table th').forEach(th => {
-                th.classList.remove('sorted');
-                const icon = th.querySelector('.sort-icon');
-                if (icon) icon.classList.remove('asc', 'desc');
-            });
-            currentSort = { column: null, direction: 'asc' };
-        }
-
-        function editProperty(btn) {
-            const row = btn.closest('tr');
-            const address = row.querySelector('.td-address').textContent;
-            alert('Edit Property: ' + address);
-        }
-
-        function deleteProperty(btn) {
-            const row = btn.closest('tr');
-            const id = row.querySelector('.property-id').textContent;
-            if (confirm('Are you sure you want to delete property ' + id + '?')) {
-                row.remove();
-            }
-        }
+    });
     </script>
 </body>
+
 </html>
