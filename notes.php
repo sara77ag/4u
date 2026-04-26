@@ -59,7 +59,7 @@ if (!$entity_type || !$entity_id || !$text) {
         VALUES (?, datetime('now'), ?, ?,  ?, ?, ?, ?, ?, ?, ?, 0)
     ");
 
-    $stmt->execute([ $text, $created_by, $entity_type, $property_id, $landlord_id, $tenant_id, $payment_id, $viewing_id, $date_id, $user_id
+    $stmt->execute([ $text, $created_by, $entity_type, $property_id, $landlord_id, $tenant_id, $payment_id, $viewing_id, $date_id, $user_note_id
     ]);
 
     echo json_encode([
