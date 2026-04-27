@@ -111,6 +111,13 @@ $properties = $stmt->fetchAll(PDO::FETCH_ASSOC);
     <main class="main-content">
         <h1 class="page-title">Properties</h1>
 
+        <?php if (isset($_GET['error']) && $_GET['error'] === 'duplicate'): ?>
+        <div class="flash-message flash-error">
+            <i class="fa-solid fa-circle-exclamation"></i>
+            A property with that address already exists.
+        </div>
+        <?php endif; ?>
+
         <div class="main-container">
             <div class="controls-row">
                 <button class="btn-filter-toggle" id="filterToggle" onclick="toggleFilter()">
@@ -289,9 +296,7 @@ $properties = $stmt->fetchAll(PDO::FETCH_ASSOC);
 
     <div id="modals-container"></div>
 
-    <!-- ============================================ -->
     <!-- Action Buttons: View Property -->
-    <!-- ============================================ -->
     <div id="viewPropertyModal" class="action-modal-overlay">
         <div class="action-modal-container">
             <!-- Header -->
