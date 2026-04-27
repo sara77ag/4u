@@ -22,19 +22,21 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST' && isset($_POST['archive_id'])) {
 
 $stmt = $pdo->query("
     SELECT 
-        landlord_id,
-        name,
-        phone,
-        email,
-        address,
-        id_type,
-        id_number,
-        id_expiry_date,
-        contact_method,
-        number_of_properties
-    FROM landlords
-    WHERE archived = 0
-    ORDER BY name
+        l.landlord_id,
+        l.name,
+        l.phone,
+        l.email,
+        l.address,
+        l.id_type,
+        l.id_number,
+        l.id_expiry_date,
+        l.contact_method,
+        COUNT(p.property_id) AS number_of_properties
+    FROM landlords l
+    LEFT JOIN properties p ON p.landlord_id = l.landlord_id AND p.archived = 0
+    WHERE l.archived = 0
+    GROUP BY l.landlord_id
+    ORDER BY l.name
 ");
 
 $landlords = $stmt->fetchAll(PDO::FETCH_ASSOC);
@@ -274,22 +276,7 @@ $landlords = $stmt->fetchAll(PDO::FETCH_ASSOC);
                         <i class="fa-solid fa-folder"></i>
                         <span>Files</span>
                     </div>
-                    <div class="files-list">
-                        <div class="file-item">
-                            <i class="fa-solid fa-file-pdf file-icon"></i>
-                            <span class="file-name">Tenancy Contract</span>
-                            <button class="file-open-btn" onclick="openFile('tenancy')">Open</button>
-                        </div>
-                        <div class="file-item">
-                            <i class="fa-solid fa-file-pdf file-icon"></i>
-                            <span class="file-name">Copy of ID / Passport</span>
-                            <button class="file-open-btn" onclick="openFile('id')">Open</button>
-                        </div>
-                        <div class="file-item">
-                            <i class="fa-solid fa-file-pdf file-icon"></i>
-                            <span class="file-name">Ownership Proof</span>
-                            <button class="file-open-btn" onclick="openFile('ownership')">Open</button>
-                        </div>
+                    <div class="files-list" id="l-files-list">
                     </div>
                 </div>
 

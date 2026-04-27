@@ -22,6 +22,7 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST' && isset($_POST['unarchive_id'], $_POS
         'viewing_bookings'=> ['table' => 'viewing_bookings','pk' => 'booking_id'],
         'users'           => ['table' => 'users',           'pk' => 'user_id'],
         'notes'           => ['table' => 'notes',           'pk' => 'note_id'],
+        'files'           => ['table' => 'files',           'pk' => 'file_id'],
     ];
 
     if (isset($tableMap[$type])) {
@@ -30,8 +31,42 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST' && isset($_POST['unarchive_id'], $_POS
         $stmt = $pdo->prepare("UPDATE $t SET archived = 0, date_archived = NULL WHERE $pk = ?");
         $stmt->execute([$id]);
     }
-    header("Location: archive.php");
-    exit();
+}
+// Handle file restore request (AJAX — checks for path conflict first)
+if ($_SERVER['REQUEST_METHOD'] === 'POST' && isset($_POST['restore_file_id'])) {
+    header('Content-Type: application/json');
+    $fileId = (int)$_POST['restore_file_id'];
+
+    $stmt = $pdo->prepare("SELECT file_path FROM files WHERE file_id = ?");
+    $stmt->execute([$fileId]);
+    $row = $stmt->fetch(PDO::FETCH_ASSOC);
+
+    if (!$row) {
+        echo json_encode(['success' => false, 'error' => 'File not found']);
+        exit;
+    }
+
+    $filePath = $row['file_path'];
+
+    // Check if another active (non-archived) file already has the same path
+    $conflict = $pdo->prepare("SELECT file_id FROM files WHERE file_path = ? AND archived = 0 AND file_id != ?");
+    $conflict->execute([$filePath, $fileId]);
+    $existing = $conflict->fetch(PDO::FETCH_ASSOC);
+
+    if ($existing) {
+        echo json_encode([
+            'success'  => false,
+            'conflict' => true,
+            'message'  => 'Cannot restore this file because another file already exists at the same location. Please delete the existing file first, then try again.',
+        ]);
+        exit;
+    }
+
+    $pdo->prepare("UPDATE files SET archived = 0, date_archived = NULL WHERE file_id = ?")
+        ->execute([$fileId]);
+
+    echo json_encode(['success' => true]);
+    exit;
 }
 
 // Handle permanent delete request
@@ -48,11 +83,24 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST' && isset($_POST['delete_id'], $_POST['
         'viewing_bookings'=> ['table' => 'viewing_bookings','pk' => 'booking_id'],
         'users'           => ['table' => 'users',           'pk' => 'user_id'],
         'notes'           => ['table' => 'notes',           'pk' => 'note_id'],
+        'files'           => ['table' => 'files',           'pk' => 'file_id'],
     ];
 
     if (isset($tableMap[$type])) {
         $t  = $tableMap[$type]['table'];
         $pk = $tableMap[$type]['pk'];
+
+        // For files: physically delete the file from disk before removing DB record
+        if ($type === 'files') {
+            $fStmt = $pdo->prepare("SELECT file_path FROM files WHERE file_id = ?");
+            $fStmt->execute([$id]);
+            $fRow = $fStmt->fetch(PDO::FETCH_ASSOC);
+            if ($fRow) {
+                $fullPath = __DIR__ . '/' . $fRow['file_path'];
+                if (file_exists($fullPath)) unlink($fullPath);
+            }
+        }
+
         $stmt = $pdo->prepare("DELETE FROM $t WHERE $pk = ?");
         $stmt->execute([$id]);
     }
@@ -61,8 +109,8 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST' && isset($_POST['delete_id'], $_POST['
 }
 
 // Fetch archived records from each table
-
 $archived = [];
+$fiveYearsAgo = date('Y-m-d', strtotime('-5 years'));
 
 // Properties
 $rows = $pdo->query("
@@ -99,10 +147,6 @@ foreach ($rows as $r) {
     $archived[] = ['type' => 'tenants', 'id' => $r['id'], 'label' => $r['label'],
                    'sub' => $r['sub'], 'related' => $r['related'], 'date' => $r['date_archived']];
 }
-
-// Contracts — skipped: table does not have archived/date_archived columns yet.
-// To enable: ALTER TABLE contracts ADD COLUMN archived INTEGER NOT NULL DEFAULT 0;
-//            ALTER TABLE contracts ADD COLUMN date_archived TEXT;
 
 // Transactions
 $rows = $pdo->query("
@@ -156,21 +200,73 @@ foreach ($rows as $r) {
                    'sub' => $r['sub'], 'related' => $r['related'], 'date' => $r['date_archived']];
 }
 
+// Files
+try {
+    $rows = $pdo->query("
+        SELECT f.file_id AS id,
+               f.file_name AS label,
+               f.file_category AS file_category,
+               f.file_type AS file_type,
+               f.file_path AS file_path,
+               f.date_archived,
+               p.property_address AS owner_property,
+               t.name             AS owner_tenant,
+               l.name             AS owner_landlord,
+               u.username         AS owner_user,
+               f.payment_id       AS owner_payment_id
+        FROM files f
+        LEFT JOIN properties p ON f.property_id = p.property_id
+        LEFT JOIN tenants     t ON f.tenant_id   = t.tenant_id
+        LEFT JOIN landlords   l ON f.landlord_id = l.landlord_id
+        LEFT JOIN users       u ON f.user_id     = u.user_id
+        WHERE f.archived = 1
+    ")->fetchAll(PDO::FETCH_ASSOC);
+    foreach ($rows as $r) {
+        // Build "linked to" label
+        if ($r['owner_property'])      { $ownerType = 'Property'; $ownerName = $r['owner_property']; }
+        elseif ($r['owner_tenant'])    { $ownerType = 'Tenant';   $ownerName = $r['owner_tenant'];   }
+        elseif ($r['owner_landlord'])  { $ownerType = 'Landlord'; $ownerName = $r['owner_landlord']; }
+        elseif ($r['owner_user'])      { $ownerType = 'User';     $ownerName = $r['owner_user'];     }
+        elseif ($r['owner_payment_id']){ $ownerType = 'Payment';  $ownerName = 'Payment #' . $r['owner_payment_id']; }
+        else                           { $ownerType = '';         $ownerName = 'Unknown'; }
+
+        $catLabel = ucwords(str_replace('_', ' ', $r['file_category']));
+
+        $archived[] = [
+            'type'       => 'files',
+            'id'         => $r['id'],
+            'label'      => $r['label'],
+            'sub'        => $catLabel . ($ownerType ? ' — ' . $ownerType . ': ' . $ownerName : ''),
+            'related'    => $ownerName,
+            'date'       => $r['date_archived'],
+            'file_type'  => $r['file_type'],
+            'file_path'  => $r['file_path'],
+        ];
+    }
+} catch (Exception $e) {}
+
 // Sort by date_archived DESC (most recent first)
 usort($archived, function($a, $b) {
     return strcmp($b['date'] ?? '', $a['date'] ?? '');
 });
 
+// Count overdue records
+$overdueCount = 0;
+foreach ($archived as $item) {
+    if ($item['date'] && $item['date'] < $fiveYearsAgo) $overdueCount++;
+}
+
 // Type display config
 $typeConfig = [
-    'properties'       => ['label' => 'Property',        'icon' => 'fa-house',         'class' => 'type-property'],
-    'landlords'        => ['label' => 'Landlord',        'icon' => 'fa-user-tie',      'class' => 'type-landlord'],
-    'tenants'          => ['label' => 'Tenant',          'icon' => 'fa-user',          'class' => 'type-tenant'],
-    'contracts'        => ['label' => 'Contract',        'icon' => 'fa-file-contract', 'class' => 'type-contract'],
-    'transactions'     => ['label' => 'Transaction',     'icon' => 'fa-credit-card',   'class' => 'type-transaction'],
-    'viewing_bookings' => ['label' => 'Viewing',         'icon' => 'fa-street-view',   'class' => 'type-viewing'],
-    'users'            => ['label' => 'User',            'icon' => 'fa-users',         'class' => 'type-user'],
-    'notes'            => ['label' => 'Note',            'icon' => 'fa-sticky-note',   'class' => 'type-note'],
+    'properties'       => ['label' => 'Property',    'icon' => 'fa-house',         'class' => 'type-property'],
+    'landlords'        => ['label' => 'Landlord',    'icon' => 'fa-user-tie',      'class' => 'type-landlord'],
+    'tenants'          => ['label' => 'Tenant',      'icon' => 'fa-user',          'class' => 'type-tenant'],
+    'contracts'        => ['label' => 'Contract',    'icon' => 'fa-file-contract', 'class' => 'type-contract'],
+    'transactions'     => ['label' => 'Transaction', 'icon' => 'fa-credit-card',   'class' => 'type-transaction'],
+    'viewing_bookings' => ['label' => 'Viewing',     'icon' => 'fa-street-view',   'class' => 'type-viewing'],
+    'users'            => ['label' => 'User',        'icon' => 'fa-users',         'class' => 'type-user'],
+    'notes'            => ['label' => 'Note',        'icon' => 'fa-sticky-note',   'class' => 'type-note'],
+    'files'            => ['label' => 'File',        'icon' => 'fa-file',          'class' => 'type-file'],
 ];
 ?>
 <!DOCTYPE html>
@@ -185,7 +281,6 @@ $typeConfig = [
     <link rel="stylesheet" href="tables.css">
     <script src="navbar.js"></script>
     <style>
-    /* ── Type badge colours ─────────────────────────────── */
     .type-badge {
         display: inline-flex;
         align-items: center;
@@ -237,7 +332,23 @@ $typeConfig = [
         color: #555;
     }
 
-    /* ── Archive-specific empty state ───────────────────── */
+    .type-file {
+        background: #edf2ff;
+        color: #3b5bdb;
+    }
+
+    .file-detail-cat {
+        font-weight: 600;
+        color: #444;
+        font-size: 0.85rem;
+    }
+
+    .file-detail-owner {
+        color: #777;
+        font-size: 0.8rem;
+        margin-top: 2px;
+    }
+
     .archive-empty {
         text-align: center;
         padding: 60px 20px;
@@ -250,17 +361,16 @@ $typeConfig = [
         display: block;
     }
 
-    /* ── Label column ───────────────────────────────────── */
     .col-label {
-        width: 24%;
+        width: 22%;
     }
 
     .col-detail {
-        width: 18%;
+        width: 16%;
     }
 
     .col-related {
-        width: 18%;
+        width: 16%;
     }
 
     .col-type {
@@ -268,11 +378,11 @@ $typeConfig = [
     }
 
     .col-date {
-        width: 12%;
+        width: 14%;
     }
 
     .col-action {
-        width: 16%;
+        width: 20%;
         text-align: center;
     }
 
@@ -284,6 +394,52 @@ $typeConfig = [
         color: #777;
         font-size: 0.88rem;
     }
+
+    /* Overdue row highlight */
+    tr.overdue-row {
+        background-color: #fff5f5;
+    }
+
+    tr.overdue-row td {
+        border-left: 3px solid #e74c3c;
+    }
+
+    tr.overdue-row td:not(:first-child) {
+        border-left: none;
+    }
+
+    .overdue-badge {
+        display: inline-flex;
+        align-items: center;
+        gap: 5px;
+        background: #fdecea;
+        color: #c0392b;
+        border: 1px solid #f5c6cb;
+        border-radius: 12px;
+        padding: 2px 8px;
+        font-size: 0.75rem;
+        font-weight: 600;
+        margin-left: 6px;
+        white-space: nowrap;
+    }
+
+    /* Overdue banner */
+    .overdue-banner {
+        background: #fdecea;
+        color: #721c24;
+        border: 1px solid #f5c6cb;
+        border-radius: 8px;
+        padding: 12px 20px;
+        margin-bottom: 16px;
+        display: flex;
+        align-items: center;
+        gap: 10px;
+        font-size: 0.95rem;
+    }
+
+    .overdue-banner i {
+        font-size: 1.1rem;
+    }
     </style>
 </head>
 
@@ -293,8 +449,18 @@ $typeConfig = [
     <main class="main-content">
         <h1 class="page-title">Archive</h1>
 
+        <?php if ($overdueCount > 0): ?>
+        <div class="overdue-banner">
+            <i class="fa-solid fa-triangle-exclamation"></i>
+            <span>
+                <strong><?= $overdueCount ?> record<?= $overdueCount !== 1 ? 's' : '' ?></strong>
+                <?= $overdueCount !== 1 ? 'have' : 'has' ?> been archived for over 5 years and should be reviewed for
+                permanent deletion.
+            </span>
+        </div>
+        <?php endif; ?>
+
         <div class="main-container">
-            <!-- Controls row -->
             <div class="controls-row">
                 <button class="btn-filter-toggle" id="filterToggle" onclick="toggleFilter()">
                     <i class="fa-solid fa-filter"></i> Filter
@@ -313,6 +479,7 @@ $typeConfig = [
                             <option value="viewing_bookings">Viewing</option>
                             <option value="users">User</option>
                             <option value="notes">Note</option>
+                            <option value="files">File</option>
                         </select>
                     </div>
                     <div class="filter-group">
@@ -327,6 +494,13 @@ $typeConfig = [
                         <label>Archived To</label>
                         <input type="date" id="filterTo" onchange="applyFilters()">
                     </div>
+                    <div class="filter-group">
+                        <label>Show</label>
+                        <select id="filterOverdue" onchange="applyFilters()">
+                            <option value="">All Records</option>
+                            <option value="overdue">Overdue Only (5+ years)</option>
+                        </select>
+                    </div>
                     <button class="filter-btn-reset" onclick="resetFilters()" title="Reset filters">
                         <i class="fa-solid fa-rotate-left"></i>
                     </button>
@@ -338,7 +512,6 @@ $typeConfig = [
                     style="color:#888;font-size:.9rem;align-self:center;"></span>
             </div>
 
-            <!-- Table -->
             <div class="table-container">
                 <div class="table-wrapper">
                     <?php if (empty($archived)): ?>
@@ -366,15 +539,26 @@ $typeConfig = [
                         </thead>
                         <tbody id="archiveBody">
                             <?php foreach ($archived as $item):
-                            $cfg   = $typeConfig[$item['type']] ?? ['label' => $item['type'], 'icon' => 'fa-box', 'class' => ''];
-                            $dateF = $item['date'] ? date('d/m/Y', strtotime($item['date'])) : '-';
-                        ?>
+                                $cfg     = $typeConfig[$item['type']] ?? ['label' => $item['type'], 'icon' => 'fa-box', 'class' => ''];
+                                $dateF   = $item['date'] ? date('d/m/Y', strtotime($item['date'])) : '-';
+                                $overdue = $item['date'] && $item['date'] < $fiveYearsAgo;
+                            ?>
                             <tr data-type="<?= htmlspecialchars($item['type']) ?>"
                                 data-label="<?= htmlspecialchars(strtolower($item['label'] ?? '')) ?>"
-                                data-date="<?= $item['date'] ?? '' ?>">
+                                data-date="<?= $item['date'] ?? '' ?>" data-overdue="<?= $overdue ? '1' : '0' ?>"
+                                <?= $overdue ? 'class="overdue-row"' : '' ?>>
 
                                 <td class="label-cell"><?= htmlspecialchars($item['label'] ?? '-') ?></td>
-                                <td class="sub-cell"><?= htmlspecialchars($item['sub'] ?? '-') ?></td>
+                                <td class="sub-cell">
+                                    <?php if ($item['type'] === 'files' && strpos($item['sub'], ' — ') !== false):
+                                        [$catPart, $ownerPart] = explode(' — ', $item['sub'], 2);
+                                    ?>
+                                    <div class="file-detail-cat"><?= htmlspecialchars($catPart) ?></div>
+                                    <div class="file-detail-owner"><?= htmlspecialchars($ownerPart) ?></div>
+                                    <?php else: ?>
+                                    <?= htmlspecialchars($item['sub'] ?? '-') ?>
+                                    <?php endif; ?>
+                                </td>
                                 <td class="sub-cell"><?= htmlspecialchars($item['related'] ?? '-') ?></td>
                                 <td>
                                     <span class="type-badge <?= $cfg['class'] ?>">
@@ -382,9 +566,35 @@ $typeConfig = [
                                         <?= $cfg['label'] ?>
                                     </span>
                                 </td>
-                                <td><?= $dateF ?></td>
+                                <td>
+                                    <?= $dateF ?>
+                                    <?php if ($overdue): ?>
+                                    <span class="overdue-badge">
+                                        <i class="fa-solid fa-triangle-exclamation"></i> 5+ yrs
+                                    </span>
+                                    <?php endif; ?>
+                                </td>
                                 <td>
                                     <div class="action-buttons">
+                                        <?php if ($item['type'] === 'files'): ?>
+                                        <button type="button" class="action-btn action-btn-view" title="View file"
+                                            onclick="window.open('<?= htmlspecialchars($item['file_path'] ?? '#') ?>', '_blank')">
+                                            <i class="fa-solid fa-eye"></i>
+                                        </button>
+                                        <button type="button" class="action-btn action-btn-edit" title="Restore file"
+                                            onclick="restoreFile(<?= $item['id'] ?>, this)">
+                                            <i class="fa-solid fa-box-archive"></i>
+                                        </button>
+                                        <form method="POST" style="display:inline;">
+                                            <input type="hidden" name="delete_id" value="<?= $item['id'] ?>">
+                                            <input type="hidden" name="delete_type" value="files">
+                                            <button type="submit" class="action-btn action-btn-delete"
+                                                title="Delete permanently"
+                                                onclick="return confirm('Permanently delete this file?\nThis cannot be undone.')">
+                                                <i class="fa-solid fa-trash"></i>
+                                            </button>
+                                        </form>
+                                        <?php else: ?>
                                         <form method="POST" style="display:inline;">
                                             <input type="hidden" name="unarchive_id" value="<?= $item['id'] ?>">
                                             <input type="hidden" name="unarchive_type" value="<?= $item['type'] ?>">
@@ -396,11 +606,12 @@ $typeConfig = [
                                             <input type="hidden" name="delete_id" value="<?= $item['id'] ?>">
                                             <input type="hidden" name="delete_type" value="<?= $item['type'] ?>">
                                             <button type="submit" class="action-btn action-btn-delete"
-                                                title="Delete permanently"
+                                                title="<?= $overdue ? 'Overdue for deletion — permanently delete' : 'Delete permanently' ?>"
                                                 onclick="return confirm('Permanently delete this <?= $cfg['label'] ?>?\nThis cannot be undone.')">
                                                 <i class="fa-solid fa-trash"></i>
                                             </button>
                                         </form>
+                                        <?php endif; ?>
                                     </div>
                                 </td>
                             </tr>
@@ -419,51 +630,48 @@ $typeConfig = [
         direction: 'asc'
     };
 
-    // Update visible row count
     function updateCount() {
         const visible = document.querySelectorAll('#archiveBody tr:not([style*="display: none"])').length;
         const total = document.querySelectorAll('#archiveBody tr').length;
         const el = document.getElementById('recordCount');
-        if (el) el.textContent = visible === total ? `${total} record${total !== 1 ? 's' : ''}` :
+        if (el) el.textContent = visible === total ?
+            `${total} record${total !== 1 ? 's' : ''}` :
             `${visible} of ${total} records`;
     }
 
-    // Run on load
     document.addEventListener('DOMContentLoaded', updateCount);
 
-    // Filter toggle
     function toggleFilter() {
         const dd = document.getElementById('filterDropdowns');
         dd.style.display = dd.style.display === 'none' ? 'flex' : 'none';
     }
 
-    // Apply all filters
     function applyFilters() {
         const typeVal = document.getElementById('filterType').value;
         const searchVal = document.getElementById('filterSearch').value.toLowerCase();
         const fromVal = document.getElementById('filterFrom').value;
         const toVal = document.getElementById('filterTo').value;
+        const overdueVal = document.getElementById('filterOverdue').value;
 
         document.querySelectorAll('#archiveBody tr').forEach(row => {
             let show = true;
-
             if (typeVal && row.dataset.type !== typeVal) show = false;
             if (searchVal && !row.dataset.label.includes(searchVal)) show = false;
             if (fromVal && row.dataset.date && row.dataset.date < fromVal) show = false;
             if (toVal && row.dataset.date && row.dataset.date > toVal) show = false;
-
+            if (overdueVal === 'overdue' && row.dataset.overdue !== '1') show = false;
             row.style.display = show ? '' : 'none';
         });
 
         updateCount();
     }
 
-    // Reset all filters
     function resetFilters() {
         document.getElementById('filterType').value = '';
         document.getElementById('filterSearch').value = '';
         document.getElementById('filterFrom').value = '';
         document.getElementById('filterTo').value = '';
+        document.getElementById('filterOverdue').value = '';
         document.querySelectorAll('#archiveBody tr').forEach(r => r.style.display = '');
         document.querySelectorAll('#archiveTable th').forEach(th => {
             th.classList.remove('sorted');
@@ -477,7 +685,6 @@ $typeConfig = [
         updateCount();
     }
 
-    // Sort
     function sortTable(column, headerEl) {
         const tbody = document.getElementById('archiveBody');
         if (!tbody) return;
@@ -523,6 +730,30 @@ $typeConfig = [
         });
 
         rows.forEach(r => tbody.appendChild(r));
+    }
+
+    function restoreFile(fileId, btn) {
+        fetch('archive.php', {
+                method: 'POST',
+                headers: {
+                    'Content-Type': 'application/x-www-form-urlencoded'
+                },
+                body: 'restore_file_id=' + fileId
+            })
+            .then(r => r.json())
+            .then(data => {
+                if (data.success) {
+                    // Remove the row from the table
+                    const row = btn.closest('tr');
+                    if (row) row.remove();
+                    updateCount();
+                } else if (data.conflict) {
+                    alert(data.message);
+                } else {
+                    alert('Could not restore file: ' + (data.error || 'Unknown error'));
+                }
+            })
+            .catch(() => alert('Network error. Please try again.'));
     }
     </script>
 </body>

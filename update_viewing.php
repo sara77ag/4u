@@ -30,9 +30,8 @@ $stmt = $pdo->prepare("
         status = ?,
         date_time = ?,
         user_id = ?,
-        email = ?,
-        archived = ?,
-        date_archived = ?
+        email = ?
+
     WHERE booking_id = ?
 ");
 
@@ -43,8 +42,6 @@ $stmt->execute([
     $input['date_time'] ?? '',
     $input['user_id'] ?? '',
     $input['email'] ?? '',
-    $input['archived'] ?? '',
-    $input['date_archived'] ?? '',
     $input['id']
 ]);
 

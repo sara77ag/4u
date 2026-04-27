@@ -89,6 +89,19 @@ $stmt->execute([
     $id
 ]);
 
+if (!empty($input['tenantRecordId']) && array_key_exists('tenantExpiry', $input)) {
+    $stmt = $pdo->prepare("
+        UPDATE tenants SET
+            id_expiry_date = ?
+        WHERE tenant_id = ?
+    ");
+
+    $stmt->execute([
+        $input['tenantExpiry'] ?? '',
+        $input['tenantRecordId']
+    ]);
+}
+
 
 // ======================
 // UPDATE CONTRACT 

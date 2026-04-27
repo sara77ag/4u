@@ -154,9 +154,34 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST' && isset($_POST['reset_password_id']))
                 <div class="cards-grid" id="usersGrid">
                     <?php foreach ($users as $user): 
                         $roleDisplay = ucfirst(str_replace('_', ' ', $user['role']));
+                        $daysRemainingText = '';
+                        $expired = false;
+
+                        if (!empty($user['password_reset_date'])) {
+                            $lastReset = new DateTime($user['password_reset_date']);
+                            $today = new DateTime();
+
+                            $diffDays = $today->diff($lastReset)->days;
+
+                            if ($diffDays >= 30) {
+                                $expired = true;
+                                $daysRemainingText = "Expired!";
+                            } else {
+                                $remaining = 30 - $diffDays;
+                                $daysRemainingText = "$remaining days left";
+                            }
+                        } else {
+                            $daysRemainingText = "Never set";
+                        }
+                        $color = '#7b8288';
+
+                        if ($expired) {
+                            $color = '#dc3545';
+                        } elseif ($remaining <= 5) {
+                            $color = '#fd7e14';
+                        }
                     ?>
-                    <div class="card"
-                        data-userid="<?= $user['user_id'] ?>"
+                    <div class="card" data-userid="<?= $user['user_id'] ?>"
                         data-username="<?= htmlspecialchars($user['username']) ?>"
                         data-name="<?= htmlspecialchars($user['name']) ?>"
                         data-phone="<?= htmlspecialchars($user['phone']) ?>"
@@ -187,13 +212,22 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST' && isset($_POST['reset_password_id']))
                                 <span><?= htmlspecialchars($user['phone']) ?></span>
                             </div>
                             <span class="blue-badge"><?= htmlspecialchars($roleDisplay) ?></span>
-                            <form method="POST" style="display:inline;">
-                                <input type="hidden" name="reset_password_id" value="<?= $user['user_id'] ?>">
-                                <button type="submit" class="reset-password-link" style="border:none;background:none;color:#007bff;cursor:pointer;text-decoration:underline;"
-                                    onclick="return confirm('Reset password for <?= htmlspecialchars($user['name']) ?>?')">
-                                    Reset Password
-                                </button>
-                            </form>
+                            <div
+                                style="display:flex; justify-content:space-between; align-items:center; margin-top:8px; width:100%;">
+
+
+                                <form method="POST">
+                                    <input type="hidden" name="reset_password_id" value="<?= $user['user_id'] ?>">
+                                    <button type="submit" class="reset-password-link"
+                                        style="margin-bottom:10px; border:none;background:none;color:#007bff;cursor:pointer;text-decoration:underline;"
+                                        onclick="return confirm('Reset password for <?= htmlspecialchars($user['name']) ?>?')">
+                                        Reset Password
+                                    </button>
+                                </form>
+                                <div style="font-size:12px; color: <?= $color ?>; margin-bottom:10px;">
+                                    <?= $daysRemainingText ?>
+                                </div>
+                            </div>
                         </div>
 
                         <div class="action-buttons">
@@ -210,11 +244,8 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST' && isset($_POST['reset_password_id']))
                             <?php if ($_SESSION['role'] === 'admin'): ?>
                             <form method="POST" style="display:inline;">
                                 <input type="hidden" name="archive_id" value="<?= $user['user_id'] ?>">
-                                <button type="submit" class="action-btn action-btn-delete" title="Archive"
-                                    onclick="openArchiveModal(
-                                    <?= (int)$user['user_id'] ?>,
-                                    '<?= htmlspecialchars($user['name'], ENT_QUOTES) ?>'
-                                ); return false;">
+                                <button type="button" class="action-btn action-btn-delete"
+                                    onclick="openArchiveModal(<?= $user['user_id'] ?>, '<?= htmlspecialchars($user['name'], ENT_QUOTES) ?>')">
                                     <i class="fa-solid fa-trash"></i>
                                 </button>
                             </form>
@@ -229,7 +260,9 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST' && isset($_POST['reset_password_id']))
 
     <div id="modals-container"></div>
 
-    <?php // Action Buttons: View User ?>
+    <!-- ============================================ -->
+    <!-- Action Buttons: View User -->
+    <!-- ============================================ -->
     <div id="viewUserModal" class="action-modal-overlay">
         <div class="action-modal-container">
             <div class="action-modal-header">
@@ -245,6 +278,8 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST' && isset($_POST['reset_password_id']))
                 </button>
             </div>
 
+            <!-- Tabs Navigation -->
+
             <div class="action-tabs-nav">
                 <button class="tab-btn active" data-tab="user">
                     <i class="fa-solid fa-user"></i> User Details
@@ -252,15 +287,20 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST' && isset($_POST['reset_password_id']))
                 <button class="tab-btn" data-tab="files">
                     <i class="fa-solid fa-folder"></i> Files
                 </button>
+                <button class="tab-btn" data-tab="notes">
+                    <i class="fa-solid fa-sticky-note"></i> Notes
+                </button>
+
             </div>
 
+            <!-- Tab Content -->
             <div class="action-tabs-content">
+                <!-- User Tab -->
                 <div id="u-tab-user" class="tab-content active">
                     <div class="tab-header">
                         <i class="fa-solid fa-user"></i>
                         <span>User Details</span>
                     </div>
-
                     <div class="details-grid">
                         <div class="detail-row">
                             <span class="detail-label">Username:</span>
@@ -283,12 +323,8 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST' && isset($_POST['reset_password_id']))
                             <span id="u-user-role" class="detail-value">-</span>
                         </div>
                         <div class="detail-row">
-                            <span class="detail-label">Archived:</span>
-                            <span id="u-user-archived" class="detail-value">-</span>
-                        </div>
-                        <div class="detail-row">
-                            <span class="detail-label">Date Archived:</span>
-                            <span id="u-user-datearchived" class="detail-value">-</span>
+                            <span class="detail-label">Password Reset Date:</span>
+                            <span id="u-user-passwordresetdate" class="detail-value">-</span>
                         </div>
                     </div>
                 </div>
@@ -298,17 +334,33 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST' && isset($_POST['reset_password_id']))
                         <i class="fa-solid fa-folder"></i>
                         <span>Files</span>
                     </div>
-
-                    <div class="details-grid">
-                        <div class="detail-row">
-                            <span class="detail-label">ID Number:</span>
-                            <span id="u-user-IdNumber" class="detail-value">-</span>
-                        </div>
-                        <div class="detail-row">
-                            <span class="detail-label">ID Expiry Date:</span>
-                            <span id="u-user-Idexpirydate" class="detail-value">-</span>
+                    <div class="files-list" id="u-files-list">
+                        <div class="details-grid">
+                            <div class="detail-row">
+                                <span class="detail-label">ID Number:</span>
+                                <span id="u-user-IdNumber" class="detail-value">-</span>
+                            </div>
+                            <div class="detail-row">
+                                <span class="detail-label">ID Expiry Date:</span>
+                                <span id="u-user-Idexpirydate" class="detail-value">-</span>
+                            </div>
                         </div>
                     </div>
+                </div>
+
+                <div id="u-tab-notes" class="tab-content">
+                    <div class="tab-header">
+                        <i class="fa-solid fa-sticky-note"></i>
+                        <span>Notes</span>
+                    </div>
+                    <div class="notes-input-section">
+                        <textarea id="u-noteTextarea" class="note-textarea"
+                            placeholder="Write your note here..."></textarea>
+                        <button id="u-addNoteBtn" class="add-note-btn" onclick="actionbtn.addNote()">
+                            <i class="fa-solid fa-plus"></i> Add Note
+                        </button>
+                    </div>
+                    <div id="u-notesList" class="notes-list" data-notes-list></div>
                 </div>
             </div>
         </div>

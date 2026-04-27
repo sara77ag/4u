@@ -280,3 +280,30 @@ function loadModals() {
     xhr.send();
   }
 }
+// ── Document slot preview
+
+function previewDocSlot(slotKey, input) {
+  if (!input.files || !input.files.length) return;
+  const file = input.files[0];
+
+  // Show preview bar, hide upload prompt
+  const inner   = document.querySelector(`#slot-${slotKey} .doc-slot-inner`);
+  const preview = document.getElementById(`prev-${slotKey}`);
+  const name    = document.getElementById(`prevname-${slotKey}`);
+
+  if (!inner || !preview || !name) return;
+
+  name.textContent = file.name.length > 30 ? file.name.substring(0, 28) + '…' : file.name;
+  inner.style.display   = 'none';
+  preview.style.display = 'flex';
+}
+
+function clearDocSlot(slotKey) {
+  const input   = document.getElementById(`inp-${slotKey}`);
+  const inner   = document.querySelector(`#slot-${slotKey} .doc-slot-inner`);
+  const preview = document.getElementById(`prev-${slotKey}`);
+
+  if (input)   input.value   = '';
+  if (inner)   inner.style.display   = 'flex';
+  if (preview) preview.style.display = 'none';
+}

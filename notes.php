@@ -45,6 +45,9 @@ if (!$entity_type || !$entity_id || !$text) {
         case 'date':
             $date_id = $entity_id;
             break;
+        case 'importantdate':
+            $date_id = $entity_id;
+            break;
         case 'user':
             $user_note_id = $entity_id;
             break;
@@ -56,7 +59,7 @@ if (!$entity_type || !$entity_id || !$text) {
         VALUES (?, datetime('now'), ?, ?,  ?, ?, ?, ?, ?, ?, ?, 0)
     ");
 
-    $stmt->execute([ $text, $created_by, $entity_type, $property_id, $landlord_id, $tenant_id, $payment_id, $viewing_id, $date_id, $user_id
+    $stmt->execute([ $text, $created_by, $entity_type, $property_id, $landlord_id, $tenant_id, $payment_id, $viewing_id, $date_id, $user_note_id
     ]);
 
     echo json_encode([
@@ -108,6 +111,10 @@ if ($_SERVER['REQUEST_METHOD'] === 'GET') {
             $params[] = $entity_id;
             break;
         case 'date':
+            $where[] = "date_id = ?";
+            $params[] = $entity_id;
+            break;
+        case 'importantdate':
             $where[] = "date_id = ?";
             $params[] = $entity_id;
             break;
