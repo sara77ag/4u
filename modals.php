@@ -157,8 +157,8 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
         try {
             $stmt = $pdo->prepare("
                 INSERT INTO landlords (name, phone, address, email, id_type, id_number,
-                                       id_expiry_date, number_of_properties, archived)
-                VALUES (?, ?, ?, ?, ?, ?, ?, 0, 0)
+                                       id_expiry_date, archived)
+                VALUES (?, ?, ?, ?, ?, ?, ?, 0)
             ");
             $stmt->execute([
                 trim($_POST['landlord_name']),
@@ -419,6 +419,47 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
         }
 
         header('Location: users.php');
+        exit();
+    }
+
+    // Add Payment
+    if (isset($_POST['payment_tenant_id'])) {
+
+        $tenantId = (int)$_POST['payment_tenant_id'];
+        $propertyId = (int)$_POST['payment_property_id'];
+        $amount = (float)$_POST['payment_amount'];
+        $period = trim($_POST['payment_period']);
+        $paymentDate = $_POST['payment_date'];
+        $paymentTime = $_POST['payment_time'];
+
+        $dateTime = $paymentDate . ' ' . $paymentTime . ':00';
+
+        $nextDue = date('Y-m-d', strtotime($paymentDate . ' +1 month'));
+
+        $stmt = $pdo->prepare("
+            INSERT INTO transactions (
+                tenant_id,
+                property_id,
+                transaction_amount,
+                date_of_transaction,
+                payment_period,
+                next_due,
+                status,
+                archived
+            )
+            VALUES (?, ?, ?, ?, ?, ?, 'completed', 0)
+        ");
+
+        $stmt->execute([
+            $tenantId,
+            $propertyId,
+            $amount,
+            $dateTime,
+            $period,
+            $nextDue
+        ]);
+
+        header('Location: payments.php');
         exit();
     }
 

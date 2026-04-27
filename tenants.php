@@ -177,7 +177,7 @@ $tenants = $pdo->query($query)->fetchAll(PDO::FETCH_ASSOC);
                                 data-contract-start="<?= htmlspecialchars($t['contract_start']) ?>"
                                 data-contract-end="<?= htmlspecialchars($t['contract_end']) ?>"
                                 data-frequency="<?= htmlspecialchars($t['frequency']) ?>"
-                                data-landlord="<?= htmlspecialchars($t['landlord_name'] ?? 'N/A') ?>"
+                                data-landlord="<?= htmlspecialchars($t['landlord_name'] ?? '') ?>"
                                 data-rent="<?= htmlspecialchars($t['rent'] ?? 0) ?>">
 
                                 <td class="tenant-name"><?= htmlspecialchars($t['name']) ?></td>

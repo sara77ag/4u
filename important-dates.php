@@ -61,12 +61,12 @@ $importantDates = $stmt->fetchAll(PDO::FETCH_ASSOC);
 
 function formatDateValue($date) {
     if (empty($date)) {
-        return 'N/A';
+        return '<span class="tenant-vacant">No Record</span>';
     }
 
     $timestamp = strtotime($date);
     if (!$timestamp) {
-        return 'N/A';
+        return '<span class="tenant-vacant">N/A</span>';
     }
 
     return date('d/m/Y', $timestamp);
@@ -230,9 +230,9 @@ function formatDateValue($date) {
                                 <td class="landlord-id-ver">
                                     <?= htmlspecialchars(formatDateValue($row['landlord_id_expiry'] ?? null)) ?></td>
                                 <td class="tenant-id-ver">
-                                    <?= htmlspecialchars(formatDateValue($row['tenant_id_expiry'] ?? null)) ?></td>
+                                    <?= formatDateValue($row['tenant_id_expiry'] ?? null) ?></td>
                                 <td class="contract-enddate">
-                                    <?= htmlspecialchars(formatDateValue($row['contract_end'] ?? null)) ?></td>
+                                    <?= formatDateValue($row['contract_end'] ?? null) ?></td>
                                 <td>
                                     <div class="action-buttons">
                                         <button class="action-btn action-btn-view" title="View"
