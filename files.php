@@ -85,16 +85,8 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
             exit;
         }
 
-        $stmt = $pdo->prepare("SELECT file_path FROM files WHERE file_id = ?");
-        $stmt->execute([$fileId]);
-        $row = $stmt->fetch(PDO::FETCH_ASSOC);
-
-        if ($row) {
-            $fullPath = __DIR__ . '/' . $row['file_path'];
-            if (file_exists($fullPath)) unlink($fullPath);
-        }
-
-        $pdo->prepare("DELETE FROM files WHERE file_id = ?")->execute([$fileId]);
+        $pdo->prepare("UPDATE files SET archived = 1, date_archived = datetime('now') WHERE file_id = ?")
+            ->execute([$fileId]);
         echo json_encode(['success' => true]);
         exit;
     }
